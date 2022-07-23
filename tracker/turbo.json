@@ -6,29 +6,32 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": [],
+      "dependsOn": ["^test"],
       "outputs": [],
       "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "test:ci": {
-      "dependsOn": [],
+      "dependsOn": ["^test:ci"],
       "outputs": [],
       "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "test:coverage": {
-      "dependsOn": [],
+      "dependsOn": ["^test:coverage"],
       "outputs": ["coverage/**"],
       "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "prettify": {
+      "dependsOn": ["^prettify"],
       "outputs": [],
       "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "depcheck": {
+      "dependsOn": ["^depcheck"],
       "outputs": [],
       "inputs": ["package.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "tsc": {
+      "dependsOn": ["^tsc"],
       "outputs": [],
       "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },

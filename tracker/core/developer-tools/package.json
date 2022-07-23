@@ -45,7 +45,6 @@
     "generate": "ts-node src/scripts/generateErrorMessages.ts",
     "build": "tsup src/index.ts --format cjs,esm --legacy-output --minify --sourcemap --clean",
     "prettify": "prettier --write .",
-    "prettify:generated": "yarn prettier --write ./src/ContextErrorMessages.ts",
     "tsc": "tsc --noEmit",
     "test": "jest --silent",
     "test:ci": "jest --silent --ci",
