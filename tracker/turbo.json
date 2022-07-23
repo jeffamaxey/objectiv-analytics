@@ -8,17 +8,17 @@
     "test": {
       "dependsOn": [],
       "outputs": [],
-      "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "test:ci": {
       "dependsOn": [],
       "outputs": [],
-      "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "test:coverage": {
       "dependsOn": [],
       "outputs": ["coverage/**"],
-      "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "prettify": {
       "outputs": [],
