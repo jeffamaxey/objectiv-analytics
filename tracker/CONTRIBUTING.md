@@ -6,7 +6,7 @@ Here you'll find instructions for development on the Objectiv Tracker. If you wa
 The Objectiv JavaScript Tracker is composed of three workspaces. 
 
 - **Core** modules are generic Types, Interfaces and Classes used by Plugins and Trackers.  
-  It provides the **JavaScript Tracker Core** and **Schema** modules.
+  It contains the **TS Schema**, **JavaScript Tracker Core**, **React Tracker Core**, **Developer Tools**, **Testing Tools** and **Utilities** modules.
 
 
 - **Plugins** are independent packages that can be configured in any Tracker instance to add or mutate contextual information.  
@@ -35,6 +35,7 @@ This is a complete list of the currently available packages.
 | @objectiv/plugin-react-navigation                | plugin    | /plugins/react-navigation                | [README](/tracker/plugins/react-navigation/README.md)                |
 | @objectiv/plugin-react-router-tracked-components | plugin    | /plugins/react-router-tracked-components | [README](/tracker/plugins/react-router-tracked-components/README.md) |
 | @objectiv/plugin-root-location-context-from-url  | plugin    | /plugins/root-location-context-from-url  | [README](/tracker/plugins/root-location-context-from-url/README.md)  |
+| @objectiv/queue-local-storage                    | queue     | /queues/local-storage                    | [README](/tracker/queues/local-storage/README.md)                    |
 | @objectiv/tracker-angular                        | tracker   | /trackers/angular                        | [README](/tracker/trackers/angular/README.md)                        |
 | @objectiv/tracker-browser                        | tracker   | /trackers/browser                        | [README](/tracker/trackers/browser/README.md)                        |
 | @objectiv/tracker-react                          | tracker   | /trackers/react                          | [README](/tracker/trackers/react/README.md)                          |
@@ -71,6 +72,8 @@ For example, this command will run tests only for the Core module:
 yarn workspace @objectiv/tracker-core test
 ```
 
+> NOTE: Some commands are exclusive to the root of the monorepo
+
 ## Dependency management
 
 
@@ -95,8 +98,6 @@ yarn install
 
 > Note: We do not recommend upgrading dependencies per package unless really needed for compatibility reasons.
 > 
-> It makes much more sense to manage common dependencies via `yarn up`.
-> 
 > This ensures that sub-packages will not need their own `node_modules` linker and instead rely entirely on the shared 
 > one, located in the root of the workspace.
 > 
@@ -119,25 +120,42 @@ yarn up <package> -i
 ## Building / publishing packages
 To locally publish the packages (so they can be used by applications), we use verdaccio. By far, the easiest way, is to run
 ```bash
-make publish
+make deploy
 ```
 from the root of the repo.
 
 To have a little more control, you can also manually run the steps involved:
 ```bash
 ## start up verdaccio in Docker container
-cd verdaccio && make run
-
-## install requirements
-yarn install
-
-## build tracker
-yarn build
+cd verdaccio && make run && cd ..
 
 ## publish it
-yarn publish:verdaccio
+yarn deploy:verdaccio
 ```
 
+### Troubleshooting
+Here are some common issues you may stumble upon when publishing to Verdaccio.
+
+#### NPM, ERR! E401 Unauthorized
+Recent versions of NPM (>7) will not allow to publish packages anonymously, even locally to Verdaccio.
+
+Check if you are authenticated with `npm whoami` and, if not, you can authorize your machine with `npm adduser`. 
+Which user is authenticated doesn't really matter for local development. 
+
+This is due to NPM requiring an authorized machine to allow using their publishing API, even when reading only - which 
+is what Verdaccio does.
+
+#### Docker, error response from daemon: network with name verdaccio already exists
+This occurs when Verdaccio is not running anymore, e.g. Docker upgrade, but its network is still present.
+
+To fix it, simply remove the network manually:
+```bash
+docker network rm verdaccio
+```
+
+And rerun `make run`;
+
+## Check published packages
 Now surf to http://localhost:4873, and you should see the packages you've just published. 
 
 To stop verdaccio, simply run:
@@ -149,9 +167,24 @@ Stopping verdaccio will also remove any published packages (as the storage isn't
 
 The following commands will be executed for all packages automatically when issued from the monorepo root; the `/tracker` directory. 
 
-### `yarn clear`
-Deletes all `dist` and `coverage` folders of `core`, `plugins` and `trackers`.
-Removes also leftover `.npmrc` from failed publishing to Verdaccio.
+### `yarn build`
+Builds all packages.
+Build output will be produced in a `/dist` folder under each package.
+
+### `yarn clean`
+- Removes all `dist` and `coverage` folders of all packages
+- Removes leftover `.npmrc`, if present, from previously failed publishing to Verdaccio
+- Clears Jest cache
+- Clears Yarn cache
+
+### `yarn depcheck`
+Checks for unused or missing dependencies by running `npx depcheck` for each package.
+
+### `yarn deploy`
+Runs depcheck, tsc, build, test and, if all succeeded, publishes all packages to NPM.
+
+### `yarn deploy:verdaccio`
+Runs depcheck, tsc, build, test and, if all succeeded, publishes all packages to Verdaccio.
 
 ### `yarn list`
 Prints a list of all the packages configured in the monorepo.
@@ -162,20 +195,8 @@ Install dependencies for all packages and links local packages to each other.
 ### `yarn prettify`
 Runs prettier for all packages in write mode.
 
-### `yarn prettify:generated`
-Runs prettier for `core/schema/src/*`, `core/tracker/src/ContextFactories.ts`, `core/tracker/src/ContextNames.ts` and `core/tracker/src/EventFactories.ts` in write mode.
-
-### `yarn tsc`
-Runs the TypeScript compiler for all typed packages.
-
-### `yarn tsc:generated`
-Runs the TypeScript compiler for `core/schema` and `core/tracker`.
-
 ### `yarn test`
 Runs the tests for all packages.
-
-### `yarn test:live`
-Starts the React Tracker live testing App. This is a playground that executes from sources. Useful for debugging.
 
 ### `yarn test:ci`
 Runs the tests for all packages in CI mode.
@@ -184,23 +205,8 @@ Runs the tests for all packages in CI mode.
 Runs the tests for all packages and collects coverage.
 Coverage output will be produced in a `/coverage` folder under each package.
 
-### `yarn build`
-Builds all packages.
-Build output will be produced in a `/dist` folder under each package.
-
-### `TAG=<latest|next> yarn publish`
-Publishes all public packages to NPM.
-> **Note**:  
-> To publish a single package the command name is `npm-publish` to avoid conflicting with the default command 
-> 
-> Example: `TAG=next yarn workspace @objectiv/tracker-core npm-publish`
-
-### `TAG=<latest|next> yarn publish:verdaccio`
-Publishes all public packages to a Local Verdaccio instance.
-> **Note**:  
-> To publish a single package the command name is `npm-publish:verdaccio` to avoid conflicting with the default command
->
-> Example: `TAG=next yarn workspace @objectiv/tracker-core npm-publish:verdaccio`
+### `yarn tsc`
+Runs the TypeScript compiler for all typed packages without emitting anything.
 
 ### `yarn utils:generate`
 Runs the generator utility. This will generate:
@@ -211,34 +217,10 @@ Runs the generator utility. This will generate:
 - TypeScript for all generated files
 
 ## Versioning  commands
- - [Release Workflow Documentation](https://yarnpkg.com/features/release-workflow)
+To manage version and publishing we use [changesets](https://github.com/changesets/changesets/blob/main/docs/intro-to-using-changesets.md)
 
-### `yarn version --help`
-Shows the `version` command help
+Changesets is configured to have a fixed version for all packages. This means that updating the version of any package
+will apply the same version to all other packages as well. 
 
-### `yarn version check --interactive`
-Creates a release strategy for the current branch
-
-### `yarn version check`
-Verifies if there are changes in the current branch and if a release strategy has been created
-
-### `yarn version apply --all`
-Executes the release strategy and bumps versions accordingly
-
-### `yarn version:patch`
-Patches all packages right away, without using version release strategies
-
-### `yarn version:minor`
-Bumps the minor of all packages right away, without using version release strategies
-
-### `yarn version:major`
-Bumps the major of all packages right away, without using version release strategies
-
-### `yarn version:prerelease`
-Patches all packages and either adds or increment the prerelease postfix right away, without using version release strategies
-
-## Troubleshooting
-
-#### `Error: Cannot find module '[...]/angular/node_modules/rollup/dist/rollup.js'`
-This error can occur when switching between Node.JS versions.   
-Delete `tracker/node_modules` and rerun `yarn install` to create a fresh copy. Everything should work fine after that.
+For the moment we are not using the changelog feature of Changesets.   
+This means the changeset description is purely internal and does not matter too much at this point.

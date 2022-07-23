@@ -2,9 +2,9 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { IdentityContextPlugin } from '@objectiv/plugin-identity-context';
 import { MockConsoleImplementation } from '@objectiv/testing-tools';
 import { ContextsConfig, generateUUID, GlobalContextName, Tracker, TrackerEvent } from '@objectiv/tracker-core';
+import { IdentityContextPlugin } from '../src/IdentityContextPlugin';
 
 require('@objectiv/developer-tools');
 globalThis.objectiv.devTools?.TrackerConsole.setImplementation(MockConsoleImplementation);

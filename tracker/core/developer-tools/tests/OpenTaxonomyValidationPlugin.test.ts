@@ -17,7 +17,7 @@ import {
 } from '@objectiv/tracker-core';
 import { OpenTaxonomyValidationPlugin } from '../src/OpenTaxonomyValidationPlugin';
 
-require('@objectiv/developer-tools');
+require('../src');
 globalThis.objectiv.devTools?.TrackerConsole.setImplementation(MockConsoleImplementation);
 
 const coreTracker = new Tracker({ applicationId: 'app-id' });

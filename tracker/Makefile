@@ -6,6 +6,6 @@ clean:
 build: clean
 	yarn install && yarn build
 
-publish: build
+deploy: build
 	cd verdaccio && make  run
-	yarn publish:verdaccio
+	yarn deploy:verdaccio

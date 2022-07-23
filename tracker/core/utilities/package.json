@@ -10,7 +10,7 @@
   "scripts": {
     "prettify": "prettier --write .",
     "generate": "(cd src && node generator.js)",
-    "check:dependencies": "npx depcheck"
+    "depcheck": "npx depcheck"
   },
   "devDependencies": {
     "json5": "^2.2.0",

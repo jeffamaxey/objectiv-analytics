@@ -44,12 +44,10 @@
     "build": "tsup src/index.ts --format cjs,esm --legacy-output --minify --dts --sourcemap --clean",
     "prettify": "prettier --write .",
     "tsc": "tsc --noEmit",
-    "test": "jest --silent --runInBand",
-    "test:ci": "jest --silent --ci --runInBand",
-    "test:coverage": "jest --silent --coverage --runInBand",
-    "check:dependencies": "npx depcheck",
-    "npm-publish": "npm publish --access=public --tag=$TAG",
-    "npm-publish:verdaccio": "npm publish --tag=$TAG"
+    "test": "jest --silent",
+    "test:ci": "jest --silent --ci",
+    "test:coverage": "jest --silent --coverage",
+    "depcheck": "npx depcheck"
   },
   "devDependencies": {
     "@objectiv/developer-tools": "^0.0.22",
