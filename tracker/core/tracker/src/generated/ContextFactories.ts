@@ -23,7 +23,7 @@ import {
   SessionContext,
 } from '@objectiv/schema';
 import { GlobalContextName, LocationContextName } from './ContextNames';
-import { generateUUID } from './helpers';
+import { generateUUID } from '../helpers';
 
 /** Creates instance of ApplicationContext
  * @param {Object} props - factory properties

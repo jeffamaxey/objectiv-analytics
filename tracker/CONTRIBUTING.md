@@ -181,16 +181,31 @@ Build output will be produced in a `/dist` folder under each package.
 Checks for unused or missing dependencies by running `npx depcheck` for each package.
 
 ### `yarn deploy`
-Runs depcheck, tsc, build, test and, if all succeeded, publishes all packages to NPM.
+Runs `pre-publish` and, if it succeeds, publishes all packages to NPM.
 
 ### `yarn deploy:verdaccio`
-Runs depcheck, tsc, build, test and, if all succeeded, publishes all packages to Verdaccio.
+Runs `pre-publish` and, if it succeeds, publishes all packages to Verdaccio.
+
+### `yarn generate`
+Runs generator utilities:
+- [core/utilities/src/generator.js](core/utilities/src/generator.js); 
+- [core/developer-tools/src/scripts/generateErrorMessages.ts](core/developer-tools/src/scripts/generateErrorMessages.ts); 
+
+This will generate:
+- The @objectiv/schema package TypeScript definitions from the OSF
+- The Context and Event factories in @objectiv/tracker-core package from the @objectiv/schema 
+- The ContextErrorMessages in @objectiv/developer-tools package 
+- Yarn prettify for all generated files
+- TypeScript for all generated files
 
 ### `yarn list`
 Prints a list of all the packages configured in the monorepo.
 
 ### `yarn install`
 Install dependencies for all packages and links local packages to each other.
+
+### `yarn pre-publish`
+Runs `depcheck`, `tsc`, `test` and `build` tasks.
 
 ### `yarn prettify`
 Runs prettier for all packages in write mode.
@@ -207,14 +222,6 @@ Coverage output will be produced in a `/coverage` folder under each package.
 
 ### `yarn tsc`
 Runs the TypeScript compiler for all typed packages without emitting anything.
-
-### `yarn utils:generate`
-Runs the generator utility. This will generate:
-- The @objectiv/schema package TypeScript definitions from the OSF
-- The Context and Event factories in @objectiv/tracker-core package from the @objectiv/schema 
-- The ContextErrorMessages in @objectiv/developer-tools package 
-- Yarn prettify for all generated files
-- TypeScript for all generated files
 
 ## Versioning  commands
 To manage version and publishing we use [changesets](https://github.com/changesets/changesets/blob/main/docs/intro-to-using-changesets.md)

@@ -3,8 +3,8 @@
  */
 
 import { GlobalContextValidationRuleFactory, TrackerEvent } from '@objectiv/tracker-core';
-import { GlobalContextErrorMessages } from '../ContextErrorMessages';
 import { EventRecorder } from '../EventRecorder';
+import { GlobalContextErrorMessages } from '../generated/ContextErrorMessages';
 import { TrackerConsole } from '../TrackerConsole';
 import { GlobalContextErrorType } from '../types';
 

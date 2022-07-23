@@ -8,13 +8,14 @@ declare global {
   var objectiv: TrackerGlobalsInterface;
 }
 
+export * from './generated/ContextFactories';
+export * from './generated/ContextNames';
+export * from './generated/EventFactories';
+export * from './generated/EventNames';
+
 export * from './cleanObjectFromInternalProperties';
 export * from './Context';
-export * from './ContextFactories';
-export * from './ContextNames';
 export * from './ContextValidationRules';
-export * from './EventFactories';
-export * from './EventNames';
 export * from './EventRecorderInterface';
 export * from './helpers';
 export * from './LocationTreeInterface';

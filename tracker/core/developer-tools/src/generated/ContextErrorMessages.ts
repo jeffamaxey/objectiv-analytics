@@ -3,7 +3,7 @@
  */
 
 import { GlobalContextName, LocationContextName } from '@objectiv/tracker-core';
-import { ContextErrorMessages, GlobalContextErrorType, LocationContextErrorType } from './types';
+import { ContextErrorMessages, GlobalContextErrorType, LocationContextErrorType } from '../types';
 
 export const GlobalContextErrorMessages: ContextErrorMessages<GlobalContextErrorType, GlobalContextName> = {
   ANGULAR: {

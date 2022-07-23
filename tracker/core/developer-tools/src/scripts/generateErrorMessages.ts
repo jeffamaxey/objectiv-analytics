@@ -14,7 +14,7 @@ import { preCompileErrorMessage } from './preCompileErrorMessage';
  */
 
 export const DOCUMENTATION_URL = 'https://objectiv.io/docs';
-export const DESTINATION_FILENAME = './src/ContextErrorMessages.ts';
+export const DESTINATION_FILENAME = './src/generated/ContextErrorMessages.ts';
 
 type ErrorMessagesMap = {
   [platform: string]: {
@@ -77,7 +77,7 @@ fs.writeFileSync(
  */
 
 import { GlobalContextName, LocationContextName } from '@objectiv/tracker-core';
-import { ContextErrorMessages, GlobalContextErrorType, LocationContextErrorType } from './types';
+import { ContextErrorMessages, GlobalContextErrorType, LocationContextErrorType } from '../types';
 
 `
 );

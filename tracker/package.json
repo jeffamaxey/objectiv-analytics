@@ -18,15 +18,18 @@
     "build": "turbo run build",
     "clean": "yarn exec make clean && yarn test --clearCache && yarn cache clean",
     "depcheck": "turbo run depcheck",
-    "deploy": "shx rm -f .npmrc && turbo run deploy && changeset publish",
-    "deploy:verdaccio": "shx cp ./verdaccio/.npmrc .npmrc && turbo run deploy && changeset publish && shx rm -f .npmrc",
+    "generate": "turbo run generate && turbo run prettify && turbo run tsc",
     "list": "yarn workspaces list",
+    "pre-publish": "turbo run pre-publish",
     "prettify": "turbo run prettify",
+    "deploy": "yarn registry:npm && turbo run pre-publish && changeset publish",
+    "deploy:verdaccio": "yarn registry:verdaccio && turbo run pre-publish && changeset publish && yarn registry:npm",
+    "registry:npm": "shx rm -f .npmrc",
+    "registry:verdaccio": "shx cp ./verdaccio/.npmrc .npmrc ",
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
     "test:coverage": "turbo run test:coverage",
-    "tsc": "turbo run tsc",
-    "utils:generate": "yarn workspace @objectiv/utilities generate && yarn workspace @objectiv/developer-tools generate && yarn prettify && yarn tsc"
+    "tsc": "turbo run tsc"
   },
   "devDependencies": {
     "@changesets/cli": "^2.24.0",

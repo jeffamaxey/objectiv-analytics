@@ -21,15 +21,22 @@
       "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "prettify": {
-      "outputs": []
+      "outputs": [],
+      "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "depcheck": {
-      "outputs": []
+      "outputs": [],
+      "inputs": ["package.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "tsc": {
-      "outputs": []
+      "outputs": [],
+      "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
-    "deploy": {
+    "generate": {
+      "outputs": ["generate/**"],
+      "inputs": ["../schema/base_schema.json5", "generateErrorMessages.ts", "generator.js"]
+    },
+    "pre-publish": {
       "dependsOn": ["depcheck", "tsc", "build", "test"],
       "outputs": []
     }
