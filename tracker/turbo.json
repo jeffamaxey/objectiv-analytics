@@ -8,22 +8,22 @@
     "test": {
       "dependsOn": ["^test"],
       "outputs": [],
-      "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "test:ci": {
       "dependsOn": ["^test:ci"],
       "outputs": [],
-      "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "test:coverage": {
       "dependsOn": ["^test:coverage"],
       "outputs": ["coverage/**"],
-      "inputs": ["jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "prettify": {
       "dependsOn": ["^prettify"],
       "outputs": [],
-      "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": [".prettierignore", ".prettierrc.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "depcheck": {
       "dependsOn": ["^depcheck"],
@@ -33,7 +33,7 @@
     "tsc": {
       "dependsOn": ["^tsc"],
       "outputs": [],
-      "inputs": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "generate": {
       "outputs": ["generate/**"],
