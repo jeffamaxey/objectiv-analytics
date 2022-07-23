@@ -210,6 +210,12 @@ Runs `depcheck`, `tsc`, `test` and `build` tasks.
 ### `yarn prettify`
 Runs prettier for all packages in write mode.
 
+### `yarn registry:npm`
+Deletes Verdaccio's .npmrc from the monorepo root. Effectively switching back to the default NPM registry.
+
+### `yarn registry:verdaccio`
+Copies .npmrc from the /verdaccio directory into the monorepo root. Effectively making Verdaccio's the main registry.
+
 ### `yarn test`
 Runs the tests for all packages.
 
