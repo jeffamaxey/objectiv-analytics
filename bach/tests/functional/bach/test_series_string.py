@@ -188,7 +188,7 @@ def test_to_json_array_sorting_null(engine):
             ['ee', 'dd', 'cc', 'bb', 'aa', 'aa', None],
             ['cc', 'aa', 'bb', 'dd', None, 'ee', 'aa'],
             ['aa', 'ee', None, 'dd', 'bb', 'aa', 'cc'],
-            ['bb', 'aa', 'aa', None, 'dd' ,'cc', 'ee']
+            ['bb', 'aa', 'aa', None, 'dd', 'cc', 'ee']
         ]]
     )
 
