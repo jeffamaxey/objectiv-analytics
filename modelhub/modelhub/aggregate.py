@@ -6,7 +6,7 @@ from bach.series import Series
 from sql_models.constants import NotSet, not_set
 from typing import cast, List, Union, TYPE_CHECKING, Optional
 
-from sql_models.util import is_bigquery
+from sql_models.util import is_bigquery, is_postgres
 
 from modelhub.decorators import use_only_required_objectiv_series
 
@@ -561,14 +561,23 @@ class Aggregate:
         nice_name = _location_stack.ls.nice_name.sort_by_series(by=sort_nice_names_by)
         agg_steps = nice_name.to_json_array(partition=partition)
         flattened_lc, offset_lc = agg_steps.json.flatten_array()
-        flattened_lc = flattened_lc.copy_override_type(bach.SeriesString)
 
+        # flattening will assume items are still json type, we need to extract the items
+        # as scalar types (string items)
         if is_bigquery(data.engine):
-            # flattening will assume items are still json type, we need to extract the items
-            # as scalar types (string items)
             flattened_lc = flattened_lc.copy_override(
                 expression=bach.expression.Expression.construct('JSON_EXTRACT_SCALAR({})', flattened_lc)
             )
+        elif is_postgres(data.engine):
+            flattened_lc = flattened_lc.copy_override(
+                expression=bach.expression.Expression.construct(
+                    '{} #>> {}',
+                    flattened_lc,
+                    bach.expression.Expression.raw("'{}'")
+                )
+            )
+
+        flattened_lc = flattened_lc.astype('string')
 
         offset_lc = offset_lc.copy_override(name='__root_step_offset')
 

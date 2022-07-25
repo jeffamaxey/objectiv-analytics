@@ -201,3 +201,24 @@ def test_get_navigation_paths_grouped(db_params) -> None:
             ],
         ]
     )
+
+
+def test_get_navigation_paths_filtered(db_params) -> None:
+    df, modelhub = get_objectiv_dataframe_test(db_params)
+    bts = modelhub.aggregate.get_navigation_paths(data=df, steps=3)
+    step = 'Link: logo located at Web Document: #document => Section: navbar-top'
+    bts = bts[bts['location_stack_step_1'] == step]
+
+    assert_equals_data(
+        bts,
+        expected_columns=[
+            'location_stack_step_1', 'location_stack_step_2', 'location_stack_step_3',
+        ],
+        expected_data=[
+            [
+                'Link: logo located at Web Document: #document => Section: navbar-top',
+                'Link: notebook-product-analytics located at Web Document: #document',
+                'Link: GitHub located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+            ],
+        ]
+    )
