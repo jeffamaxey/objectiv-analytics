@@ -58,6 +58,16 @@ Python-based [modeling library](https://www.objectiv.io/docs/modeling/bach/) tha
 
 Objectiv currently supports PostgreSQL and Google BigQuery (through Snowplow), with Amazon Athena next, and more data stores coming.
 
+## Get started
+
+1. Install the open model hub from PyPI:
+
+```sh
+pip install objectiv-modelhub
+```
+
+2. [Read how to get started in your notebook](https://objectiv.io/docs/modeling/get-started-in-your-notebook/) in the docs.
+
 ---
 
 For more information, visit [objectiv.io](https://www.objectiv.io) or [Objectiv Docs](https://www.objectiv.io/docs) - Objectiv's official documentation..
