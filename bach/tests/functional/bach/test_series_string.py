@@ -5,6 +5,7 @@ import pandas as pd
 
 from bach import Series, SeriesString, DataFrame
 from tests.functional.bach.test_data_and_utils import assert_equals_data, get_df_with_test_data
+from tests.unit.bach.util import get_pandas_df
 
 
 def test_from_value(engine):
@@ -153,30 +154,41 @@ def test_to_json_array(engine):
     )
 
 
-def test_to_json_array_sorting(engine):
-    df = get_df_with_test_data(engine, full_data_set=True)
+def test_to_json_array_sorting_null(engine):
+    data = [
+        [1, 'x', 'aa'],
+        [2, 'x', 'bb'],
+        [3, 'y', 'dd'],
+        [None, 'y', 'cc'],
+        [5, 'y', None],
+        [6, 'z', 'ee'],
+        [7, 'y', 'aa']
+    ]
+    df = DataFrame.from_pandas(
+        engine=engine,
+        df=get_pandas_df(dataset=data, columns=['index', 'group', 'value']),
+        convert_objects=True,
+    )
+
     # We'll call to_json_array() multiple times and combine that in one dataframe. This way we can fit all
     # tests in a single query
-    result_df = df['city'].to_json_array().to_frame()
-    result_df = result_df.rename(columns={'city': 'no_sorting'})
-    result_df['ascending'] = df['city'].sort_values(ascending=False).to_json_array()
-    result_df['muni'] = df['city'].sort_by_series(by=[df['municipality']]).to_json_array()
-    by = [df['municipality'], df['skating_order']]
-    result_df['muni_skating_order'] = df['city'].sort_by_series(by=by).to_json_array()
+    result_df = df['value'].to_json_array().to_frame()
+    result_df = result_df.rename(columns={'value': 'no_sorting'})
+    result_df['descending'] = df['value'].sort_values(ascending=False).to_json_array()
+    result_df['index_asc'] = df['value'].sort_by_series(by=[df['index']]).to_json_array()
+    result_df['index_desc'] = df['value'].sort_by_series(by=[df['index']], ascending=False).to_json_array()
+    result_df['group_index'] = df['value'].sort_by_series(
+        by=[df['group'], df['index']], ascending=[True, False]).to_json_array()
     assert_equals_data(
         result_df,
         use_to_pandas=True,
-        expected_columns=['no_sorting', 'ascending', 'muni', 'muni_skating_order'],
-        # single row, with two columns cells, each column containing a json that is a list of strings
+        expected_columns=['no_sorting', 'descending', 'index_asc', 'index_desc', 'group_index'],
         expected_data=[[
-            # no sorting: ascending by value
-            ['Boalsert', 'Dokkum', 'Drylts', 'Frjentsjer', 'Harns', 'Hylpen', 'Ljouwert', 'Sleat', 'Snits','Starum', 'Warkum'],
-            # acending by value
-            ['Warkum', 'Starum', 'Snits', 'Sleat', 'Ljouwert', 'Hylpen', 'Harns', 'Frjentsjer', 'Drylts', 'Dokkum', 'Boalsert'],
-            # sorted by municipality, within each municipality by value
-            ['Sleat', 'Harns', 'Ljouwert', 'Dokkum', 'Boalsert', 'Drylts', 'Hylpen', 'Snits', 'Starum', 'Warkum', 'Frjentsjer'],
-            # sorted by municipality, within each municipality by skating_order
-            ['Sleat', 'Harns', 'Ljouwert', 'Dokkum', 'Snits', 'Drylts', 'Starum', 'Hylpen', 'Warkum', 'Boalsert', 'Frjentsjer']
+            [None, 'aa', 'aa', 'bb', 'cc', 'dd', 'ee'],
+            ['ee', 'dd', 'cc', 'bb', 'aa', 'aa', None],
+            ['cc', 'aa', 'bb', 'dd', None, 'ee', 'aa'],
+            ['aa', 'ee', None, 'dd', 'bb', 'aa', 'cc'],
+            ['bb', 'aa', 'aa', None, 'dd' ,'cc', 'ee']
         ]]
     )
 
