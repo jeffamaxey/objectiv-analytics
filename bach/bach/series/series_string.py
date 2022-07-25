@@ -229,9 +229,9 @@ class SeriesString(Series):
     def _comparator_operation(self, other, comparator, other_dtypes=tuple(['string'])) -> 'SeriesBoolean':
         return super()._comparator_operation(other, comparator, other_dtypes)
 
-    def to_json_array(self, partition: WrappedPartition = None) -> 'SeriesJson':
+    def to_json_array(self, window: Optional[WrappedWindow] = None) -> 'SeriesJson':
         """
-        Aggregate function: Concatenate the values of this Series into a json array
+        Aggregate function: Group the values of this Series into a json array
 
         The order of the values in the array will be based of the order of the values in this Series. If
         this Series does not have a deterministic sorting, then the values are additionally sorted by the

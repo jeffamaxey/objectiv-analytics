@@ -139,7 +139,6 @@ def test_to_json_array(engine):
     assert isinstance(s_muni, SeriesString)
 
     series_json_array = s_muni.to_json_array()
-    print(series_json_array.view_sql())
     assert series_json_array.dtype == 'json'
     assert_equals_data(
         series_json_array,
@@ -156,7 +155,6 @@ def test_to_json_array(engine):
 
 def test_to_json_array_sorting(engine):
     df = get_df_with_test_data(engine, full_data_set=True)
-    series_city = df['city']
     # We'll call to_json_array() multiple times and combine that in one dataframe. This way we can fit all
     # tests in a single query
     result_df = df['city'].to_json_array().to_frame()
