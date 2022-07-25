@@ -6,19 +6,18 @@
 
 Self hosted, open-source & built for those who like their data raw and models in code.
 
-### Demo
-
-Follow our [Quickstart Guide](https://objectiv.io/docs/home/quickstart-guide) to set up a fully functional dockerized demo in under 5 minutes.
-
 ### Go to
 
-* [Objectiv Docs](https://www.objectiv.io/docs) - Objectiv's official documentation.
-* [Objectiv on Slack](https://objectiv.io/join-slack) - Get help & join the discussion on where to take Objectiv next.
-* [Objectiv.io](https://www.objectiv.io) - Objectiv's official website.
+* [Objectiv Docs](https://www.objectiv.io/docs) - Technical documentation.
+* [Objectiv on Slack](https://objectiv.io/join-slack) - Get help & join the discussion.
+* [Objectiv.io](https://www.objectiv.io) - Our website.
+
+If you like what we do, give us a star!
 
 ---
 
-## What's in the box?
+## Everything you need to unlock a whole new level of product analytics
+
 ![objectiv_stack](https://user-images.githubusercontent.com/920184/180789710-94e7bf9c-f081-4a0f-9637-3edf6fe5f501.svg#gh-light-mode-only "Objectiv Stack")
 ![objectiv_stack_dark](https://user-images.githubusercontent.com/920184/180790336-4143f099-dee3-4e83-8fb2-5a71d35169bb.svg#gh-dark-mode-only "Objectiv Stack")
 
