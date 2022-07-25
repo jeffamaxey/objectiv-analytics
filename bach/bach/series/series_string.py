@@ -229,7 +229,7 @@ class SeriesString(Series):
     def _comparator_operation(self, other, comparator, other_dtypes=tuple(['string'])) -> 'SeriesBoolean':
         return super()._comparator_operation(other, comparator, other_dtypes)
 
-    def to_json_array(self, window: Optional[WrappedWindow] = None) -> 'SeriesJson':
+    def to_json_array(self, partition: Optional[WrappedPartition] = None) -> 'SeriesJson':
         """
         Aggregate function: Group the values of this Series into a json array
 
