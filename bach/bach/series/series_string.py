@@ -290,5 +290,4 @@ class SeriesString(Series):
                 expr = Expression.construct('{} {}', level_expr, asc_expr)
                 expressions.append(expr)
 
-        join_expressions(expressions)
         return Expression.construct('order by {}', join_expressions(expressions))
