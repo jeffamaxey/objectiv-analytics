@@ -2,7 +2,7 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { GlobalContextName, LocationContextName, TrackerPlatform } from '@objectiv/tracker-core';
+import { GlobalContextName, LocationContextName, TrackerPlatform } from '../../../tracker';
 import * as fs from 'fs';
 import { GlobalContextErrorType, LocationContextErrorType } from '../types';
 import { GlobalContextErrorMessagesTemplates, LocationContextErrorMessagesTemplates } from './ErrorMessagesTemplates';
