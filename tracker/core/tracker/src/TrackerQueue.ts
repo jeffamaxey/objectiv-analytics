@@ -60,7 +60,7 @@ export class TrackerQueue implements TrackerQueueInterface {
     this.store = config?.store ?? new TrackerQueueMemoryStore();
     this.batchSize = config?.batchSize ?? 10;
     this.batchDelayMs = config?.batchDelayMs ?? 1000;
-    this.concurrency = config?.concurrency ?? 4;
+    this.concurrency = config?.concurrency ?? 1;
 
     if (globalThis.objectiv.devTools) {
       globalThis.objectiv.devTools.TrackerConsole.groupCollapsed(`｢objectiv:${this.queueName}｣ Initialized`);

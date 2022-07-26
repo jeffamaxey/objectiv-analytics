@@ -1,6 +1,6 @@
 {
   "name": "@objectiv/testing-tools",
-  "version": "0.0.22",
+  "version": "0.0.23-next.0",
   "private": true,
   "license": "Apache-2.0",
   "description": "Mocks and other testing utilities shared across Objectiv Trackers",
@@ -18,6 +18,6 @@
     "typescript": "^4.6.2"
   },
   "peerDependencies": {
-    "@objectiv/tracker-core": "^0.0.22"
+    "@objectiv/tracker-core": "^0.0.23-next.0"
   }
 }

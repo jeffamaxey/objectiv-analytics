@@ -82,7 +82,7 @@ describe('BrowserTracker', () => {
       queueName: 'TrackerQueue',
       batchDelayMs: 1000,
       batchSize: 10,
-      concurrency: 4,
+      concurrency: 1,
       lastRunTimestamp: 0,
       running: false,
       processFunction: expect.any(Function),
