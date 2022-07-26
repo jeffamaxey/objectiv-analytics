@@ -229,17 +229,18 @@ class SeriesString(Series):
     def _comparator_operation(self, other, comparator, other_dtypes=tuple(['string'])) -> 'SeriesBoolean':
         return super()._comparator_operation(other, comparator, other_dtypes)
 
-    def to_json_array(self, partition: WrappedPartition = None) -> 'SeriesJson':
+    def to_json_array(self, partition: Optional[WrappedPartition] = None) -> 'SeriesJson':
         """
-        Aggregate function: Concatenate the values of this Series into a json array
+        Aggregate function: Group the values of this Series into a json array
 
         The order of the values in the array will be based of the order of the values in this Series. If
-        this Series does not have a deterministic sorting, then the values are sorted by the values
-        themselves. A difference in sorting can occur between the resulting array and the values in a Series
-        when the Series contains None/NULL values. Null values will be sorted first when sorting ascending,
-        contrary to sorting inside a DataFrame or a Series where they come last.
+        this Series does not have a deterministic sorting, then the values are additionally sorted by the
+        values themselves. A difference in sorting can occur between the resulting array and the values in a
+        Series when the Series contains None/NULL values. Null values will be sorted first when sorting
+        ascending, contrary to sorting inside a DataFrame or a Series where they come last.
 
-        :param partition: The partition to apply
+        :param partition: The partition to apply, optional.
+        :return: SeriesJson containing an array of strings on each row.
         """
         order_by = self.order_by
         # Add this series as the final column to sort on. If the order_by is deterministic then this won't
@@ -289,5 +290,4 @@ class SeriesString(Series):
                 expr = Expression.construct('{} {}', level_expr, asc_expr)
                 expressions.append(expr)
 
-        join_expressions(expressions)
         return Expression.construct('order by {}', join_expressions(expressions))
