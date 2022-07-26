@@ -1,30 +1,33 @@
 /*
  * Copyright 2022 Objectiv B.V.
  */
+ 
 
-import { AbstractLocationContext, AbstractPressableContext } from './abstracts';
+import {AbstractLocationContext,AbstractPressableContext} from './abstracts';
 
 /**
  * A Location Context that describes an element that accepts user input, i.e. a form field.
  * Inheritance: InputContext -> AbstractLocationContext -> AbstractContext
  */
 export interface InputContext extends AbstractLocationContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'InputContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'InputContext';
+
 }
 
 /**
- * An Location Context that describes an interactive element (like a link, button, icon),
+ * An Location Context that describes an interactive element (like a link, button, icon), 
  * that the user can press and will trigger an Interactive Event.
  * Inheritance: PressableContext -> AbstractPressableContext -> AbstractLocationContext -> AbstractContext
  */
 export interface PressableContext extends AbstractPressableContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'PressableContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'PressableContext';
+
 }
 
 /**
@@ -32,15 +35,16 @@ export interface PressableContext extends AbstractPressableContext {
  * Inheritance: LinkContext -> AbstractPressableContext -> AbstractLocationContext -> AbstractContext
  */
 export interface LinkContext extends AbstractPressableContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'LinkContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'LinkContext';
 
-  /**
-   * URL (href) the link points to.
-   */
-  href: string;
+	/**
+ * URL (href) the link points to.
+ */
+	href: string;
+
 }
 
 /**
@@ -48,10 +52,11 @@ export interface LinkContext extends AbstractPressableContext {
  * Inheritance: RootLocationContext -> AbstractLocationContext -> AbstractContext
  */
 export interface RootLocationContext extends AbstractLocationContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'RootLocationContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'RootLocationContext';
+
 }
 
 /**
@@ -59,10 +64,11 @@ export interface RootLocationContext extends AbstractLocationContext {
  * Inheritance: ExpandableContext -> AbstractLocationContext -> AbstractContext
  */
 export interface ExpandableContext extends AbstractLocationContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'ExpandableContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'ExpandableContext';
+
 }
 
 /**
@@ -70,10 +76,11 @@ export interface ExpandableContext extends AbstractLocationContext {
  * Inheritance: MediaPlayerContext -> AbstractLocationContext -> AbstractContext
  */
 export interface MediaPlayerContext extends AbstractLocationContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'MediaPlayerContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'MediaPlayerContext';
+
 }
 
 /**
@@ -81,10 +88,11 @@ export interface MediaPlayerContext extends AbstractLocationContext {
  * Inheritance: NavigationContext -> AbstractLocationContext -> AbstractContext
  */
 export interface NavigationContext extends AbstractLocationContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'NavigationContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'NavigationContext';
+
 }
 
 /**
@@ -92,20 +100,22 @@ export interface NavigationContext extends AbstractLocationContext {
  * Inheritance: OverlayContext -> AbstractLocationContext -> AbstractContext
  */
 export interface OverlayContext extends AbstractLocationContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'OverlayContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'OverlayContext';
+
 }
 
 /**
- * A Location Context that describes a logical section of the UI that contains other Location Contexts.
+ * A Location Context that describes a logical section of the UI that contains other Location Contexts. 
  * Enabling Data Science to analyze this section specifically.
  * Inheritance: ContentContext -> AbstractLocationContext -> AbstractContext
  */
 export interface ContentContext extends AbstractLocationContext {
-  /**
-   * Typescript discriminator
-   */
-  readonly _type: 'ContentContext';
+	/**
+ * Typescript discriminator
+ */
+	readonly _type: 'ContentContext';
+
 }

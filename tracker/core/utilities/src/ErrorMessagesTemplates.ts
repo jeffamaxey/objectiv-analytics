@@ -2,8 +2,14 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { GlobalContextName, LocationContextName, TrackerPlatform } from '@objectiv/tracker-core';
-import { ContextErrorMessagesTemplates, GlobalContextErrorType, LocationContextErrorType } from '../types';
+import {
+  ContextErrorMessagesTemplates,
+  GlobalContextErrorType,
+  GlobalContextName,
+  LocationContextErrorType,
+  LocationContextName,
+  TrackerPlatform,
+} from '@objectiv/tracker-core/';
 
 /**
  * These are platform-independent error messages that can be shown for any type of error and context.

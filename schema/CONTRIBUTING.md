@@ -25,7 +25,7 @@ So how does this work?
 4. If all is OK, create a PR (in the case of changes to the base schema)
 
 ### Tracker: Typescript
-For TypeScript, there is a generator.js script in tracker/core/utility/src/. Using it is quite simple:
+For TypeScript, there is a generateSchema.js script in tracker/core/utility/src/. Using it is quite simple:
 ```bash
 cd tracker && yarn generate
 ```

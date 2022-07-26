@@ -2,8 +2,8 @@
  * Copyright 2022 Objectiv B.V.
  */
 
+import { ContextErrorMessage, ContextName, ErrorType } from '@objectiv/tracker-core';
 import { DefaultErrorMessagesByType } from './ErrorMessagesTemplates';
-import { ContextErrorMessage, ContextName, ErrorType } from '../types';
 
 /**
  * The parameters of preCompileErrorMessage

@@ -2,9 +2,14 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { GlobalContextName, LocationContextName, TrackerPlatform } from '../../../tracker';
+import {
+  GlobalContextErrorType,
+  GlobalContextName,
+  LocationContextErrorType,
+  LocationContextName,
+  TrackerPlatform,
+} from '@objectiv/tracker-core';
 import * as fs from 'fs';
-import { GlobalContextErrorType, LocationContextErrorType } from '../types';
 import { GlobalContextErrorMessagesTemplates, LocationContextErrorMessagesTemplates } from './ErrorMessagesTemplates';
 import { preCompileErrorMessage } from './preCompileErrorMessage';
 
@@ -14,7 +19,7 @@ import { preCompileErrorMessage } from './preCompileErrorMessage';
  */
 
 export const DOCUMENTATION_URL = 'https://objectiv.io/docs';
-export const DESTINATION_FILENAME = './src/generated/ContextErrorMessages.ts';
+export const DESTINATION_FILENAME = '../../core/developer-tools/src/generated/ContextErrorMessages.ts';
 
 type ErrorMessagesMap = {
   [platform: string]: {
@@ -76,8 +81,13 @@ fs.writeFileSync(
  * Copyright ${new Date().getFullYear()} Objectiv B.V.
  */
 
-import { GlobalContextName, LocationContextName } from '@objectiv/tracker-core';
-import { ContextErrorMessages, GlobalContextErrorType, LocationContextErrorType } from '../types';
+import {
+  ContextErrorMessages,
+  GlobalContextErrorType,
+  GlobalContextName,
+  LocationContextErrorType,
+  LocationContextName
+} from '@objectiv/tracker-core';
 
 `
 );

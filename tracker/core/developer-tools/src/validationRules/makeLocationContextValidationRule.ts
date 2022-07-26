@@ -2,11 +2,10 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { LocationContextValidationRuleFactory, TrackerEvent } from '@objectiv/tracker-core';
+import { LocationContextErrorType, LocationContextValidationRuleFactory, TrackerEvent } from '@objectiv/tracker-core';
 import { EventRecorder } from '../EventRecorder';
 import { LocationContextErrorMessages } from '../generated/ContextErrorMessages';
 import { TrackerConsole } from '../TrackerConsole';
-import { LocationContextErrorType } from '../types';
 
 /**
  * A generic configurable Rule that can verify, and console error, whether the given `context` is:

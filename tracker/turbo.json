@@ -37,7 +37,7 @@
     },
     "generate": {
       "outputs": ["generate/**"],
-      "inputs": ["../schema/base_schema.json5", "generateErrorMessages.ts", "generator.js"]
+      "inputs": ["../schema/base_schema.json5", "generateErrorMessages.ts", "generateSchema.js"]
     },
     "pre-publish": {
       "dependsOn": ["depcheck", "tsc", "build", "test"],

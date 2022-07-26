@@ -2,7 +2,8 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { GlobalContextName, LocationContextName, TrackerPlatform } from '@objectiv/tracker-core';
+import { GlobalContextName, LocationContextName } from './generated/ContextNames';
+import { TrackerPlatform } from './TrackerPlatform';
 
 /**
  * GlobalContext error types

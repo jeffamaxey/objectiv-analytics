@@ -12,7 +12,7 @@
  * Additionally, the script will look for extensions there, and will add them to the generated classes and interfaces.
  *
  * Usage is pretty straight forward:
- *    ```node generate.js```
+ *    ```node generateSchema.js```
  * That's all there is to it.
  *
  */

@@ -188,8 +188,8 @@ Runs `pre-publish` and, if it succeeds, publishes all packages to Verdaccio.
 
 ### `yarn generate`
 Runs generator utilities:
-- [core/utilities/src/generator.js](core/utilities/src/generator.js); 
-- [core/developer-tools/src/scripts/generateErrorMessages.ts](core/developer-tools/src/scripts/generateErrorMessages.ts); 
+- [core/utilities/src/generateSchema.js](core/utilities/src/generateSchema.js); 
+- [core/utilities/src/generateErrorMessages.ts](core/utilities/src/generateErrorMessages.ts); 
 
 This will generate:
 - The @objectiv/schema package TypeScript definitions from the OSF
