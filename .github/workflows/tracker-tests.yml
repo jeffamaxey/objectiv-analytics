@@ -93,9 +93,5 @@ jobs:
         working-directory: tracker
         run: |
           yarn turbo run generate
-          echo "after generate"
           yarn turbo run prettify
-          echo "after prettify"
-          yarn turbo run tsc
-          echo "after tsc"
           test $(git status -s -uno | wc -l) -eq 0
