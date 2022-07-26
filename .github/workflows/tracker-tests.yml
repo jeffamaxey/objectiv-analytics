@@ -42,7 +42,7 @@ jobs:
         working-directory: tracker
         run: yarn depcheck
 
- run-ts-check:
+  run-ts-check:
     runs-on: ubuntu-latest
     needs: [install-dependencies]
     steps:
@@ -59,7 +59,7 @@ jobs:
         working-directory: tracker
         run: yarn tsc
 
- run-unit-tests:
+  run-unit-tests:
     runs-on: ubuntu-latest
     needs: [install-dependencies]
     steps:
@@ -76,7 +76,7 @@ jobs:
         working-directory: tracker
         run: yarn test:ci
 
- run-ts-schema-check:
+  run-ts-schema-check:
     runs-on: ubuntu-latest
     needs: [install-dependencies]
     steps:
