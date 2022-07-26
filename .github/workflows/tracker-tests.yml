@@ -81,8 +81,6 @@ jobs:
     needs: [install-dependencies]
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
 
       - name: Use cached node_modules
         id: node-modules-cache
@@ -95,6 +93,4 @@ jobs:
         working-directory: tracker
         run: |
           yarn generate
-          git status
-          git diff --name-only origin/main origin/${GITHUB_HEAD_REF}
-#          test $(git status -s -uno | wc -l) -eq 0
+          test $(git status -s -uno | wc -l) -eq 0

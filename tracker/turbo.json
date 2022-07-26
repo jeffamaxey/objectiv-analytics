@@ -36,7 +36,7 @@
       "inputs": ["tsconfig.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
     },
     "generate": {
-      "outputs": ["generate/**"],
+      "outputs": ["generated/**"],
       "inputs": ["../schema/base_schema.json5", "generateErrorMessages.ts", "generateSchema.js"]
     },
     "pre-publish": {

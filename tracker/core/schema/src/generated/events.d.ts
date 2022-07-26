@@ -1,20 +1,18 @@
 /*
  * Copyright 2022 Objectiv B.V.
  */
- 
 
-import {AbstractInteractiveEvent,AbstractNonInteractiveEvent,AbstractMediaEvent} from './abstracts';
+import { AbstractInteractiveEvent, AbstractNonInteractiveEvent, AbstractMediaEvent } from './abstracts';
 
 /**
  * The parent of Events that are the direct result of a user interaction, e.g. a button click.
  * Inheritance: InteractiveEvent -> AbstractInteractiveEvent -> AbstractEvent
  */
 export interface InteractiveEvent extends AbstractInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'InteractiveEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'InteractiveEvent';
 }
 
 /**
@@ -22,11 +20,10 @@ export interface InteractiveEvent extends AbstractInteractiveEvent {
  * Inheritance: NonInteractiveEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface NonInteractiveEvent extends AbstractNonInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'NonInteractiveEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'NonInteractiveEvent';
 }
 
 /**
@@ -34,29 +31,27 @@ export interface NonInteractiveEvent extends AbstractNonInteractiveEvent {
  * Inheritance: ApplicationLoadedEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface ApplicationLoadedEvent extends AbstractNonInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'ApplicationLoadedEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'ApplicationLoadedEvent';
 }
 
 /**
- * A NonInteractiveEvent that is sent when a user action results in a error, 
+ * A NonInteractiveEvent that is sent when a user action results in a error,
  * like an invalid email when sending a form.
  * Inheritance: FailureEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface FailureEvent extends AbstractNonInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'FailureEvent';
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'FailureEvent';
 
-	/**
- * Failure message.
- */
-	message: string;
-
+  /**
+   * Failure message.
+   */
+  message: string;
 }
 
 /**
@@ -64,24 +59,22 @@ export interface FailureEvent extends AbstractNonInteractiveEvent {
  * Inheritance: InputChangeEvent -> AbstractInteractiveEvent -> AbstractEvent
  */
 export interface InputChangeEvent extends AbstractInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'InputChangeEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'InputChangeEvent';
 }
 
 /**
- * An InteractiveEvent that is sent when a user presses on a pressable element 
+ * An InteractiveEvent that is sent when a user presses on a pressable element
  * (like a link, button, icon).
  * Inheritance: PressEvent -> AbstractInteractiveEvent -> AbstractEvent
  */
 export interface PressEvent extends AbstractInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'PressEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'PressEvent';
 }
 
 /**
@@ -89,11 +82,10 @@ export interface PressEvent extends AbstractInteractiveEvent {
  * Inheritance: HiddenEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface HiddenEvent extends AbstractNonInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'HiddenEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'HiddenEvent';
 }
 
 /**
@@ -101,42 +93,39 @@ export interface HiddenEvent extends AbstractNonInteractiveEvent {
  * Inheritance: VisibleEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface VisibleEvent extends AbstractNonInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'VisibleEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'VisibleEvent';
 }
 
 /**
- * A NonInteractiveEvent that is sent when a user action is successfully completed, 
+ * A NonInteractiveEvent that is sent when a user action is successfully completed,
  * like sending an email form.
  * Inheritance: SuccessEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface SuccessEvent extends AbstractNonInteractiveEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'SuccessEvent';
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'SuccessEvent';
 
-	/**
- * Success message.
- */
-	message: string;
-
+  /**
+   * Success message.
+   */
+  message: string;
 }
 
 /**
- * The parent of non-interactive events that are triggered by a media player. 
+ * The parent of non-interactive events that are triggered by a media player.
  * It requires a MediaPlayerContext to detail the origin of the event.
  * Inheritance: MediaEvent -> AbstractMediaEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface MediaEvent extends AbstractMediaEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'MediaEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'MediaEvent';
 }
 
 /**
@@ -144,11 +133,10 @@ export interface MediaEvent extends AbstractMediaEvent {
  * Inheritance: MediaLoadEvent -> AbstractMediaEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface MediaLoadEvent extends AbstractMediaEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'MediaLoadEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'MediaLoadEvent';
 }
 
 /**
@@ -156,11 +144,10 @@ export interface MediaLoadEvent extends AbstractMediaEvent {
  * Inheritance: MediaPauseEvent -> AbstractMediaEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface MediaPauseEvent extends AbstractMediaEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'MediaPauseEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'MediaPauseEvent';
 }
 
 /**
@@ -168,11 +155,10 @@ export interface MediaPauseEvent extends AbstractMediaEvent {
  * Inheritance: MediaStartEvent -> AbstractMediaEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface MediaStartEvent extends AbstractMediaEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'MediaStartEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'MediaStartEvent';
 }
 
 /**
@@ -180,9 +166,8 @@ export interface MediaStartEvent extends AbstractMediaEvent {
  * Inheritance: MediaStopEvent -> AbstractMediaEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
 export interface MediaStopEvent extends AbstractMediaEvent {
-	/**
- * Typescript discriminator
- */
-	readonly _type: 'MediaStopEvent';
-
+  /**
+   * Typescript discriminator
+   */
+  readonly _type: 'MediaStopEvent';
 }
