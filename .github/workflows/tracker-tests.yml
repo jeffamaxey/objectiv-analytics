@@ -96,6 +96,6 @@ jobs:
           echo "after generate"
           yarn turbo run prettify
           echo "after prettify"
-          turbo run tsc
+          yarn turbo run tsc
           echo "after tsc"
           test $(git status -s -uno | wc -l) -eq 0
