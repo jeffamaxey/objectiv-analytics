@@ -26,6 +26,7 @@
     "@objectiv/transport-xhr": "0.0.22"
   },
   "changesets": [
-    "fluffy-poems-joke"
+    "fluffy-poems-joke",
+    "green-chicken-repair"
   ]
 }
