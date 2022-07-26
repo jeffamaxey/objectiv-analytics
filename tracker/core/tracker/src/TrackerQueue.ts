@@ -161,7 +161,7 @@ export class TrackerQueue implements TrackerQueueInterface {
    * If this is the first run: override concurrency to 1 and effectively send 1 batch synchronously before all others.
    *
    * We must send and receive a successful response from the Collector to receive valid cookie credentials.
-   * After the cookie has been set, all other batches will use automatically and can be sent concurrently.
+   * After the cookie has been set, all other batches will use it automatically and can be sent concurrently.
    */
   getConcurrency(): number {
     return this.lastRunTimestamp ? this.concurrency : 1;
