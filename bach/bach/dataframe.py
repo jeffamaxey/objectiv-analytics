@@ -12,7 +12,7 @@ import numpy
 import pandas
 from sqlalchemy.engine import Engine
 
-from bach.expression import Expression, SingleValueExpression, VariableToken
+from bach.expression import Expression, SingleValueExpression, VariableToken, ColumnReferenceToken
 from bach.from_database import get_dtypes_from_table, get_dtypes_from_model
 from bach.sql_model import BachSqlModel, CurrentNodeSqlModel, get_variable_values_sql
 from bach.types import get_series_type_from_dtype, AllSupportedLiteralTypes, StructuredDtype
@@ -1232,7 +1232,7 @@ class DataFrame:
                 # If a group_by is set on both, they have to match.
                 if key.group_by and key.group_by != self._group_by:
                     raise ValueError('Can not apply aggregated BooleanSeries with non matching group_by.'
-                                     'Please merge() the selector df with thisdf first.')
+                                     'Please merge() the selector df with this df first.')
 
                 if key.group_by is not None and key.expression.has_aggregate_function:
                     # Create a having-condition if the key is aggregated
@@ -1248,7 +1248,6 @@ class DataFrame:
             return self.copy_override(
                 base_node=node,
                 group_by=None,
-                order_by=[],
                 index_dtypes={name: series.instance_dtype for name, series in self.index.items()},
                 series_dtypes={name: series.instance_dtype for name, series in self.data.items()},
                 single_value=single_value
