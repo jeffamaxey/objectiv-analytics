@@ -5,6 +5,7 @@ import pandas as pd
 
 from bach import Series, SeriesString, DataFrame
 from tests.functional.bach.test_data_and_utils import assert_equals_data, get_df_with_test_data
+from tests.unit.bach.util import get_pandas_df
 
 
 def test_from_value(engine):
@@ -131,3 +132,84 @@ def test_string_replace(engine) -> None:
             expected_data[idx].append(m.replace(pat, '_'))
 
     assert_equals_data(result_df, expected_columns=expected_columns, expected_data=expected_data)
+
+
+def test_to_json_array(engine):
+    df = get_df_with_test_data(engine, full_data_set=True)
+    s_muni = df['municipality']
+    assert isinstance(s_muni, SeriesString)
+
+    series_json_array = s_muni.to_json_array()
+    assert series_json_array.dtype == 'json'
+    assert_equals_data(
+        series_json_array,
+        use_to_pandas=True,
+        expected_columns=['municipality'],
+        # single row, single column, with a list of strings in that cell
+        expected_data=[[
+            ['De Friese Meren', 'Harlingen', 'Leeuwarden', 'Noardeast-Fryslân', 'Súdwest-Fryslân',
+             'Súdwest-Fryslân', 'Súdwest-Fryslân', 'Súdwest-Fryslân', 'Súdwest-Fryslân', 'Súdwest-Fryslân',
+             'Waadhoeke']
+        ]]
+    )
+
+
+def test_to_json_array_sorting_null(engine):
+    data = [
+        [1, 'x', 'aa'],
+        [2, 'x', 'bb'],
+        [3, 'y', 'dd'],
+        [None, 'y', 'cc'],
+        [5, 'y', None],
+        [6, 'z', 'ee'],
+        [7, 'y', 'aa']
+    ]
+    df = DataFrame.from_pandas(
+        engine=engine,
+        df=get_pandas_df(dataset=data, columns=['index', 'group', 'value']),
+        convert_objects=True,
+    )
+
+    # We'll call to_json_array() multiple times and combine that in one dataframe. This way we can fit all
+    # tests in a single query
+    result_df = df['value'].to_json_array().to_frame()
+    result_df = result_df.rename(columns={'value': 'no_sorting'})
+    result_df['descending'] = df['value'].sort_values(ascending=False).to_json_array()
+    result_df['index_asc'] = df['value'].sort_by_series(by=[df['index']]).to_json_array()
+    result_df['index_desc'] = df['value'].sort_by_series(by=[df['index']], ascending=False).to_json_array()
+    result_df['group_index'] = df['value'].sort_by_series(
+        by=[df['group'], df['index']], ascending=[True, False]).to_json_array()
+    assert_equals_data(
+        result_df,
+        use_to_pandas=True,
+        expected_columns=['no_sorting', 'descending', 'index_asc', 'index_desc', 'group_index'],
+        expected_data=[[
+            [None, 'aa', 'aa', 'bb', 'cc', 'dd', 'ee'],
+            ['ee', 'dd', 'cc', 'bb', 'aa', 'aa', None],
+            ['cc', 'aa', 'bb', 'dd', None, 'ee', 'aa'],
+            ['aa', 'ee', None, 'dd', 'bb', 'aa', 'cc'],
+            ['bb', 'aa', 'aa', None, 'dd', 'cc', 'ee']
+        ]]
+    )
+
+
+def test_to_json_array_groupby(engine):
+    df = get_df_with_test_data(engine, full_data_set=True)
+    df = df.reset_index()
+    df = df.groupby('municipality')
+    by = [df['_index_skating_order']]
+    series_json_array = df['city'].sort_by_series(by=by, ascending=False).to_json_array()
+    assert series_json_array.dtype == 'json'
+    assert_equals_data(
+        series_json_array,
+        use_to_pandas=True,
+        expected_columns=['municipality', 'city'],
+        expected_data=[
+            ['De Friese Meren', ['Sleat']],
+            ['Harlingen', ['Harns']],
+            ['Leeuwarden', ['Ljouwert']],
+            ['Noardeast-Fryslân', ['Dokkum']],
+            ['Súdwest-Fryslân', ['Boalsert', 'Warkum', 'Hylpen', 'Starum', 'Drylts', 'Snits']],
+            ['Waadhoeke', ['Frjentsjer']]
+        ]
+    )
