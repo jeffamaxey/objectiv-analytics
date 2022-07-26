@@ -12,15 +12,17 @@ from tests.unit.bach.util import get_pandas_df
 def test_windowing_frame_clause(engine):
     bt = get_df_with_test_data(engine, full_data_set=True)
     bt = bt.sort_index()
-    w = bt.window().group_by
+    window = bt.window()
+    w = window.group_by
     # Check the default
     assert (w.frame_clause == "RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW")
 
+    results = []
     def frame_clause_equals(expected, **kwargs):
         w2 = w.set_frame_clause(**kwargs)
         assert(w2.frame_clause == expected)
-        # Run a query to check whether the SQL is valid if we generated what we expected.
-        bt.inhabitants.window_last_value(w2).to_pandas()
+        lv = bt.inhabitants.window_last_value(w2).copy_override(name=f'window_result_{len(results)}')
+        results.append(lv)
 
     # Again, check the default but through set_frame_clause in this case
     frame_clause_equals("RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW")
@@ -99,6 +101,14 @@ def test_windowing_frame_clause(engine):
                         start_value=None,
                         end_boundary=WindowFrameBoundary.FOLLOWING,
                         end_value=None)
+
+    result_df = bt.copy_override(
+        base_node=window.base_node,
+        series={r.name:  r for r in results}
+    )
+
+    # Run a query to check whether the SQL is valid if we generated what we expected.
+    result_df.to_pandas()
 
     #     The value PRECEDING and value FOLLOWING cases are currently only allowed in ROWS mode.
     #     They indicate that the frame starts or ends with the row that many rows before or after
