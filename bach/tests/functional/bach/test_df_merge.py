@@ -304,7 +304,6 @@ def test_merge_right_join(engine):
 def test_merge_right_join_shared_on(engine) -> None:
     bt = get_df_with_test_data(engine, full_data_set=False)[['skating_order', 'city']]
     bt['station'] = SeriesString.from_value(base=bt, value=None)
-    bt = bt.materialize()
 
     bt = bt.reset_index(drop=True)
 
@@ -315,12 +314,7 @@ def test_merge_right_join_shared_on(engine) -> None:
     result = result.sort_values('station')
     assert_equals_data(
         result,
-        expected_columns=[
-            'skating_order',
-            'city',
-            'station',
-            'platforms',
-        ],
+        expected_columns=['skating_order', 'city', 'station', 'platforms'],
         expected_data=[
             [None, None, 'Camminghaburen', 1],
             [None, None, 'Heerenveen', 1],
