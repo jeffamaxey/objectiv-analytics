@@ -93,5 +93,5 @@ jobs:
         working-directory: tracker
         run: |
           yarn generate
-          git status -s -uno | wc -l
+          git status
 #          test $(git status -s -uno | wc -l) -eq 0

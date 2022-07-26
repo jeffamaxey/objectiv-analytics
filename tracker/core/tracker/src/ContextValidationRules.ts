@@ -3,7 +3,7 @@
  */
 
 import { GlobalContextName, LocationContextName } from './generated/ContextNames';
-import { TrackerPlatform } from "./TrackerPlatform";
+import { TrackerPlatform } from './TrackerPlatform';
 import { TrackerValidationRuleConfig, TrackerValidationRuleInterface } from './TrackerValidationRuleInterface';
 
 /**
