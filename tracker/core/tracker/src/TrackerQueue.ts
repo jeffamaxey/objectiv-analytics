@@ -47,7 +47,7 @@ export class TrackerQueue implements TrackerQueueInterface {
   // Holds a list of Event IDs that are currently being processed
   processingEventIds: string[] = [];
 
-  // Holds when we last sent a batch, used to determine if we should wait and whether at least one batch was sent
+  // Holds when we last sent a batch, used to determine if we should wait
   lastRunTimestamp: number = 0;
 
   // State to avoid concurrent runs
