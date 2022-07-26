@@ -205,7 +205,7 @@ def test_get_navigation_paths_grouped(db_params) -> None:
 
 def test_get_navigation_paths_filtered(db_params) -> None:
     df, modelhub = get_objectiv_dataframe_test(db_params)
-    bts = modelhub.aggregate.get_navigation_paths(data=df, steps=3)
+    bts = modelhub.aggregate.get_navigation_paths(data=df, steps=3).materialize()
     step = 'Link: logo located at Web Document: #document => Section: navbar-top'
     bts = bts[bts['location_stack_step_1'] == step]
 
