@@ -4,7 +4,7 @@
 
 import { MockConsoleImplementation } from '@objectiv/testing-tools';
 import { ContextsConfig, generateUUID, GlobalContextName, Tracker, TrackerEvent } from '@objectiv/tracker-core';
-import { IdentityContextPlugin } from '../src/IdentityContextPlugin';
+import { IdentityContextPlugin } from '../src';
 
 require('@objectiv/developer-tools');
 globalThis.objectiv.devTools?.TrackerConsole.setImplementation(MockConsoleImplementation);

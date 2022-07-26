@@ -15,7 +15,7 @@ import { NavigationContainer, NavigationState } from '@react-navigation/native';
 import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import { Text } from 'react-native';
-import { makeLinkPressListener } from '../src/makeLinkPressListener';
+import { makeLinkPressListener } from '../src';
 
 require('@objectiv/developer-tools');
 globalThis.objectiv.devTools?.TrackerConsole.setImplementation(MockConsoleImplementation);

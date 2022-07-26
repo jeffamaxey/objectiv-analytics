@@ -47,7 +47,7 @@ export class TrackerQueue implements TrackerQueueInterface {
   // Holds a list of Event IDs that are currently being processed
   processingEventIds: string[] = [];
 
-  // Holds when we last sent a batch, used to determine if we should wait
+  // Holds when we last sent a batch, used to determine if we should wait and whether at least one batch was sent
   lastRunTimestamp: number = 0;
 
   // State to avoid concurrent runs
@@ -60,7 +60,7 @@ export class TrackerQueue implements TrackerQueueInterface {
     this.store = config?.store ?? new TrackerQueueMemoryStore();
     this.batchSize = config?.batchSize ?? 10;
     this.batchDelayMs = config?.batchDelayMs ?? 1000;
-    this.concurrency = config?.concurrency ?? 1;
+    this.concurrency = config?.concurrency ?? 4;
 
     if (globalThis.objectiv.devTools) {
       globalThis.objectiv.devTools.TrackerConsole.groupCollapsed(`｢objectiv:${this.queueName}｣ Initialized`);
@@ -110,7 +110,7 @@ export class TrackerQueue implements TrackerQueueInterface {
     // Load and process as many Event batches as `concurrency` allows. For each Event we create a Promise.
     let processPromises: Promise<any>[] = [];
 
-    for (let i = 0; i < this.concurrency; i++) {
+    for (let i = 0; i < this.getConcurrency(); i++) {
       const eventsBatch = await this.readBatch();
 
       // No need to continue if there are no more Events to process
@@ -154,5 +154,16 @@ export class TrackerQueue implements TrackerQueueInterface {
 
   isIdle(): boolean {
     return this.store.length === 0 && this.processingEventIds.length === 0;
+  }
+
+  /**
+   * Helper function to retrieve the concurrency to use for batching
+   * If this is the first run: override concurrency to 1 and effectively send 1 batch synchronously before all others.
+   *
+   * We must send and receive a successful response from the Collector to receive valid cookie credentials.
+   * After the cookie has been set, all other batches will use automatically and can be sent concurrently.
+   */
+  getConcurrency(): number {
+    return this.lastRunTimestamp ? this.concurrency : 1;
   }
 }

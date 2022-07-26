@@ -21,7 +21,7 @@ describe('Without DOM', () => {
       queueName: 'TrackerQueue',
       batchDelayMs: 1000,
       batchSize: 10,
-      concurrency: 1,
+      concurrency: 4,
       lastRunTimestamp: 0,
       running: false,
       processingEventIds: [],
