@@ -53,6 +53,9 @@ export class TrackerQueue implements TrackerQueueInterface {
   // State to avoid concurrent runs
   running: boolean = false;
 
+  // State to determine whether at least one batch has been successfully sent
+  firstBatchSuccessfullySent: boolean = false;
+
   /**
    * Initializes batching configuration with some sensible values.
    */
@@ -134,6 +137,7 @@ export class TrackerQueue implements TrackerQueueInterface {
           // Delete Events from Store when the process function promise resolves
           .then(() => {
             this.store.delete(eventsBatchIds);
+            this.firstBatchSuccessfullySent = true;
           })
           // Delete Event Ids from processing list, regardless if the processing was successful or not
           .finally(() => {
@@ -164,6 +168,6 @@ export class TrackerQueue implements TrackerQueueInterface {
    * After the cookie has been set, all other batches will use it automatically and can be sent concurrently.
    */
   getConcurrency(): number {
-    return this.lastRunTimestamp ? this.concurrency : 1;
+    return this.firstBatchSuccessfullySent ? this.concurrency : 1;
   }
 }
