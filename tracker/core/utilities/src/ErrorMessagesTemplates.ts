@@ -9,7 +9,7 @@ import {
   LocationContextErrorType,
   LocationContextName,
   TrackerPlatform,
-} from '@objectiv/tracker-core/';
+} from '@objectiv/tracker-core';
 
 /**
  * These are platform-independent error messages that can be shown for any type of error and context.
