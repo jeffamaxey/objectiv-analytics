@@ -8,8 +8,7 @@
     "plugins/*",
     "queues/*",
     "trackers/*",
-    "transports/*",
-    "live-testing"
+    "transports/*"
   ],
   "engines": {
     "node": ">= 12",
