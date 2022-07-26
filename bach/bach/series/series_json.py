@@ -56,15 +56,15 @@ class SeriesJson(Series):
 
     Examples:
 
-     .. testsetup:: jsonb
+     .. testsetup:: json
         :skipif: engine is None
 
         data = ['["a","b","c"]', '["d","e","f","g"]', '[{"h":"i","j":"k"},{"l":["m","n","o"]},{"p":"q"}]']
         pdf = pd.DataFrame(data=data, columns=['jsonb_column'])
         df = DataFrame.from_pandas(engine, pdf, convert_objects=True)
-        df['jsonb_column'] = df.jsonb_column.astype('jsonb')
+        df['jsonb_column'] = df.jsonb_column.astype('json')
 
-    .. doctest:: jsonb
+    .. doctest:: json
         :skipif: engine is None
 
         >>> pdf
@@ -73,11 +73,11 @@ class SeriesJson(Series):
         1                                  ["d","e","f","g"]
         2  [{"h":"i","j":"k"},{"l":["m","n","o"]},{"p":"q"}]
 
-    .. doctest:: jsonb
+    .. doctest:: json
         :skipif: engine is None
 
         >>> df = DataFrame.from_pandas(engine, pdf, convert_objects=True)
-        >>> df['jsonb_column'] = df.jsonb_column.astype('jsonb')
+        >>> df['jsonb_column'] = df.jsonb_column.astype('json')
         >>> # load some json strings and convert them to jsonb type
         >>> # slice and show with .head()
         >>> df.jsonb_column.json[:2].head()
@@ -87,7 +87,7 @@ class SeriesJson(Series):
         2    [{'h': 'i', 'j': 'k'}, {'l': ['m', 'n', 'o']}]
         Name: jsonb_column, dtype: object
 
-    .. doctest:: jsonb
+    .. doctest:: json
         :skipif: engine is None
 
         >>> df.jsonb_column.json[1].head()
@@ -97,7 +97,7 @@ class SeriesJson(Series):
         2    {'l': ['m', 'n', 'o']}
         Name: jsonb_column, dtype: object
 
-    .. doctest:: jsonb
+    .. doctest:: json
         :skipif: engine is None
 
         >>> # selecting from objects is done by entering a key:
@@ -113,25 +113,25 @@ class SeriesJson(Series):
     to the objects in a json array is returned for the `.json[]` selector. A match is when all key/value pairs
     of the dict are found in an object. This can be used for selecting a subset of a json array with objects.
 
-    .. doctest:: jsonb
+    .. doctest:: json
         :skipif: engine is None
 
         >>> # selecting from arrays by searching objects in the array.
         >>> df.jsonb_column.json[:{"j":"k"}].head()
         _index_0
-        0                      None
-        1                      None
+        0                        []
+        1                        []
         2    [{'h': 'i', 'j': 'k'}]
         Name: jsonb_column, dtype: object
 
-    .. doctest:: jsonb
+    .. doctest:: json
         :skipif: engine is None
 
         >>> # or:
         >>> df.jsonb_column.json[{"l":["m","n","o"]}:].head()
         _index_0
-        0                                    None
-        1                                    None
+        0                                      []
+        1                                      []
         2    [{'l': ['m', 'n', 'o']}, {'p': 'q'}]
         Name: jsonb_column, dtype: object
     """
