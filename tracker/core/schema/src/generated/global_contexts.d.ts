@@ -74,7 +74,7 @@ export interface InputValueContext extends AbstractGlobalContext {
 }
 
 /**
- * A GlobalContext describing the locale used by the user. E.g. an ISO 639-1 code.
+ * A GlobalContext describing the users' language (ISO 639-1) and country (ISO 3166-1 alpha-2).
  * Inheritance: LocaleContext -> AbstractGlobalContext -> AbstractContext
  */
 export interface LocaleContext extends AbstractGlobalContext {
@@ -82,6 +82,16 @@ export interface LocaleContext extends AbstractGlobalContext {
    * Typescript discriminator
    */
   readonly _type: 'LocaleContext';
+
+  /**
+   * Case sensitive ISO 639-1 language code. E.g. en, nl, fr, de, it, etc.
+   */
+  languageCode: string | null;
+
+  /**
+   * Case sensitive ISO 3166-1 alpha-2 country code. E.g. US, NL, FR, DE, IT, etc.
+   */
+  countryCode: string | null;
 }
 
 /**
