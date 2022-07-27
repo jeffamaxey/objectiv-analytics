@@ -4,27 +4,7 @@ The Objectiv collector supports using the Snowplow pipeline as a sink for Object
 for Google PubSub and AWS SQS/Kinesis, using Thrift messages. This means we by-pass the Snowplow collector, but hook 
 directly into Snowplows enrichment step.
 
-## Architecture
-The Snowplow pipeline roughly consists of the following components:
-1. `Collector` - http(s) endpoint that receives events
-2. `Enrichment` - process that validates incoming events, potentially enriches them (adds metadata)
-3. `Loader` - final step, where the validated and enriched events are loaded into persistent storage. Depending on your 
-  choice of platform, this could be Big Query on GCP, Redshift on AWS, etc
-4. `iglu` - central repository, used by other components to pull schema to do validation on events, contexts, etc.
-The Snowplow pipeline uses message queues and Thrift messages to communicate between the components.
-
-Objectiv uses its own collector (which also handles validation), so bypasses the Snowplow collector, but pushes events 
-directly into the message queue that is read by the `enrichment`. Snowplow allows for so-called structured custom 
-contexts to be added to events. This is exactly what Objectiv uses. As with all contexts, they must pass validation in 
-the enrichment step, which is why a schema for the Objectiv custom context must be added to iglu.
-
-This way Snowplow knows how to validate the context. Furthermore, it also infers the database schema to be able to persist
-the context. How this is handled depends on the loader chosen (e.g. Postgres uses a different, more relational schema 
-than for instance Big Query).
-
-
-## Setup
-please see https://objectiv.io/docs/tracking/collector/snowplow-pipeline.
+Please see https://objectiv.io/docs/tracking/collector/snowplow-pipeline for more information.
 
 # Maintenance
 
