@@ -527,9 +527,9 @@ class Aggregate:
             For example:
                 Having, `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
                 Will generate the following paths:
-                    - `'a', 'b', 'c'`
-                    - `'b', 'c', 'd'`
-                    - `'c', 'd', None`
+                - `'a', 'b', 'c'`
+                - `'b', 'c', 'd'`
+                - `'c', 'd', None`
 
         :param data: :py:class:`bach.DataFrame` to apply the method on.
         :param steps: Number of steps/locations to consider in navigation path.
