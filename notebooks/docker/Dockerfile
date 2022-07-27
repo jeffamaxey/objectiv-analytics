@@ -14,7 +14,8 @@ RUN mkdir -p $APP && \
     python -m pip install --upgrade pip && \
     useradd --user-group --system --create-home --no-log-init notebook
 
-COPY docker/*.sql  /services/
+COPY docker/00_objectiv.sql  /services/
+COPY docker/0_objectiv_data.sql /services/
 
 COPY requirements.txt /services
 
