@@ -62,6 +62,10 @@ export const defaultXHRFunction = ({
     xhr.send(
       JSON.stringify({
         events,
+
+        // Add client session id to the request
+        client_session_id: globalThis.objectiv.clientSessionId,
+
         // add current timestamp to the request, so the collector
         // may check if there's any clock offset between server and client
         transport_time: Date.now(),

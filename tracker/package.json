@@ -19,7 +19,7 @@
     "clean": "yarn exec make clean && yarn test --clearCache && yarn cache clean",
     "depcheck": "turbo run depcheck",
     "deploy": "yarn registry:npm && turbo run pre-deploy && changeset publish",
-    "deploy:verdaccio": "yarn registry:verdaccio && turbo run pre-deploy && turbo run deploy:verdaccio && yarn registry:npm",
+    "deploy:verdaccio": "yarn registry:verdaccio && turbo run deploy:verdaccio --force && yarn registry:npm",
     "generate": "turbo run generate && turbo run prettify && turbo run tsc",
     "list": "yarn workspaces list",
     "pre-deploy": "turbo run pre-deploy",

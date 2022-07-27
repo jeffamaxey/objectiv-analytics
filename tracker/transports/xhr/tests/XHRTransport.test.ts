@@ -41,6 +41,7 @@ describe('XHRTransport', () => {
       expect(req.body()).toEqual(
         JSON.stringify({
           events: [testEvent],
+          client_session_id: globalThis.objectiv.clientSessionId,
           transport_time: Date.now(),
         })
       );
