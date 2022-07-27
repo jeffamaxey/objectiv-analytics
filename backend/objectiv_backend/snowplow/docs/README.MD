@@ -22,37 +22,9 @@ This way Snowplow knows how to validate the context. Furthermore, it also infers
 the context. How this is handled depends on the loader chosen (e.g. Postgres uses a different, more relational schema 
 than for instance Big Query).
 
+
 ## Setup
-In this setup, we assume you already have a fully functional Snowplow pipeline running, including enrichment, loader 
-and iglu repository. If you haven't, the [Snowplow quickstart for Open Source](https://docs.snowplowanalytics.com/docs/open-source-quick-start/what-is-the-quick-start-for-open-source/) is a good place to start. 
-
-Enabling Objectiv involves two steps:
-1. Add the Objectiv Taxonomy schema to the iglu repository.
-2. Configure the Objectiv Collector output to push events into the appropriate message queue.
-
-### Add the Objectiv schema to the iglu repo
-This explains how to get the Objectiv schema into iglu. This is necessary, so the Snowplow pipeline (enrichment) can 
-validate the incoming custom contexts.
-#### Preparation
-
-- copy the Objectiv iglu schema (see [1-0-0](1-0-0) in this dir) into `schemas/io.objectiv/taxonomy/jsonschema/1-0-0` in your local repo
-- get the address / URL of your iglu repository
-- get the uuid of the repo
-
-#### Pushing the schema
-```shell
-java -jar igluctl static push --public <path to schemas> <url to repo> <uuid>
-
-## example:
-java -jar igluctl static push --public ./schemas https://iglu.example.com myuuid-abcd-abcd-abcd-abcdef12345
-``` 
-
-
-### Enabling the collector output
-The collector can be configured to push events into a Snowplow message queue, using environment 
-variables. Please refer to [aws.md](aws.md) or [gcp.md](gcp.md) for the platform specific instructions.
-
-
+please see https://objectiv.io/docs/tracking/collector/snowplow-pipeline.
 
 # Maintenance
 
