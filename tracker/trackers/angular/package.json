@@ -30,6 +30,7 @@
   "module": "dist/index.js",
   "scripts": {
     "build": "ng-packagr -p ng-package.json",
+    "deploy:verdaccio": "npm publish",
     "prettify": "prettier --write .",
     "tsc": "tsc --noEmit"
   },

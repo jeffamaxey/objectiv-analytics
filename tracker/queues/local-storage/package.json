@@ -41,6 +41,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --legacy-output --minify --dts --sourcemap --clean",
+    "deploy:verdaccio": "npm publish",
     "prettify": "prettier --write .",
     "tsc": "tsc --noEmit",
     "test": "jest --silent",

@@ -42,6 +42,10 @@
     "pre-publish": {
       "dependsOn": ["depcheck", "tsc", "build", "test"],
       "outputs": []
+    },
+    "deploy:verdaccio": {
+      "dependsOn": ["depcheck", "tsc", "build", "test"],
+      "outputs": []
     }
   }
 }
