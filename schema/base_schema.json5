@@ -194,8 +194,20 @@
       }
     },
     "LocaleContext": {
-      "description": "A GlobalContext describing the locale used by the user. E.g. an ISO 639-1 code.",
-      "parents": ["AbstractGlobalContext"]
+      "description": "A GlobalContext describing the users' language (ISO 639-1) and country (ISO 3166-1 alpha-2).",
+      "parents": ["AbstractGlobalContext"],
+      "properties": {
+        "languageCode": {
+          "description": "Case sensitive ISO 639-1 language code. E.g. en, nl, fr, de, it, etc.",
+          "type": "string",
+          "optional": true
+        },
+        "countryCode": {
+          "description": "Case sensitive ISO 3166-1 alpha-2 country code. E.g. US, NL, FR, DE, IT, etc.",
+          "type": "string",
+          "optional": true
+        }
+      }
     },
     "PathContext": {
       "description": "A GlobalContext describing the path where the user is when an event is sent.",
