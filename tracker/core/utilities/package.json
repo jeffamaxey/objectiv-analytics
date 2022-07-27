@@ -12,11 +12,14 @@
     "prettify": "prettier --write .",
     "generate:schema": "(cd src && node generateSchema.js)",
     "generate:errors": "tsup src/generateErrorMessages.ts --onSuccess 'node dist/generateErrorMessages.js'",
+    "generate:language-codes": "tsup src/generateLanguageCodes.ts --onSuccess 'node dist/generateLanguageCodes.js'",
     "generate": "yarn generate:schema && yarn generate:errors",
     "depcheck": "npx depcheck --ignores uuid"
   },
   "devDependencies": {
     "@objectiv/tracker-core": "^0.0.23-next.2",
+    "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12",
     "json5": "^2.2.0",
     "prettier": "^2.5.1",
     "tsup": "^5.12.0",
