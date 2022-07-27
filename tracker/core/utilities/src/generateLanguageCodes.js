@@ -2,17 +2,17 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import axios from 'axios';
-import cheerio from 'cheerio';
-import fs from 'fs';
+const cheerio = require('cheerio');
+const axios = require('axios');
+const fs = require('fs');
 
 /**
  * Script to fetch, parse and generate language codes definitions for LocaleContext Plugin.
- * Execute with `yarn generate:language-codes`. This will compile the script to JS first, then run it.
+ * Execute directly with node (node src/generateLanguageCodes.js), or via `yarn generate:language-codes`.
  */
 
-export const LANGUAGE_CODES_PAGE = 'https://www.loc.gov/standards/iso639-2/php/code_list.php';
-export const DESTINATION_FILENAME = '../../plugins/locale-context/src/generated/LanguageCodes.ts';
+const LANGUAGE_CODES_PAGE = 'https://www.loc.gov/standards/iso639-2/php/code_list.php';
+const DESTINATION_FILENAME = '../../plugins/locale-context/src/generated/LanguageCodes.ts';
 
 try {
   axios({

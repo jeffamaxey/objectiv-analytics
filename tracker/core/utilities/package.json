@@ -12,7 +12,7 @@
     "prettify": "prettier --write .",
     "generate:schema": "(cd src && node generateSchema.js)",
     "generate:errors": "tsup src/generateErrorMessages.ts --onSuccess 'node dist/generateErrorMessages.js'",
-    "generate:language-codes": "tsup src/generateLanguageCodes.ts --onSuccess 'node dist/generateLanguageCodes.js'",
+    "generate:language-codes": "node src/generateLanguageCodes.js",
     "generate": "yarn generate:schema && yarn generate:errors",
     "depcheck": "npx depcheck --ignores uuid"
   },
