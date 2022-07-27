@@ -314,7 +314,12 @@ def test_merge_right_join_shared_on(engine) -> None:
     result = result.sort_values('station')
     assert_equals_data(
         result,
-        expected_columns=['skating_order', 'city', 'station', 'platforms'],
+        expected_columns=[
+            'skating_order',
+            'city',
+            'station',
+            'platforms',
+        ],
         expected_data=[
             [None, None, 'Camminghaburen', 1],
             [None, None, 'Heerenveen', 1],
