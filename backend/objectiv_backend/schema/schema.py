@@ -156,22 +156,35 @@ class InputValueContext(AbstractGlobalContext):
 
 class LocaleContext(AbstractGlobalContext):
     """
-        A GlobalContext describing the locale used by the user. E.g. an ISO 639-1 code.
+        A GlobalContext describing the users' language (ISO 639-1) and country (ISO 3166-1 alpha-2).
 
         Attributes:
+        languageCode (str):
+                Case sensitive ISO 639-1 language code. E.g. en, nl, fr, de, it, etc.
+        countryCode (str):
+                Case sensitive ISO 3166-1 alpha-2 country code. E.g. US, NL, FR, DE, IT, etc.
         id (str):
                 A unique string identifier to be combined with the Context Type (`_type`)
                 for Context instance uniqueness.
     """
     _type = 'LocaleContext'
 
-    def __init__(self, id: str, **kwargs: Optional[Any]):
+    def __init__(self,
+                 id: str,
+                 languageCode: str = None,
+                 countryCode: str = None,
+                 **kwargs: Optional[Any]):
         """
+        :param languageCode: 
+            Case sensitive ISO 639-1 language code. E.g. en, nl, fr, de, it, etc.
+        :param countryCode: 
+            Case sensitive ISO 3166-1 alpha-2 country code. E.g. US, NL, FR, DE, IT, etc.
         :param id: 
             A unique string identifier to be combined with the Context Type (`_type`)
             for Context instance uniqueness.
         """
-        AbstractGlobalContext.__init__(self, id=id, **kwargs)
+        AbstractGlobalContext.__init__(
+            self, languageCode=languageCode, countryCode=countryCode, id=id, **kwargs)
 
 
 class PathContext(AbstractGlobalContext):
