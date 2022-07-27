@@ -181,10 +181,10 @@ Build output will be produced in a `/dist` folder under each package.
 Checks for unused or missing dependencies by running `npx depcheck` for each package.
 
 ### `yarn deploy`
-Runs `pre-publish` and, if it succeeds, publishes all packages to NPM.
+Runs `pre-deploy` and, if it succeeds, publishes all packages to NPM.
 
 ### `yarn deploy:verdaccio`
-Runs `pre-publish` and, if it succeeds, publishes all packages to Verdaccio.
+Runs `pre-deploy` and, if it succeeds, publishes all packages to Verdaccio.
 
 ### `yarn generate`
 Runs generator utilities:
@@ -204,7 +204,7 @@ Prints a list of all the packages configured in the monorepo.
 ### `yarn install`
 Install dependencies for all packages and links local packages to each other.
 
-### `yarn pre-publish`
+### `yarn pre-deploy`
 Runs `depcheck`, `tsc`, `test` and `build` tasks.
 
 ### `yarn prettify`

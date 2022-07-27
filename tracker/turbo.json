@@ -6,46 +6,37 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": ["^test"],
       "outputs": [],
-      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
+      "dependsOn": ["^test"]
     },
     "test:ci": {
-      "dependsOn": ["^test:ci"],
       "outputs": [],
-      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
+      "dependsOn": ["^test:ci"]
     },
     "test:coverage": {
-      "dependsOn": ["^test:coverage"],
       "outputs": ["coverage/**"],
-      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
+      "dependsOn": ["^test:coverage"]
     },
     "prettify": {
-      "dependsOn": ["^prettify"],
       "outputs": [],
-      "inputs": [".prettierignore", ".prettierrc.json", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
+      "dependsOn": ["^prettify"]
     },
     "depcheck": {
-      "dependsOn": ["^depcheck"],
       "outputs": [],
-      "inputs": ["package.json", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
+      "dependsOn": ["^depcheck"]
     },
     "tsc": {
-      "dependsOn": ["^tsc"],
       "outputs": [],
-      "inputs": ["tsconfig.json", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
+      "dependsOn": ["^tsc"]
     },
     "generate": {
-      "outputs": ["generated/**"],
-      "inputs": ["../schema/base_schema.json5", "generateErrorMessages.ts", "generateSchema.js"]
+      "outputs": ["generated/**"]
     },
-    "pre-publish": {
-      "dependsOn": ["depcheck", "tsc", "build", "test"],
-      "outputs": []
+    "pre-deploy": {
+      "dependsOn": ["depcheck", "tsc", "build", "test"]
     },
     "deploy:verdaccio": {
-      "dependsOn": ["depcheck", "tsc", "build", "test"],
-      "outputs": []
+      "dependsOn": ["depcheck", "tsc", "build", "test", "^deploy:verdaccio"]
     }
   }
 }

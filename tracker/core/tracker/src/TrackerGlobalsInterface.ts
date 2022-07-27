@@ -9,6 +9,7 @@ import { TrackerRepositoryInterface } from './TrackerRepositoryInterface';
  * Globals interface definition.
  */
 export interface TrackerGlobalsInterface {
-  TrackerRepository: TrackerRepositoryInterface<any>;
   devTools?: TrackerDeveloperToolsInterface;
+  TrackerRepository: TrackerRepositoryInterface<any>;
+  versions: Map<string, string>;
 }
