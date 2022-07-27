@@ -40,9 +40,8 @@ Google Colab / Hex / Deepnote
 -----------------------------
 
 .. note:: 
-    **For Deepnote only:** as a very first step, create a requirements.txt file, add `pandas==1.4.1` to it, 
-    and restart the machine.
-
+    **For Deepnote only:** as a very first step, create a requirements.txt file, add `objectiv-modelhub` to it,
+    restart the machine and go to step 2.
 
 \1. Install the open model hub in the beginning of your notebook:
 
