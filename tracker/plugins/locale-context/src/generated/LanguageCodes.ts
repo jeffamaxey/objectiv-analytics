@@ -191,5 +191,5 @@ export const LanguageCodes = [
   'yo',
   'za',
   'zh',
-  'zu'
+  'zu',
 ];

@@ -54,7 +54,7 @@ try {
 
     fs.appendFileSync(
       DESTINATION_FILENAME,
-      `export const LanguageCodes = [\n  '${filteredAndSortedLanguageCodes.join(`',\n  '`)}'\n];\n`
+      `export const LanguageCodes = [\n  '${filteredAndSortedLanguageCodes.join(`',\n  '`)}',\n];\n`
     );
 
     console.log(`Language Codes saved to ${DESTINATION_FILENAME}.`);

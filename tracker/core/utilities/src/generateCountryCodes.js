@@ -28,7 +28,10 @@ try {
     const activeCountryLinks = table.find(`td.active a`);
 
     // Get `a`s contents as text and convert to array, then sort it alphabetically
-    const countryCodes = activeCountryLinks.map((_, td) => $(td).text()).toArray().sort();
+    const countryCodes = activeCountryLinks
+      .map((_, td) => $(td).text())
+      .toArray()
+      .sort();
 
     fs.writeFileSync(DESTINATION_FILENAME, `/*\n * Copyright ${new Date().getFullYear()} Objectiv B.V.\n */\n\n`);
 
@@ -39,7 +42,7 @@ try {
 
     fs.appendFileSync(
       DESTINATION_FILENAME,
-      `export const CountryCodes = [\n  '${countryCodes.join(`',\n  '`)}'\n];\n`
+      `export const CountryCodes = [\n  '${countryCodes.join(`',\n  '`)}',\n];\n`
     );
 
     console.log(`Country Codes saved to ${DESTINATION_FILENAME}.`);

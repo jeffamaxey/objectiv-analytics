@@ -18,7 +18,16 @@
       "dependsOn": ["^test:coverage"]
     },
     "prettify": {
-      "outputs": [],
+      "inputs": [
+        ".prettierignore",
+        ".prettierrc.json",
+        "src/**/*.tsx",
+        "src/**/*.ts",
+        "src/**/*.js",
+        "tests/**/*.tsx",
+        "tests/**/*.ts",
+        "tests/**/*.js"
+      ],
       "dependsOn": ["^prettify"]
     },
     "depcheck": {

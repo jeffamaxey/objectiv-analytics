@@ -249,5 +249,5 @@ export const CountryCodes = [
   'YT',
   'ZA',
   'ZM',
-  'ZW'
+  'ZW',
 ];
