@@ -1,19 +1,25 @@
 {
   "name": "@objectiv/utilities",
-  "version": "0.0.22",
+  "version": "0.0.23-next.1",
   "private": true,
   "license": "Apache-2.0",
   "description": "Objectiv Core Utilities",
   "files": [
-    "src/generator.js"
+    "src/generateSchema.js",
+    "src/generateErrorMessages.ts"
   ],
   "scripts": {
     "prettify": "prettier --write .",
-    "generate": "(cd src && node generator.js)",
-    "check:dependencies": "npx depcheck"
+    "generate:schema": "(cd src && node generateSchema.js)",
+    "generate:errors": "tsup src/generateErrorMessages.ts --onSuccess 'node dist/generateErrorMessages.js'",
+    "generate": "yarn generate:schema && yarn generate:errors",
+    "depcheck": "npx depcheck --ignores uuid"
   },
   "devDependencies": {
+    "@objectiv/tracker-core": "^0.0.23-next.1",
     "json5": "^2.2.0",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "tsup": "^5.12.0",
+    "typescript": "^4.6.2"
   }
 }

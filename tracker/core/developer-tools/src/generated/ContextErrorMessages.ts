@@ -2,8 +2,13 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { GlobalContextName, LocationContextName } from '@objectiv/tracker-core';
-import { ContextErrorMessages, GlobalContextErrorType, LocationContextErrorType } from './types';
+import {
+  ContextErrorMessages,
+  GlobalContextErrorType,
+  GlobalContextName,
+  LocationContextErrorType,
+  LocationContextName,
+} from '@objectiv/tracker-core';
 
 export const GlobalContextErrorMessages: ContextErrorMessages<GlobalContextErrorType, GlobalContextName> = {
   ANGULAR: {

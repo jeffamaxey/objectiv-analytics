@@ -2,11 +2,10 @@
  * Copyright 2022 Objectiv B.V.
  */
 
-import { GlobalContextValidationRuleFactory, TrackerEvent } from '@objectiv/tracker-core';
-import { GlobalContextErrorMessages } from '../ContextErrorMessages';
+import { GlobalContextErrorType, GlobalContextValidationRuleFactory, TrackerEvent } from '@objectiv/tracker-core';
 import { EventRecorder } from '../EventRecorder';
+import { GlobalContextErrorMessages } from '../generated/ContextErrorMessages';
 import { TrackerConsole } from '../TrackerConsole';
-import { GlobalContextErrorType } from '../types';
 
 /**
  * A generic configurable Rule that can verify, and console error, whether the given `context` is:

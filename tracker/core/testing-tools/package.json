@@ -1,6 +1,6 @@
 {
   "name": "@objectiv/testing-tools",
-  "version": "0.0.22",
+  "version": "0.0.23-next.1",
   "private": true,
   "license": "Apache-2.0",
   "description": "Mocks and other testing utilities shared across Objectiv Trackers",
@@ -11,11 +11,13 @@
   "scripts": {
     "prettify": "prettier --write .",
     "tsc": "tsc --noEmit",
-    "check:dependencies": "npx depcheck"
+    "depcheck": "npx depcheck"
   },
   "devDependencies": {
-    "@objectiv/tracker-core": "^0.0.22",
     "prettier": "^2.5.1",
     "typescript": "^4.6.2"
+  },
+  "peerDependencies": {
+    "@objectiv/tracker-core": "^0.0.23-next.1"
   }
 }

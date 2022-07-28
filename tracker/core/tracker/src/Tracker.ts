@@ -6,22 +6,12 @@ import { AbstractGlobalContext, AbstractLocationContext, Contexts } from '@objec
 import { ContextsConfig } from './Context';
 import { waitForPromise } from './helpers';
 import { TrackerEvent, TrackerEventConfig } from './TrackerEvent';
+import { TrackerPlatform } from './TrackerPlatform';
 import { TrackerPluginInterface } from './TrackerPluginInterface';
 import { TrackerPlugins } from './TrackerPlugins';
 import { TrackerQueueInterface } from './TrackerQueueInterface';
 import { TrackerTransportGroup } from './TrackerTransportGroup';
 import { TrackerTransportInterface } from './TrackerTransportInterface';
-
-/**
- * Tracker platforms
- */
-export enum TrackerPlatform {
-  ANGULAR = 'ANGULAR',
-  CORE = 'CORE',
-  BROWSER = 'BROWSER',
-  REACT = 'REACT',
-  REACT_NATIVE = 'REACT_NATIVE',
-}
 
 /**
  * The configuration of the Tracker

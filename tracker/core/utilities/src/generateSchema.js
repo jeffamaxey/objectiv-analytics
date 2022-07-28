@@ -12,7 +12,7 @@
  * Additionally, the script will look for extensions there, and will add them to the generated classes and interfaces.
  *
  * Usage is pretty straight forward:
- *    ```node generate.js```
+ *    ```node generateSchema.js```
  * That's all there is to it.
  *
  */
@@ -36,10 +36,10 @@ const CONTEXT_DISCRIMINATOR = '_type';
 const schema_dir = '../../../../schema/';
 
 // where to find the core schema package files
-const core_schema_package_dir = '../../../core/schema/src/';
+const core_schema_package_dir = '../../../core/schema/src/generated/';
 
 // where to find the core tracker package source files
-const core_tracker_package_dir = '../../../core/tracker/src/';
+const core_tracker_package_dir = '../../../core/tracker/src/generated/';
 
 // name of base schema, will be loaded first
 const base_schema_file = 'base_schema.json5';
@@ -676,7 +676,7 @@ Object.keys(object_factories).forEach((factory_type) => {
 
   if (factory_type === 'ContextFactories') {
     import_statements.push(`import { GlobalContextName, LocationContextName } from "./ContextNames";`);
-    import_statements.push(`import { generateUUID } from "./helpers";`);
+    import_statements.push(`import { generateUUID } from "../helpers";`);
   }
 
   const filename = `${core_tracker_package_dir}${factory_type}.ts`;
@@ -793,7 +793,7 @@ if (contentEventNamesTsFile) {
 
 // generate index for all declarations
 // this includes all generated types, as well as those in static.d.ts
-const export_file_list = [...Object.keys(object_declarations), 'static', 'discriminators'].sort();
+const export_file_list = [...Object.keys(object_declarations), 'discriminators'].sort();
 const index_filename = `${core_schema_package_dir}index.d.ts`;
 fs.writeFileSync(index_filename, COPYRIGHT);
 fs.appendFileSync(

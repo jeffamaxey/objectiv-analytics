@@ -21,9 +21,12 @@ node_modules/
 # Test coverage reports
 coverage/
 
-# Distribution files
-dist/
+# Artifacts
+dist
 
 # IDE files
 .idea/
 .vscode/
+
+# Turborepo
+.turbo/

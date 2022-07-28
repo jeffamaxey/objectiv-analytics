@@ -1,6 +1,6 @@
 {
   "name": "@objectiv/transport-fetch",
-  "version": "0.0.22",
+  "version": "0.0.23-next.1",
   "description": "A TrackerTransport based on Fetch API",
   "license": "Apache-2.0",
   "homepage": "https://objectiv.io",
@@ -41,18 +41,17 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --legacy-output --minify --dts --sourcemap --clean",
+    "deploy:verdaccio": "npm publish",
     "prettify": "prettier --write .",
     "tsc": "tsc --noEmit",
-    "test": "jest --silent --runInBand",
-    "test:ci": "jest --silent --ci --runInBand",
-    "test:coverage": "jest --silent --coverage --runInBand",
-    "check:dependencies": "npx depcheck",
-    "npm-publish": "npm publish --access=public --tag=$TAG",
-    "npm-publish:verdaccio": "npm publish --tag=$TAG"
+    "test": "jest --silent",
+    "test:ci": "jest --silent --ci",
+    "test:coverage": "jest --silent --coverage",
+    "depcheck": "npx depcheck"
   },
   "devDependencies": {
-    "@objectiv/developer-tools": "^0.0.22",
-    "@objectiv/testing-tools": "^0.0.22",
+    "@objectiv/developer-tools": "^0.0.23-next.1",
+    "@objectiv/testing-tools": "^0.0.23-next.1",
     "@types/jest": "^27.4.1",
     "jest": "^27.5.1",
     "jest-fetch-mock": "^3.0.3",
@@ -63,6 +62,6 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@objectiv/tracker-core": "~0.0.22"
+    "@objectiv/tracker-core": "~0.0.23-next.1"
   }
 }
