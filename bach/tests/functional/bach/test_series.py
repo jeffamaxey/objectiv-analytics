@@ -197,6 +197,7 @@ def test_isnull(engine):
     assert bt.const_null.isnull().expression.is_constant
     assert bt.const_not_null.notnull().expression.is_constant
     assert bt.const_null.notnull().expression.is_constant
+    assert bt.const_null.dtype == 'string'
     assert_equals_data(
         bt,
         expected_columns=['_index_text_with_null', 'text_with_null', 'const_not_null', 'const_null', 'y', 'z'],
