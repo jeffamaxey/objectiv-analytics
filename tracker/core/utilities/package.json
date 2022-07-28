@@ -13,6 +13,7 @@
     "generate:schema": "(cd src && node generateSchema.js)",
     "generate:errors": "tsup src/generateErrorMessages.ts --onSuccess 'node dist/generateErrorMessages.js'",
     "generate:language-codes": "node src/generateLanguageCodes.js",
+    "generate:country-codes": "node src/generateCountryCodes.js",
     "generate": "yarn generate:schema && yarn generate:errors",
     "depcheck": "npx depcheck --ignores uuid"
   },
