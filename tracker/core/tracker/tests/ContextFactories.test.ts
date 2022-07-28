@@ -125,8 +125,8 @@ describe('Context Factories', () => {
       __global_context: true,
       _type: GlobalContextName.LocaleContext,
       id: 'en',
-      languageCode: null,
-      countryCode: null,
+      language_code: null,
+      country_code: null,
     });
 
     expect(makeLocaleContext({ id: 'en', language_code: 'en' })).toStrictEqual({
@@ -134,8 +134,8 @@ describe('Context Factories', () => {
       __global_context: true,
       _type: GlobalContextName.LocaleContext,
       id: 'en',
-      languageCode: 'en',
-      countryCode: null,
+      language_code: 'en',
+      country_code: null,
     });
 
     expect(makeLocaleContext({ id: 'US', country_code: 'US' })).toStrictEqual({
@@ -143,8 +143,8 @@ describe('Context Factories', () => {
       __global_context: true,
       _type: GlobalContextName.LocaleContext,
       id: 'US',
-      languageCode: null,
-      countryCode: 'US',
+      language_code: null,
+      country_code: 'US',
     });
 
     expect(makeLocaleContext({ id: 'en_US', language_code: 'en', country_code: 'US' })).toStrictEqual({
@@ -152,8 +152,8 @@ describe('Context Factories', () => {
       __global_context: true,
       _type: GlobalContextName.LocaleContext,
       id: 'en_US',
-      languageCode: 'en',
-      countryCode: 'US',
+      language_code: 'en',
+      country_code: 'US',
     });
   });
 

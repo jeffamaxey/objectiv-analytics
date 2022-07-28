@@ -92,8 +92,8 @@ describe('LocaleContextPlugin', () => {
       expect.objectContaining({
         _type: GlobalContextName.LocaleContext,
         id: 'en',
-        languageCode: 'en',
-        countryCode: null,
+        language_code: 'en',
+        country_code: null,
       }),
     ]);
   });
@@ -105,8 +105,8 @@ describe('LocaleContextPlugin', () => {
       expect.objectContaining({
         _type: GlobalContextName.LocaleContext,
         id: 'US',
-        languageCode: null,
-        countryCode: 'US',
+        language_code: null,
+        country_code: 'US',
       }),
     ]);
   });
@@ -120,8 +120,8 @@ describe('LocaleContextPlugin', () => {
       expect.objectContaining({
         _type: GlobalContextName.LocaleContext,
         id: 'en_FR',
-        languageCode: 'en',
-        countryCode: 'FR',
+        language_code: 'en',
+        country_code: 'FR',
       }),
     ]);
   });
@@ -179,8 +179,8 @@ describe('LocaleContextPlugin', () => {
           __global_context: true,
           _type: GlobalContextName.LocaleContext,
           id: 'en',
-          countryCode: null,
-          languageCode: null,
+          country_code: null,
+          language_code: null,
         },
       ])
     );
