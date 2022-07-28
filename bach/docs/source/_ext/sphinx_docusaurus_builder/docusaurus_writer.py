@@ -561,9 +561,10 @@ class DocusaurusTranslator(Translator):
                     if (i != 0): 
                         node_input += "\n"
                     node_input += line[3:]
+                    output_index = i+1
                 else:
-                    output_index = i
                     break
+            
             for i, line in enumerate(node_lines[output_index:]):
                 if (i != 0): 
                     node_output += "\n"
@@ -582,14 +583,15 @@ class DocusaurusTranslator(Translator):
             self.add('</div>\n\n') # end notebook input
             self.add('</div>\n\n') # end notebook in-/output
 
-            self.add('\n<div class="jupyter-notebook-in-output">\n\n')
-            self.add('\n<div class="jupyter-notebook-out">Out:</div>\n\n')
-            self.add('<div class="jupyter-notebook-output">\n\n')
-            self.add('```notebook-output\n')
-            self.add(node_output)
-            self.add('\n```\n\n')
-            self.add('</div>\n\n') # end notebook output
-            self.add('</div>\n\n') # end notebook in-/output
+            if node_output != "":
+                self.add('\n<div class="jupyter-notebook-in-output">\n\n')
+                self.add('\n<div class="jupyter-notebook-out">Out:</div>\n\n')
+                self.add('<div class="jupyter-notebook-output">\n\n')
+                self.add('```notebook-output\n')
+                self.add(node_output)
+                self.add('\n```\n\n')
+                self.add('</div>\n\n') # end notebook output
+                self.add('</div>\n\n') # end notebook in-/output
 
         else:
             if ('language' in node):
