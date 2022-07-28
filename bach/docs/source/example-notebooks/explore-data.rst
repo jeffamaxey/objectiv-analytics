@@ -8,18 +8,14 @@
 Explore your data
 =================
 
-In this example, we briefly demonstrate how you can easily explore your new data collected with Objectiv.
-
-This example is also available in a `notebook
+This example notebook shows how you can easily explore your data collected with Objectiv. It's also available 
+as a `full Jupyter notebook 
 <https://github.com/objectiv/objectiv-analytics/blob/main/notebooks/explore-your-data.ipynb>`_
-to run on your own data or use our `quickstart <https://objectiv.io/docs/home/quickstart-guide/>`_ to try it 
-out with demo data in 5 minutes.
+to run on your own data, or you can instead `run the Demo </docs/home/quickstart-guide/>`_ to quickly try it 
+out. The dataset used here is the same as in the Demo.
 
-First we have to install the open model hub and instantiate the Objectiv DataFrame object; see
-:doc:`getting started in your notebook <../get-started-in-your-notebook>`.
-
-The data used in this example is based on the data set that comes with our quickstart docker demo.
-
+We assume below that you've installed the open model hub and instantiated an Objectiv DataFrame object; see 
+how to :doc:`get started in your notebook <../get-started-in-your-notebook>`.
 
 A first look at the data
 ------------------------
@@ -31,14 +27,15 @@ A first look at the data
     from bach import display_sql_as_markdown
     modelhub = ModelHub(time_aggregation='%Y-%m-%d')
     df = modelhub.get_objectiv_dataframe(
-      start_date='2022-06-01',
-      end_date='2022-06-30',
-      table_name='data')
+        db_url=DB_PG_TEST_URL,
+        start_date='2022-06-01',
+        end_date='2022-06-30',
+        table_name='data')
 
 .. doctest:: explore-data
     :skipif: engine is None
 
-    >>> # have a look at the data
+    >>> # have a look at the event data, sorted by the user's session ID & hit
     >>> df.sort_values(['session_id', 'session_hit_number'], ascending=False).head()
                                                 day                  moment                              user_id                                   global_contexts                                    location_stack            event_type                                  stack_event_types session_id session_hit_number
     event_id
@@ -55,7 +52,7 @@ Understanding the columns
 .. doctest:: explore-data
     :skipif: engine is None
 
-    >>> # show the data type of each column
+    >>> # see the data type for each column
     >>> df.dtypes
     {'day': 'date',
     'moment': 'timestamp',
@@ -67,55 +64,64 @@ Understanding the columns
     'session_id': 'int64',
     'session_hit_number': 'int64'}
 
-What is in these columns:
+What's in these columns:
 
 * `day`: the day of the session as a date.
-* `moment`: the exact moment of the event.
-* `user_id`: the unique identifier of the user based on the cookie.
-* `global_contexts`: a json-like data column that stores additional information on the event that is logged. 
-  This includes data like device data, application data, and cookie information. 
-  :ref:`See this example notebook <open_taxonomy_location_stack_and_global_contexts>` for a more detailed 
-  explanation.
-* `location_stack`: a json-like data column that stores information on the exact location where the event is 
-  triggered in the product's UI. 
-  :ref:`See this example notebook <open_taxonomy_location_stack_and_global_contexts>` for more detailed 
-  explanation.
-* `event_type`: the type of event that is logged.
-* `stack_event_types`: the parents of the event_type.
-* `session_id`: a unique incremented integer id for each session. Starts at 1 for the selected data in the 
+* `moment`: the exact moment of the event as a timestamp.
+* `user_id`: the unique identifier of the user, based on the cookie.
+* `global_contexts`: a JSON-like column that stores additional global information on the event that is logged, 
+  such as device, application, cookie, etcetera. :doc:`See the open taxonomy notebook <./open-taxonomy>` for 
+  more details.
+* `location_stack`: a JSON-like column that stores information on the UI location that the event was 
+  triggered. :doc:`See the open taxonomy notebook <./open-taxonomy>` for more details.
+* `event_type`: the type of event that is logged, e.g. a `PressEvent`.
+* `stack_event_types`: the parents of the `event_type` as a hierarchical JSON structure.
+* `session_id`: a unique incremented integer ID for each session. Starts at 1 for the selected data in the 
   DataFrame.
-* `session_hit_number`: a incremented integer id for each hit in session ordered by moment.
+* `session_hit_number`: an incremented integer ID for each hit in the session, ordered by moment.
 
-Open Analytics Taxonomy
------------------------
-To get a good understanding of all the data and what you can get out of it, the open analytics taxonomy 
-documentation is the place to go:
+**Open analytics taxonomy**
 
-* `Event types, the stored data and hierarchy <https://objectiv.io/docs/taxonomy/events>`_.
-* `Global contexts and what data you can find where <https://objectiv.io/docs/taxonomy/global-contexts>`_.
-* `Location contexts to capture your product's UI in the data <https://objectiv.io/docs/taxonomy/location-contexts>`_.
+For a more detailed understanding of Objectiv events in general, and especially the `global_contexts` and 
+`location_stack` data columns, see the open analytics taxonomy documentation:
+
+* `Events </docs/taxonomy/events>`_.
+* `Global contexts </docs/taxonomy/global-contexts>`_.
+* `Location contexts </docs/taxonomy/location-contexts>`_.
 
 Your first Objectiv event data
 ------------------------------
-Before we dig any deeper, let's look at what data Objectiv is now tracking from your product. An easy way to 
-do this, is by looking at it from the 'root locations', these are the main sections in your products UI.
+Before we dig any deeper, let's take a more global look at the data Objectiv is now tracking in your product. 
+An easy way to do this, is by looking at it from the `'root locations' 
+</docs/taxonomy/reference/location-contexts/RootLocationContext>`_; the main sections in your product's UI.
 
-Before we can do this, we first extract data from the Global Contexts and Location Stack. These columns 
-contain all relevant context about the event. See more detailed examples on how you can do this in 
-:ref:`this example notebook <open_taxonomy_location_stack_and_global_contexts>`.
+First, we want to extract data from the `global_contexts` and `location_stack` columns that contain all 
+relevant context about the event. :doc:`See the open taxonomy notebook <./open-taxonomy>` for more details.
 
-.. code-block:: python
+.. doctest:: explore-data
+    :skipif: engine is None
 
-    # adding specific contexts to the data as columns
-    df['application'] = df.global_contexts.gc.application
-    df['root_location'] = df.location_stack.ls.get_from_context_with_type_series(type='RootLocationContext', key='id')
-    df['path'] = df.global_contexts.gc.get_from_context_with_type_series(type='PathContext', key='id')
+    >>> # add specific contexts to the data as columns
+    >>> df['application'] = df.global_contexts.gc.application
+    >>> df['root_location'] = df.location_stack.ls.get_from_context_with_type_series(type='RootLocationContext', key='id')
+    >>> df['path'] = df.global_contexts.gc.get_from_context_with_type_series(type='PathContext', key='id')
 
-.. code-block:: python
+.. doctest:: explore-data
+    :skipif: engine is None
 
-    # now, we can easily slice the data using these columns
-    event_data = modelhub.agg.unique_users(df, groupby=['application', 'root_location', 'path', 'event_type'])
-    event_data.sort_values(ascending=False).to_frame().head(50)
+    >>> # now, we can easily slice the data using these columns
+    >>> event_data = modelhub.agg.unique_users(df, groupby=['application', 'root_location', 'path', 'event_type'])
+    >>> event_data.sort_values(ascending=False).to_frame().head(7)
+                                                                               unique_users
+    application      root_location path                 event_type 
+    objectiv-website home          https://objectiv.io/ MediaLoadEvent                  202
+                                                        ApplicationLoadedEvent          194
+                                                        PressEvent                      161
+                                                        VisibleEvent                    158
+                                                        HiddenEvent                      82
+    objectiv-docs    home          NaN                  VisibleEvent                     79
+                                                        ApplicationLoadedEvent           67
+
 
 Understanding product features
 ------------------------------
