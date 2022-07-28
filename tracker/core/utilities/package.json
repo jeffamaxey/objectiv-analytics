@@ -14,7 +14,7 @@
     "generate:errors": "tsup src/generateErrorMessages.ts --onSuccess 'node dist/generateErrorMessages.js'",
     "generate:country-codes": "node src/generateCountryCodes.js",
     "generate:language-codes": "node src/generateLanguageCodes.js",
-    "generate:locale-codes": "yarn generate:country-codes && yarn generate:locale-codes",
+    "generate:locale-codes": "yarn generate:country-codes && yarn generate:language-codes",
     "generate": "yarn generate:schema && yarn generate:errors && yarn generate:locale-codes",
     "depcheck": "npx depcheck --ignores uuid"
   },
