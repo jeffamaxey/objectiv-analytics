@@ -560,7 +560,7 @@ class DocusaurusTranslator(Translator):
                 if(line[0:3] == ">>>"):
                     if (i != 0): 
                         node_input += "\n"
-                    node_input += line
+                    node_input += line[3:]
                 else:
                     output_index = i
                     break
@@ -570,16 +570,26 @@ class DocusaurusTranslator(Translator):
                 node_output += line
 
             # parse in- and output blocks separately
+            self.add('\n<div class="jupyter-notebook-in-output">\n\n')
+            self.add('\n<div class="jupyter-notebook-in">In:</div>\n\n')
+            self.add('<div class="jupyter-notebook-input">\n\n')
             if node['language'] == 'pycon3':
                 self.add('```python\n')
             else:
                 self.add('```\n')
             self.add(node_input)
             self.add('\n```\n\n')
+            self.add('</div>\n\n') # end notebook input
+            self.add('</div>\n\n') # end notebook in-/output
 
+            self.add('\n<div class="jupyter-notebook-in-output">\n\n')
+            self.add('\n<div class="jupyter-notebook-out">Out:</div>\n\n')
+            self.add('<div class="jupyter-notebook-output">\n\n')
             self.add('```notebook-output\n')
             self.add(node_output)
             self.add('\n```\n\n')
+            self.add('</div>\n\n') # end notebook output
+            self.add('</div>\n\n') # end notebook in-/output
 
         else:
             if ('language' in node):
