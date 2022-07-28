@@ -21,48 +21,48 @@ A first look at the data
 ------------------------
 
 .. testsetup:: explore-data
-    :skipif: engine is None
+	:skipif: engine is None
 
-    from modelhub import ModelHub
-    from bach import display_sql_as_markdown
-    modelhub = ModelHub(time_aggregation='%Y-%m-%d')
-    df = modelhub.get_objectiv_dataframe(
-        db_url=DB_PG_TEST_URL,
-        start_date='2022-06-01',
-        end_date='2022-06-30',
-        table_name='data')
+	from modelhub import ModelHub
+	from bach import display_sql_as_markdown
+	modelhub = ModelHub(time_aggregation='%Y-%m-%d')
+	df = modelhub.get_objectiv_dataframe(
+		db_url=DB_PG_TEST_URL,
+		start_date='2022-06-01',
+		end_date='2022-06-30',
+		table_name='data')
 
 .. doctest:: explore-data
-    :skipif: engine is None
+	:skipif: engine is None
 
-    >>> # have a look at the event data, sorted by the user's session ID & hit
-    >>> df.sort_values(['session_id', 'session_hit_number'], ascending=False).head()
-                                                day                  moment                              user_id                                   global_contexts                                    location_stack            event_type                                  stack_event_types session_id session_hit_number
-    event_id
-    96b5e709-bb8a-46de-ac82-245be25dac29 2022-06-30 2022-06-30 21:40:32.401 2d718142-9be7-4975-a669-ba022fd8fd48 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... VisibleEvent           [AbstractEvent, NonInteractiveEvent, VisibleEv...        872                  3
-    252d7d87-5600-4d90-b24f-2a6fb8986c5e 2022-06-30 2022-06-30 21:40:30.117 2d718142-9be7-4975-a669-ba022fd8fd48 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... PressEvent             [AbstractEvent, InteractiveEvent, PressEvent]            872                  2
-    157a3000-bbfc-42e0-b857-901bd578ea7c 2022-06-30 2022-06-30 21:40:16.908 2d718142-9be7-4975-a669-ba022fd8fd48 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... PressEvent             [AbstractEvent, InteractiveEvent, PressEvent]            872                  1
-    8543f519-d3a4-4af6-89f5-cb04393944b8 2022-06-30 2022-06-30 20:43:50.962 bb127c9e-3067-4375-9c73-cb86be332660 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... MediaLoadEvent         [AbstractEvent, MediaEvent, MediaLoadEvent, No...        871                  2
-    a0ad4364-57e0-4da9-a266-057744550cc2 2022-06-30 2022-06-30 20:43:49.820 bb127c9e-3067-4375-9c73-cb86be332660 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... ApplicationLoadedEvent [AbstractEvent, ApplicationLoadedEvent, NonInt...        871                  1
-    <BLANKLINE>
+	>>> # have a look at the event data, sorted by the user's session ID & hit
+	>>> df.sort_values(['session_id', 'session_hit_number'], ascending=False).head()
+												 day                  moment                              user_id                                   global_contexts                                    location_stack            event_type                                  stack_event_types session_id session_hit_number
+	event_id
+	96b5e709-bb8a-46de-ac82-245be25dac29  2022-06-30 2022-06-30 21:40:32.401 2d718142-9be7-4975-a669-ba022fd8fd48 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... VisibleEvent           [AbstractEvent, NonInteractiveEvent, VisibleEv...        872                  3
+	252d7d87-5600-4d90-b24f-2a6fb8986c5e  2022-06-30 2022-06-30 21:40:30.117 2d718142-9be7-4975-a669-ba022fd8fd48 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... PressEvent             [AbstractEvent, InteractiveEvent, PressEvent]            872                  2
+	157a3000-bbfc-42e0-b857-901bd578ea7c  2022-06-30 2022-06-30 21:40:16.908 2d718142-9be7-4975-a669-ba022fd8fd48 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... PressEvent             [AbstractEvent, InteractiveEvent, PressEvent]            872                  1
+	8543f519-d3a4-4af6-89f5-cb04393944b8  2022-06-30 2022-06-30 20:43:50.962 bb127c9e-3067-4375-9c73-cb86be332660 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... MediaLoadEvent         [AbstractEvent, MediaEvent, MediaLoadEvent, No...        871                  2
+	a0ad4364-57e0-4da9-a266-057744550cc2  2022-06-30 2022-06-30 20:43:49.820 bb127c9e-3067-4375-9c73-cb86be332660 [{'id': 'http_context', '_type': 'HttpContext'... [{'id': 'home', '_type': 'RootLocationContext'... ApplicationLoadedEvent [AbstractEvent, ApplicationLoadedEvent, NonInt...        871                  1
+	<BLANKLINE>
 
 Understanding the columns
 -------------------------
 
 .. doctest:: explore-data
-    :skipif: engine is None
+	:skipif: engine is None
 
-    >>> # see the data type for each column
-    >>> df.dtypes
-    {'day': 'date',
-    'moment': 'timestamp',
-    'user_id': 'uuid',
-    'global_contexts': 'objectiv_global_context',
-    'location_stack': 'objectiv_location_stack',
-    'event_type': 'string',
-    'stack_event_types': 'json',
-    'session_id': 'int64',
-    'session_hit_number': 'int64'}
+	>>> # see the data type for each column
+	>>> df.dtypes
+	{'day': 'date',
+	'moment': 'timestamp',
+	'user_id': 'uuid',
+	'global_contexts': 'objectiv_global_context',
+	'location_stack': 'objectiv_location_stack',
+	'event_type': 'string',
+	'stack_event_types': 'json',
+	'session_id': 'int64',
+	'session_hit_number': 'int64'}
 
 What's in these columns:
 
@@ -80,7 +80,7 @@ What's in these columns:
   DataFrame.
 * `session_hit_number`: an incremented integer ID for each hit in the session, ordered by moment.
 
-**Open analytics taxonomy**
+**Open analytics taxonomy columns**
 
 For a more detailed understanding of Objectiv events in general, and especially the `global_contexts` and 
 `location_stack` data columns, see the open analytics taxonomy documentation:
@@ -99,29 +99,42 @@ First, we want to extract data from the `global_contexts` and `location_stack` c
 relevant context about the event. :doc:`See the open taxonomy notebook <./open-taxonomy>` for more details.
 
 .. doctest:: explore-data
-    :skipif: engine is None
+	:skipif: engine is None
 
-    >>> # add specific contexts to the data as columns
-    >>> df['application'] = df.global_contexts.gc.application
-    >>> df['root_location'] = df.location_stack.ls.get_from_context_with_type_series(type='RootLocationContext', key='id')
-    >>> df['path'] = df.global_contexts.gc.get_from_context_with_type_series(type='PathContext', key='id')
+	>>> # add specific contexts to the data as columns
+	>>> df['application'] = df.global_contexts.gc.application
+	>>> df['root_location'] = df.location_stack.ls.get_from_context_with_type_series(type='RootLocationContext', key='id')
+	>>> df['path'] = df.global_contexts.gc.get_from_context_with_type_series(type='PathContext', key='id')
 
 .. doctest:: explore-data
-    :skipif: engine is None
+	:skipif: engine is None
+	:options: +NORMALIZE_WHITESPACE
 
-    >>> # now, we can easily slice the data using these columns
-    >>> event_data = modelhub.agg.unique_users(df, groupby=['application', 'root_location', 'path', 'event_type'])
-    >>> event_data.sort_values(ascending=False).to_frame().head(7)
-                                                                               unique_users
-    application      root_location path                 event_type 
-    objectiv-website home          https://objectiv.io/ MediaLoadEvent                  202
-                                                        ApplicationLoadedEvent          194
-                                                        PressEvent                      161
-                                                        VisibleEvent                    158
-                                                        HiddenEvent                      82
-    objectiv-docs    home          NaN                  VisibleEvent                     79
-                                                        ApplicationLoadedEvent           67
-
+	>>> # now easily slice the data using the added context columns
+	>>> event_data = modelhub.agg.unique_users(df, groupby=['application', 'root_location', 'path', 'event_type'])
+	>>> event_data.sort_values(ascending=False).to_frame().head(20)
+																													unique_users
+	application         root_location   path                                            event_type 
+	objectiv-website    home            https://objectiv.io/                            MediaLoadEvent                  202
+																						ApplicationLoadedEvent          194
+																						PressEvent                      161
+																						VisibleEvent                    158
+																						HiddenEvent                     82
+	objectiv-docs       home            NaN                                             VisibleEvent                    79
+																						ApplicationLoadedEvent          67
+						modeling        NaN                                             VisibleEvent                    56
+						home            NaN                                             PressEvent                      47
+										https://objectiv.io/docs/                       VisibleEvent                    45
+						modeling        NaN                                             PressEvent                      41
+						taxonomy        NaN                                             VisibleEvent                    39
+										https://objectiv.io/docs/taxonomy/reference     VisibleEvent                    36
+										NaN                                             PressEvent                      34
+	objectiv-website    about           https://objectiv.io/about                       PressEvent                      30
+	objectiv-docs       taxonomy        NaN                                             ApplicationLoadedEvent          29
+										https://objectiv.io/docs/taxonomy/              ApplicationLoadedEvent          27
+						home            https://objectiv.io/docs/home/quickstart-guide/ VisibleEvent                    26
+						tracking        NaN                                             VisibleEvent                    25
+						modeling        NaN                                             ApplicationLoadedEvent          24
 
 Understanding product features
 ------------------------------
@@ -130,24 +143,50 @@ slice the data on any part of the UI that you're interested in. See
 :ref:`this example notebook <open_taxonomy_location_stack_and_global_contexts>`. It also means you can make 
 product features very readable and easy to understand for your internal data reports.
 
-.. code-block:: python
+.. doctest:: explore-data
+	:skipif: engine is None
 
-    # adding the readable product feature name to the data frame as column
-    df['feature_nice_name'] = df.location_stack.ls.nice_name
+	>>> # add the readable product feature name to the dataframe as a column
+	>>> df['feature_nice_name'] = df.location_stack.ls.nice_name
 
-.. code-block:: python
+.. doctest:: explore-data
+	:skipif: engine is None
 
-    # now, we can easily look at the data by product feature
-    product_feature_data = modelhub.agg.unique_users(df, groupby=['feature_nice_name', 'event_type'])
-    product_feature_data.sort_values(ascending=False).to_frame().head(50)
+	>>> # now easily look at the data by product feature
+	>>> pd.set_option('max_colwidth', None)
+	>>> product_feature_data = modelhub.agg.unique_users(df, groupby=['feature_nice_name', 'event_type'])
+	>>> product_feature_data.sort_values(ascending=False).to_frame().head(2)
+																																					 unique_users
+	feature_nice_name                                                                                                        event_type 
+	Root Location: home                                                                                                      ApplicationLoadedEvent           250
+	Media Player: 2-minute-video located at Root Location: home => Content: modeling                                         MediaLoadEvent                   220
+
+.. Overlay: star-us-notification-overlay located at Root Location: home => Pressable: star-us-notification                  VisibleEvent                     181
+..                                                                                                                          HiddenEvent                       94
+.. Expandable: The Project located at Root Location: home => Navigation: docs-sidebar                                       VisibleEvent                      75
+.. Pressable: after located at Root Location: home => Content: capture-data => Content: data-capture-workflow-before-after  PressEvent                        74
+.. Root Location: taxonomy                                                                                                  ApplicationLoadedEvent            58
+.. Expandable: the-project located at Root Location: home => Navigation: docs-sidebar                                       VisibleEvent                      55
+.. Pressable: after located at Root Location: home => Content: modeling => Content: modeling-workflow-before-after          PressEvent                        48
+.. Root Location: blog                                                                                                      ApplicationLoadedEvent            46
+.. Root Location: modeling                                                                                                  ApplicationLoadedEvent            45
+.. Link: about-us located at Root Location: home => Navigation: navbar-top                                                  PressEvent                        36
+.. Pressable: before located at Root Location: home => Content: capture-data => Content: data-capture-workflow-before-after PressEvent                        35
+.. Expandable: reference located at Root Location: taxonomy => Navigation: docs-sidebar                                     VisibleEvent                      31
+.. Overlay: hamburger-menu located at Root Location: home => Navigation: navbar-top                                         VisibleEvent                      29
+.. Link: logo located at Root Location: home => Navigation: navbar-top                                                      PressEvent                        28
+.. Expandable: Reference located at Root Location: taxonomy => Navigation: docs-sidebar                                     VisibleEvent                      26
+.. Overlay: hamburger-menu located at Root Location: modeling => Navigation: navbar-top                                     VisibleEvent                      23
+.. Link: docs located at Root Location: home => Navigation: navbar-top                                                      PressEvent                        23
+.. Pressable: hamburger located at Root Location: home => Navigation: navbar-top                                            PressEvent                        21
 
 Get the SQL for any analysis
 ----------------------------
 
 .. code-block:: python
 
-    # just one analysis as an example, this works for anything you do with Objectiv Bach
-    display_sql_as_markdown(product_feature_data)
+	# just one analysis as an example, this works for anything you do with Objectiv Bach
+	display_sql_as_markdown(product_feature_data)
 
 Where to go next
 ----------------
