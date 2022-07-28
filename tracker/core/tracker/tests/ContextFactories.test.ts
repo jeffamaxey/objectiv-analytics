@@ -129,7 +129,7 @@ describe('Context Factories', () => {
       countryCode: null,
     });
 
-    expect(makeLocaleContext({ id: 'en', languageCode: 'en' })).toStrictEqual({
+    expect(makeLocaleContext({ id: 'en', language_code: 'en' })).toStrictEqual({
       __instance_id: matchUUID,
       __global_context: true,
       _type: GlobalContextName.LocaleContext,
@@ -138,7 +138,7 @@ describe('Context Factories', () => {
       countryCode: null,
     });
 
-    expect(makeLocaleContext({ id: 'US', countryCode: 'US' })).toStrictEqual({
+    expect(makeLocaleContext({ id: 'US', country_code: 'US' })).toStrictEqual({
       __instance_id: matchUUID,
       __global_context: true,
       _type: GlobalContextName.LocaleContext,
@@ -147,7 +147,7 @@ describe('Context Factories', () => {
       countryCode: 'US',
     });
 
-    expect(makeLocaleContext({ id: 'en_US', languageCode: 'en', countryCode: 'US' })).toStrictEqual({
+    expect(makeLocaleContext({ id: 'en_US', language_code: 'en', country_code: 'US' })).toStrictEqual({
       __instance_id: matchUUID,
       __global_context: true,
       _type: GlobalContextName.LocaleContext,

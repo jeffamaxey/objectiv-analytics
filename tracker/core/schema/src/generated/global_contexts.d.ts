@@ -86,12 +86,12 @@ export interface LocaleContext extends AbstractGlobalContext {
   /**
    * Case sensitive ISO 639-1 language code. E.g. en, nl, fr, de, it, etc.
    */
-  languageCode: string | null;
+  language_code: string | null;
 
   /**
    * Case sensitive ISO 3166-1 alpha-2 country code. E.g. US, NL, FR, DE, IT, etc.
    */
-  countryCode: string | null;
+  country_code: string | null;
 }
 
 /**

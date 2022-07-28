@@ -197,12 +197,12 @@
       "description": "A GlobalContext describing the users' language (ISO 639-1) and country (ISO 3166-1 alpha-2).",
       "parents": ["AbstractGlobalContext"],
       "properties": {
-        "languageCode": {
+        "language_code": {
           "description": "Case sensitive ISO 639-1 language code. E.g. en, nl, fr, de, it, etc.",
           "type": "string",
           "optional": true
         },
-        "countryCode": {
+        "country_code": {
           "description": "Case sensitive ISO 3166-1 alpha-2 country code. E.g. US, NL, FR, DE, IT, etc.",
           "type": "string",
           "optional": true

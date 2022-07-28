@@ -121,8 +121,8 @@ export class LocaleContextPlugin implements TrackerPluginInterface {
 
     const localeContext = makeLocaleContext({
       id: localeContextId,
-      languageCode,
-      countryCode,
+      language_code: languageCode,
+      country_code: countryCode,
     });
     contexts.global_contexts.push(localeContext);
   }
