@@ -55,6 +55,26 @@ describe('LocaleContextPlugin', () => {
     );
   });
 
+  it('enrich should console error if the given languageFactoryFunction returns an invalid code', async () => {
+    const testEvent = new TrackerEvent({ _type: 'test-event' });
+    new LocaleContextPlugin({ languageFactoryFunction: () => 'nope' }).enrich(testEvent);
+
+    expect(MockConsoleImplementation.warn).toHaveBeenCalledWith(
+      '%c｢objectiv:LocaleContextPlugin｣ Language code is not ISO 639-1. Got: nope.',
+      'font-weight: bold'
+    );
+  });
+
+  it('enrich should console error if the given countryFactoryFunction returns an invalid code', async () => {
+    const testEvent = new TrackerEvent({ _type: 'test-event' });
+    new LocaleContextPlugin({ countryFactoryFunction: () => 'nope' }).enrich(testEvent);
+
+    expect(MockConsoleImplementation.warn).toHaveBeenCalledWith(
+      '%c｢objectiv:LocaleContextPlugin｣ Country code is not ISO 3166-1 alpha-2. Got: nope.',
+      'font-weight: bold'
+    );
+  });
+
   it('enrich should console error if the given factory does not return a value - countryFactoryFunction', async () => {
     const testEvent = new TrackerEvent({ _type: 'test-event' });
     new LocaleContextPlugin({ countryFactoryFunction: () => null }).enrich(testEvent);

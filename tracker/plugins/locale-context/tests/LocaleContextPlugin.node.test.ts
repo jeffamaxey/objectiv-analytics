@@ -56,5 +56,19 @@ describe('LocaleContextPlugin - node', () => {
 
       expect(MockConsoleImplementation.warn).not.toHaveBeenCalled();
     });
+
+    it('enrich should not console error if the given languageFactoryFunction returns an invalid code', async () => {
+      const testEvent = new TrackerEvent({ _type: 'test-event' });
+      new LocaleContextPlugin({ languageFactoryFunction: () => 'nope' }).enrich(testEvent);
+
+      expect(MockConsoleImplementation.warn).not.toHaveBeenCalled();
+    });
+
+    it('enrich should not console error if the given countryFactoryFunction returns an invalid code', async () => {
+      const testEvent = new TrackerEvent({ _type: 'test-event' });
+      new LocaleContextPlugin({ countryFactoryFunction: () => 'nope' }).enrich(testEvent);
+
+      expect(MockConsoleImplementation.warn).not.toHaveBeenCalled();
+    });
   });
 });

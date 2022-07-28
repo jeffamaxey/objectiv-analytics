@@ -3,6 +3,8 @@
  */
 
 import { ContextsConfig, makeLocaleContext, TrackerPluginInterface } from '@objectiv/tracker-core';
+import { CountryCodes } from './generated/CountryCodes';
+import { LanguageCodes } from './generated/LanguageCodes';
 
 /**
  * Factory functions may return string, null or undefined
@@ -77,10 +79,29 @@ export class LocaleContextPlugin implements TrackerPluginInterface {
       return;
     }
 
-    const languageCode = this.languageFactoryFunction();
-    const countryCode = this.countryFactoryFunction();
+    // Generate and validate language code.
+    const maybeLanguageCode = this.languageFactoryFunction();
+    const languageCode = maybeLanguageCode && LanguageCodes.includes(maybeLanguageCode) ? maybeLanguageCode : null;
+    if (maybeLanguageCode && !languageCode) {
+      globalThis.objectiv.devTools?.TrackerConsole.warn(
+        `%c｢objectiv:${this.pluginName}｣ Language code is not ISO 639-1. Got: ${maybeLanguageCode}.`,
+        'font-weight: bold'
+      );
+      return;
+    }
 
-    // Generate context id. We use either what the developer specified, or generate one with language and country
+    // Generate and validate country code.
+    const maybeCountryCode = this.countryFactoryFunction();
+    const countryCode = maybeCountryCode && CountryCodes.includes(maybeCountryCode) ? maybeCountryCode : null;
+    if (maybeCountryCode && !countryCode) {
+      globalThis.objectiv.devTools?.TrackerConsole.warn(
+        `%c｢objectiv:${this.pluginName}｣ Country code is not ISO 3166-1 alpha-2. Got: ${maybeCountryCode}.`,
+        'font-weight: bold'
+      );
+      return;
+    }
+
+    // Generate LocaleContext id. We use either what the developer specified, or make one with language and country.
     let localeContextId = this.idFactoryFunction();
     if (!localeContextId) {
       if (languageCode && countryCode) {
