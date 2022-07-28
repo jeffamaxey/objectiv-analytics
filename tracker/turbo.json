@@ -8,38 +8,42 @@
     "test": {
       "dependsOn": ["^test"],
       "outputs": [],
-      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
     },
     "test:ci": {
       "dependsOn": ["^test:ci"],
       "outputs": [],
-      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
     },
     "test:coverage": {
       "dependsOn": ["^test:coverage"],
       "outputs": ["coverage/**"],
-      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "jest.config.js", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
     },
     "prettify": {
       "dependsOn": ["^prettify"],
       "outputs": [],
-      "inputs": [".prettierignore", ".prettierrc.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": [".prettierignore", ".prettierrc.json", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
     },
     "depcheck": {
       "dependsOn": ["^depcheck"],
       "outputs": [],
-      "inputs": ["package.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["package.json", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
     },
     "tsc": {
       "dependsOn": ["^tsc"],
       "outputs": [],
-      "inputs": ["tsconfig.json", "src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+      "inputs": ["tsconfig.json", "src/**/*.tsx", "src/**/*.ts", "tests/*.ts", "tests/*.tsx"]
     },
     "generate": {
       "outputs": ["generated/**"],
       "inputs": ["../schema/base_schema.json5", "generateErrorMessages.ts", "generateSchema.js"]
     },
     "pre-publish": {
+      "dependsOn": ["depcheck", "tsc", "build", "test"],
+      "outputs": []
+    },
+    "deploy:verdaccio": {
       "dependsOn": ["depcheck", "tsc", "build", "test"],
       "outputs": []
     }

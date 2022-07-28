@@ -53,6 +53,9 @@ export class TrackerQueue implements TrackerQueueInterface {
   // State to avoid concurrent runs
   running: boolean = false;
 
+  // State to determine whether at least one batch has been successfully sent
+  firstBatchSuccessfullySent: boolean = false;
+
   /**
    * Initializes batching configuration with some sensible values.
    */
@@ -110,7 +113,7 @@ export class TrackerQueue implements TrackerQueueInterface {
     // Load and process as many Event batches as `concurrency` allows. For each Event we create a Promise.
     let processPromises: Promise<any>[] = [];
 
-    for (let i = 0; i < this.concurrency; i++) {
+    for (let i = 0; i < this.getConcurrency(); i++) {
       const eventsBatch = await this.readBatch();
 
       // No need to continue if there are no more Events to process
@@ -134,6 +137,7 @@ export class TrackerQueue implements TrackerQueueInterface {
           // Delete Events from Store when the process function promise resolves
           .then(() => {
             this.store.delete(eventsBatchIds);
+            this.firstBatchSuccessfullySent = true;
           })
           // Delete Event Ids from processing list, regardless if the processing was successful or not
           .finally(() => {
@@ -154,5 +158,16 @@ export class TrackerQueue implements TrackerQueueInterface {
 
   isIdle(): boolean {
     return this.store.length === 0 && this.processingEventIds.length === 0;
+  }
+
+  /**
+   * Helper function to retrieve the concurrency to use for batching
+   * If this is the first run: override concurrency to 1 and effectively send 1 batch synchronously before all others.
+   *
+   * We must send and receive a successful response from the Collector to receive valid cookie credentials.
+   * After the cookie has been set, all other batches will use it automatically and can be sent concurrently.
+   */
+  getConcurrency(): number {
+    return this.firstBatchSuccessfullySent ? this.concurrency : 1;
   }
 }
