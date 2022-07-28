@@ -1,75 +1,72 @@
 <img src="https://user-images.githubusercontent.com/82152911/159266790-19e0e3d4-0d10-4c58-9da7-16edde9ec05a.svg#gh-light-mode-only" alt="objectiv_logo_light" title="Objectiv Logo">
 <img src="https://user-images.githubusercontent.com/82152911/159266895-39f52604-83c1-438d-96bd-9a6d66e74b08.svg#gh-dark-mode-only" alt="objectiv_logo_dark" title="Objectiv Logo">
 
-[Objectiv](https://objectiv.io/) is open-source product analytics infrastructure, built around a [generic taxonomy](https://www.objectiv.io/docs/taxonomy).
 
-* Collect validated user behavior data with an event structure designed for modeling
-* Send it into your SQL datastore of choice without stopovers
-* Model on the raw data without cleaning & transformation 
-* Build models on one dataset, deploy and run them on another 
-* Use pandas-like operations that run on the full SQL dataset
-* Stack pre-built models and functions to build in-depth analyses quickly
-* Convert models to SQL to feed dashboards, BI tools, pipelines etc. from one source
+[Objectiv](https://objectiv.io/) is ready-to-use infrastructure for advanced product analytics. Collect the best data for modeling, validate your tracking instrumentation, and run pre-built open-source models straight on your data warehouse.
 
-Self-hosted, 100% free to use and fully open source.
+Self hosted, open-source & built for those who like their data raw and models in code.
 
-### Demo
+### Go to
 
-Follow our [Quickstart Guide](https://objectiv.io/docs/home/quickstart-guide) to set up a fully functional dockerized demo in under 5 minutes.
+* [Objectiv Docs](https://www.objectiv.io/docs) - Technical documentation.
+* [Objectiv on Slack](https://objectiv.io/join-slack) - Get help & join the discussion.
+* [Objectiv.io](https://www.objectiv.io) - Our website.
 
-### Resources
-
-* [Objectiv Docs](https://www.objectiv.io/docs) - Objectiv's official documentation.
-* [Objectiv on Slack](https://objectiv.io/join-slack) - Get help & join the discussion on where to take Objectiv next.
-* [Objectiv.io](https://www.objectiv.io) - Objectiv's official website.
+If you like what we do, give us a star!
 
 ---
 
-## What's in the box?
-![objectiv_stack](https://user-images.githubusercontent.com/82152911/161998050-7ec9e452-20c7-447f-a61f-12b904733c74.svg#gh-light-mode-only "Objectiv Stack")
-![objectiv_stack_dark](https://user-images.githubusercontent.com/82152911/161998028-4dbe0759-fb8d-4579-b2c9-200e69adc821.svg#gh-dark-mode-only "Objectiv Stack")
+## Everything you need to unlock a whole new level of product analytics
 
+![objectiv_stack](https://user-images.githubusercontent.com/920184/180789710-94e7bf9c-f081-4a0f-9637-3edf6fe5f501.svg#gh-light-mode-only "Objectiv Stack")
+![objectiv_stack_dark](https://user-images.githubusercontent.com/920184/180790336-4143f099-dee3-4e83-8fb2-5a71d35169bb.svg#gh-dark-mode-only "Objectiv Stack")
 
-### Open analytics taxonomy
+### The open analytics taxonomy
 
-Enables a [generic way to collect & structure rich analytics events](https://www.objectiv.io/docs/taxonomy). Describes classes for common user interactions and their contexts. 
+Objectiv is built around an [open analytics taxonomy](https://www.objectiv.io/docs/taxonomy): a universal structure for analytics data, so models built on one dataset can be deployed and run on another.
 
 [![taxonomy](https://user-images.githubusercontent.com/82152911/162000133-1eea0192-c882-4121-a866-8c1a3f8ffee3.svg)](https://www.objectiv.io/docs/taxonomy)
 
-* Used for data validation and debugging of instrumentation
-* Designed to ensure collected data is model-ready without cleaning, transformation or tracking plans
-* Results in consistent data: models can be shared/reused between teams, products & (data)platforms
+It's designed and tested with UIs and analytics use cases of over 50 companies. Areas like payments & CRM are on the roadmap, and it's extensible to cover custom use cases.
 
-Supports a wide range of product analytics use cases. We're currently working on extending the range of marketing related use cases.
-
-### Tracking SDK
+### Tracking SDKs
 
 Supports front-end engineers to [implement tracking instrumentation](https://www.objectiv.io/docs/tracking) that embraces the open analytics taxonomy.
 
-* Provides guidance, validation & E2E esting to help setting up error-free instrumentation
-* Support for React, React Native, Angular and Browser
+* Provides validation and end-to-end testing tooling to set up error-free instrumentation.
+* Support for React, React Native, Angular & JS, and expanding.
  
 ### Open model hub
 
-A [growing collection of pre-built models and functions](https://objectiv.io/docs/modeling/open-model-hub/) to run, combine or customize for quick, in-depth analyses.
+A [growing collection of pre-built models and functions](https://objectiv.io/docs/modeling/open-model-hub/), so you can take and run what someone else made, or quickly build your own with pre-built models and functions.
 
-* Covers a wide range of use cases: from basic product analytics to predictive analysis with ML
-* Works with any dataset that embraces the open analytics taxonomy
-* New models & functions are added continuously
+* Covers a wide range of use cases: from basic product analytics to predictive analysis with ML.
+* Works with any dataset that embraces the open analytics taxonomy.
+* New models & functions are added continuously.
 
 ### Bach modeling library
 
 Python-based [modeling library](https://www.objectiv.io/docs/modeling/bach/) that enables using pandas-like operations on the full SQL dataset.
 
-* Includes specific operations to easily work with data sets that embrace the open analytics taxonomy
-* Pandas-compatible: use popular pandas ML libraries in your models
-* Output your entire model to SQL with a single command
+* Includes specific operations to easily work with datasets that embrace the open analytics taxonomy.
+* Pandas-compatible: use popular pandas ML libraries in your models.
+* Output models to production SQL directly, to simplify data debugging & delivery to BI tools, dbt, etc. 
 
 ---
 
 ## Compatible data stores
 
-Objectiv currently supports PostgreSQL. We're working on support for Snowplow and BigQuery for event handling at scale. Amazon Redshift is planned next.
+Objectiv currently supports PostgreSQL and Google BigQuery (through Snowplow), with Amazon Athena next, and more data stores coming.
+
+## Get started
+
+1. Install the open model hub from PyPI:
+
+```sh
+pip install objectiv-modelhub
+```
+
+2. [Read how to get started in your notebook](https://objectiv.io/docs/modeling/get-started-in-your-notebook/) in the docs.
 
 ---
 

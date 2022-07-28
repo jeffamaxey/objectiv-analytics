@@ -375,12 +375,10 @@ class Map:
 
         calc_series_name = series_to_calculate.private_name
         data[calc_series_name] = 1
-        data.loc[~pch_mask, calc_series_name] = None
+        data.loc[~pch_mask, calc_series_name] = bach.SeriesInt64.from_value(base=data, value=None)
 
-        pre_conversion_hit_number = (
-            data[calc_series_name].astype('int64')
-            .copy_override_type(bach.SeriesInt64)  # None is parsed as string
-        )
+        pre_conversion_hit_number = data[calc_series_name]
+        assert isinstance(pre_conversion_hit_number, bach.SeriesInt64)  # help mypy
         data[calc_series_name] = pre_conversion_hit_number.sum(window)
 
         # pre_conversion_hit_number requires materialization due to window

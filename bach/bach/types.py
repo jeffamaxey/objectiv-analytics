@@ -25,8 +25,8 @@ AllSupportedLiteralTypes = Union[
     int, numpy.int64,
     float, numpy.float64,
     bool,
-    None,
     str,
+    None,
     datetime.date, datetime.time, datetime.datetime, numpy.datetime64, datetime.timedelta, numpy.timedelta64,
     UUID,
     pandas.Interval,
@@ -217,8 +217,8 @@ class TypeRegistry:
         self._register_value_klass(float, SeriesFloat64)
         self._register_value_klass(numpy.float64, SeriesFloat64)
         self._register_value_klass(bool, SeriesBoolean)
-        self._register_value_klass(type(None), SeriesString)  # NoneType ends up as a string for now
         self._register_value_klass(str, SeriesString)
+        self._register_value_klass(type(None), SeriesString)  # NoneType defaults to String.
         self._register_value_klass(pandas.Interval, SeriesNumericInterval)
 
         self._register_value_klass(datetime.date, SeriesDate)

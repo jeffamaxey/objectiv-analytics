@@ -12,7 +12,7 @@ import numpy
 import pandas
 from sqlalchemy.engine import Engine
 
-from bach.expression import Expression, SingleValueExpression, VariableToken
+from bach.expression import Expression, SingleValueExpression, VariableToken, ColumnReferenceToken
 from bach.from_database import get_dtypes_from_table, get_dtypes_from_model
 from bach.sql_model import BachSqlModel, CurrentNodeSqlModel, get_variable_values_sql
 from bach.types import get_series_type_from_dtype, AllSupportedLiteralTypes, StructuredDtype
@@ -1232,7 +1232,7 @@ class DataFrame:
                 # If a group_by is set on both, they have to match.
                 if key.group_by and key.group_by != self._group_by:
                     raise ValueError('Can not apply aggregated BooleanSeries with non matching group_by.'
-                                     'Please merge() the selector df with thisdf first.')
+                                     'Please merge() the selector df with this df first.')
 
                 if key.group_by is not None and key.expression.has_aggregate_function:
                     # Create a having-condition if the key is aggregated
@@ -3202,16 +3202,23 @@ class DataFrame:
            pdf = pandas.DataFrame(data)
            df = DataFrame.from_pandas(engine=engine, df=pdf, convert_objects=True)
            df = df.set_index('index')
-           agg_df = df.agg(['mean', 'std_pop'], numeric_only=True)
 
            feature = df['feature']
-           mean_feature = agg_df['feature_mean']
-           std_feature = agg_df['feature_std_pop']
+           mean_feature = df['feature'].mean()
+           std_feature = df['feature'].std(ddof=0)
            with_mean = True
            with_std = True
 
         .. doctest:: scale
             :skipif: engine is None
+
+            >>> feature.to_pandas()
+            index
+            a           1
+            b           2
+            c           3
+            d           4
+            Name: feature, dtype: int64
 
             >>> scaled_feature = feature.copy()
             >>> if with_mean:
@@ -3221,10 +3228,18 @@ class DataFrame:
             >>> if with_std:
             ...     scaled_feature /= std_feature
 
+            >>> scaled_feature.to_pandas()
+            index
+            a   -1.341641
+            b   -0.447214
+            c    0.447214
+            d    1.341641
+            Name: feature, dtype: float64
+
         Where:
             * ``feature`` is the series to be scaled
             * ``mean_feature`` is the mean of ``feature``
-            * ``std_feature`` is the (population-based) stardard deviation of ``feature``
+            * ``std_feature`` is the (population-based) standard deviation of ``feature``
 
         """
         from bach.preprocessing.scalers import StandardScaler
@@ -3258,9 +3273,16 @@ class DataFrame:
         .. doctest:: minmax_scale
             :skipif: engine is None
 
-            >>> range_min,  = (0, 1)
+            >>> range_min, range_max = (0, 1)
             >>> feature_std = (feature - min_feature) / (max_feature - min_feature)
             >>> scaled_feature = feature_std * (range_max - range_min) + range_min
+            >>> scaled_feature.to_pandas()
+            index
+            a    0.000000
+            b    0.333333
+            c    0.666667
+            d    1.000000
+            Name: feature, dtype: float64
 
         Where:
             * ``feature`` is the series to be scaled
@@ -3329,9 +3351,7 @@ class DataFrame:
                 new_column_name = f'{column}__{curr_col}'
                 new_columns.append(new_column_name)
 
-                df[new_column_name] = None
-                # previous statement will change dtype to string because value is None
-                df[new_column_name] = df[new_column_name].astype(df[curr_col].dtype)
+                df[new_column_name] = df[curr_col].from_value(base=df, value=None)
                 df.loc[df[index_to_unstack] == column, new_column_name] = df[curr_col]
 
         df = df.groupby(remaining_indexes).aggregate(aggregation)
