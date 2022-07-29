@@ -88,8 +88,8 @@ def test_event_list_validates():
 
     assert(validate_structure_event_list(event_list) == [])
 
-    # check validation actually fails if a required property `client_session_id` is not there
-    del event_list['client_session_id']
+    # check validation actually fails if a required property `transport_time` is not there
+    del event_list['transport_time']
 
     assert(validate_structure_event_list(event_list) != [])
 

@@ -1,6 +1,6 @@
 {
   "name": "event_list",
-  "version": {"base_schema": "0.0.1"},
+  "version": {"base_schema": "0.0.2"},
   "description": "This is the Objectiv event list schema",
   "properties": {
     "events": {
@@ -19,5 +19,5 @@
       "description": "Timestamp when the list of events was sent by the tracker"
     }
   },
-  "required": ["events", "client_session_id", "transport_time"]
+  "required": ["events", "transport_time"]
 }
