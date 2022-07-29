@@ -22,8 +22,11 @@ copyright = '2021, Objectiv'
 author = 'Objectiv B.V.'
 
 doctest_global_setup = f'''
-from bach.dataframe import DataFrame
 import pandas as pd
+pd.set_option('display.max_columns', None)
+pd.set_option('display.expand_frame_repr', False)
+
+from bach.dataframe import DataFrame
 try:
     import os
     import sqlalchemy
@@ -33,8 +36,9 @@ except Exception:
     engine = None
 
 from modelhub import ModelHub
-from bach import display_sql_as_markdown
 modelhub = ModelHub(time_aggregation='%Y-%m-%d')
+
+from bach import display_sql_as_markdown
 from IPython.display import display
 def display_sql_as_markdown(arg):
     print('sql\\n' + arg.view_sql() + '\\n')
