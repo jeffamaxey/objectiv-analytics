@@ -31,6 +31,10 @@ try:
     engine = sqlalchemy.create_engine(DB_PG_TEST_URL)
 except Exception:
     engine = None
+
+from modelhub import ModelHub
+from bach import display_sql_as_markdown
+modelhub = ModelHub(time_aggregation='%Y-%m-%d')
 '''
 
 doctest_default_flags = (

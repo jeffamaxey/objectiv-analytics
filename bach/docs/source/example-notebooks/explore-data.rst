@@ -23,14 +23,11 @@ A first look at the data
 .. testsetup:: explore-data
 	:skipif: engine is None
 
-	from modelhub import ModelHub
-	from bach import display_sql_as_markdown
-	modelhub = ModelHub(time_aggregation='%Y-%m-%d')
 	df = modelhub.get_objectiv_dataframe(
-		db_url=DB_PG_TEST_URL,
-		start_date='2022-06-01',
-		end_date='2022-06-30',
-		table_name='data')
+			db_url=DB_PG_TEST_URL,
+			start_date='2022-06-01',
+			end_date='2022-06-30',
+			table_name='data')
 
 .. doctest:: explore-data
 	:skipif: engine is None
@@ -117,33 +114,32 @@ relevant context about the event. :doc:`See the open taxonomy notebook <./open-t
 
 .. doctest:: explore-data
 	:skipif: engine is None
-	:options: +NORMALIZE_WHITESPACE
 
 	>>> # now easily slice the data using the added context columns
 	>>> event_data = modelhub.agg.unique_users(df, groupby=['application', 'root_location', 'path', 'event_type'])
 	>>> event_data.sort_values(ascending=False).to_frame().head(20)
-																													unique_users
+	                                                                                                                    unique_users
 	application         root_location   path                                            event_type 
 	objectiv-website    home            https://objectiv.io/                            MediaLoadEvent                  202
-																						ApplicationLoadedEvent          194
-																						PressEvent                      161
-																						VisibleEvent                    158
-																						HiddenEvent                     82
+	                                                                                    ApplicationLoadedEvent          194
+	                                                                                    PressEvent                      161
+	                                                                                    VisibleEvent                    158
+	                                                                                    HiddenEvent                     82
 	objectiv-docs       home            NaN                                             VisibleEvent                    79
-																						ApplicationLoadedEvent          67
-						modeling        NaN                                             VisibleEvent                    56
-						home            NaN                                             PressEvent                      47
-										https://objectiv.io/docs/                       VisibleEvent                    45
-						modeling        NaN                                             PressEvent                      41
-						taxonomy        NaN                                             VisibleEvent                    39
-										https://objectiv.io/docs/taxonomy/reference     VisibleEvent                    36
-										NaN                                             PressEvent                      34
+	                                                                                    ApplicationLoadedEvent          67
+	                    modeling        NaN                                             VisibleEvent                    56
+	                    home            NaN                                             PressEvent                      47
+	                                    https://objectiv.io/docs/                       VisibleEvent                    45
+	                    modeling        NaN                                             PressEvent                      41
+	                    taxonomy        NaN                                             VisibleEvent                    39
+	                                    https://objectiv.io/docs/taxonomy/reference     VisibleEvent                    36
+	                                    NaN                                             PressEvent                      34
 	objectiv-website    about           https://objectiv.io/about                       PressEvent                      30
 	objectiv-docs       taxonomy        NaN                                             ApplicationLoadedEvent          29
-										https://objectiv.io/docs/taxonomy/              ApplicationLoadedEvent          27
-						home            https://objectiv.io/docs/home/quickstart-guide/ VisibleEvent                    26
-						tracking        NaN                                             VisibleEvent                    25
-						modeling        NaN                                             ApplicationLoadedEvent          24
+	                                    https://objectiv.io/docs/taxonomy/              ApplicationLoadedEvent          27
+	                    home            https://objectiv.io/docs/home/quickstart-guide/ VisibleEvent                    26
+	                    tracking        NaN                                             VisibleEvent                    25
+	                    modeling        NaN                                             ApplicationLoadedEvent          24
 
 .. seealso::
 
@@ -161,43 +157,55 @@ slice the data on any part of the UI that you're interested in. See
 :ref:`this example notebook <open_taxonomy_location_stack_and_global_contexts>`. It also means you can make 
 product features very readable and easy to understand for your internal data reports.
 
-.. doctest:: explore-data
+.. 
+	The testsetup below sets the max_colwidth for this example, so it fits the code block.
+	However, it has to re-instantiate `df` to be able to work, resetting the outputs before.
+	Works in this case, but not a good solution in other cases. Didn't find something better yet.
+
+.. testsetup:: explore-data-features
+	:skipif: engine is None
+
+	df = modelhub.get_objectiv_dataframe(
+			db_url=DB_PG_TEST_URL,
+			start_date='2022-06-01',
+			end_date='2022-06-30',
+			table_name='data')
+	pd.set_option('display.max_colwidth', 93)
+
+.. doctest:: explore-data-features
 	:skipif: engine is None
 
 	>>> # add the readable product feature name to the dataframe as a column
 	>>> df['feature_nice_name'] = df.location_stack.ls.nice_name
 
-.. doctest:: explore-data
+.. doctest:: explore-data-features
 	:skipif: engine is None
 
 	>>> # now easily look at the data by product feature
-	>>> pd.set_option('max_colwidth', None)
 	>>> product_feature_data = modelhub.agg.unique_users(df, groupby=['feature_nice_name', 'event_type'])
-	>>> product_feature_data.sort_values(ascending=False).to_frame().head(2)
-																																					 unique_users
-	feature_nice_name                                                                                                        event_type 
-	Root Location: home                                                                                                      ApplicationLoadedEvent           250
-	Media Player: 2-minute-video located at Root Location: home => Content: modeling                                         MediaLoadEvent                   220
-
-.. Overlay: star-us-notification-overlay located at Root Location: home => Pressable: star-us-notification                  VisibleEvent                     181
-..                                                                                                                          HiddenEvent                       94
-.. Expandable: The Project located at Root Location: home => Navigation: docs-sidebar                                       VisibleEvent                      75
-.. Pressable: after located at Root Location: home => Content: capture-data => Content: data-capture-workflow-before-after  PressEvent                        74
-.. Root Location: taxonomy                                                                                                  ApplicationLoadedEvent            58
-.. Expandable: the-project located at Root Location: home => Navigation: docs-sidebar                                       VisibleEvent                      55
-.. Pressable: after located at Root Location: home => Content: modeling => Content: modeling-workflow-before-after          PressEvent                        48
-.. Root Location: blog                                                                                                      ApplicationLoadedEvent            46
-.. Root Location: modeling                                                                                                  ApplicationLoadedEvent            45
-.. Link: about-us located at Root Location: home => Navigation: navbar-top                                                  PressEvent                        36
-.. Pressable: before located at Root Location: home => Content: capture-data => Content: data-capture-workflow-before-after PressEvent                        35
-.. Expandable: reference located at Root Location: taxonomy => Navigation: docs-sidebar                                     VisibleEvent                      31
-.. Overlay: hamburger-menu located at Root Location: home => Navigation: navbar-top                                         VisibleEvent                      29
-.. Link: logo located at Root Location: home => Navigation: navbar-top                                                      PressEvent                        28
-.. Expandable: Reference located at Root Location: taxonomy => Navigation: docs-sidebar                                     VisibleEvent                      26
-.. Overlay: hamburger-menu located at Root Location: modeling => Navigation: navbar-top                                     VisibleEvent                      23
-.. Link: docs located at Root Location: home => Navigation: navbar-top                                                      PressEvent                        23
-.. Pressable: hamburger located at Root Location: home => Navigation: navbar-top                                            PressEvent                        21
-
+	>>> product_feature_data.sort_values(ascending=False).to_frame().head(20)
+	                                                                                                                       unique_users
+	feature_nice_name                                                                              event_type 
+	Root Location: home                                                                            ApplicationLoadedEvent           250
+	Media Player: 2-minute-video located at Root Location: home => Content: modeling               MediaLoadEvent                   220
+	Overlay: star-us-notification-overlay located at Root Location: home => Pressable: star-us...  VisibleEvent                     181
+	                                                                                               HiddenEvent                       94
+	Expandable: The Project located at Root Location: home => Navigation: docs-sidebar             VisibleEvent                      75
+	Pressable: after located at Root Location: home => Content: capture-data => Content: data-...  PressEvent                        74
+	Root Location: taxonomy                                                                        ApplicationLoadedEvent            58
+	Expandable: the-project located at Root Location: home => Navigation: docs-sidebar             VisibleEvent                      55
+	Pressable: after located at Root Location: home => Content: modeling => Content: modeling-...  PressEvent                        48
+	Root Location: blog                                                                            ApplicationLoadedEvent            46
+	Root Location: modeling                                                                        ApplicationLoadedEvent            45
+	Link: about-us located at Root Location: home => Navigation: navbar-top                        PressEvent                        36
+	Pressable: before located at Root Location: home => Content: capture-data => Content: data...  PressEvent                        35
+	Expandable: reference located at Root Location: taxonomy => Navigation: docs-sidebar           VisibleEvent                      31
+	Overlay: hamburger-menu located at Root Location: home => Navigation: navbar-top               VisibleEvent                      29
+	Link: logo located at Root Location: home => Navigation: navbar-top                            PressEvent                        28
+	Expandable: Reference located at Root Location: taxonomy => Navigation: docs-sidebar           VisibleEvent                      26
+	Overlay: hamburger-menu located at Root Location: modeling => Navigation: navbar-top           VisibleEvent                      23
+	Link: docs located at Root Location: home => Navigation: navbar-top                            PressEvent                        23
+	Pressable: hamburger located at Root Location: home => Navigation: navbar-top                  PressEvent                        21
 
 .. seealso::
 
@@ -214,7 +222,6 @@ Get the SQL for any analysis
 
 	# just one analysis as an example, this works for anything you do with Objectiv Bach
 	display_sql_as_markdown(product_feature_data)
-
 
 Where to go next
 ----------------
