@@ -157,7 +157,7 @@ relevant context about the event. :doc:`See the open taxonomy notebook <./open-t
 Understanding product features
 ------------------------------
 For every event, Objectiv captures where it occurred in your product's UI, using a hierarchical stack of 
-`Location contexts </docs/taxonomy/location-contexts>`_. This means you can easily slice the data on any part 
+`LocationContexts </docs/taxonomy/location-contexts>`_. This means you can easily slice the data on any part 
 of the UI that you're interested in. :doc:`See the open taxonomy notebook <./open-taxonomy>` for more details. 
 It also means you can make product features very readable and easy to understand; see below how.
 
@@ -175,9 +175,6 @@ It also means you can make product features very readable and easy to understand
 			end_date='2022-06-30',
 			table_name='data')
 	pd.set_option('display.max_colwidth', 93)
-	from IPython.display import display
-	def display_sql_as_markdown(arg):
-  		print("sql\n" + arg.view_sql() +"\n")
 
 .. doctest:: explore-data-features
 	:skipif: engine is None

@@ -35,6 +35,9 @@ except Exception:
 from modelhub import ModelHub
 from bach import display_sql_as_markdown
 modelhub = ModelHub(time_aggregation='%Y-%m-%d')
+from IPython.display import display
+def display_sql_as_markdown(arg):
+    print('sql\\n' + arg.view_sql() + '\\n')
 '''
 
 doctest_default_flags = (
