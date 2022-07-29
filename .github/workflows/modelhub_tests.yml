@@ -62,13 +62,11 @@ jobs:
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
-          key: pip-${{ matrix.python-version }}-${{ hashFiles('modelhub/requirements.txt', 'modelhub/requirements-dev.txt', 'bach/requirements-bigquery.txt') }}
+          key: pip-${{ matrix.python-version }}-${{ hashFiles('modelhub/setup.cfg') }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e bach/
-          cd modelhub
-          pip install -r requirements-dev.txt -r requirements.txt
+          pip install -e bach -e modelhub[dev]
       - name: Typecheck with mypy
         run: |
           cd modelhub
@@ -85,12 +83,6 @@ jobs:
         run: |
           cd modelhub
           pytest -n 4 --dist loadgroup --postgres tests_modelhub/functional/
-      - name: Install BQ dependencies
-        run: |
-          cd modelhub
-          # We don't have an equivalent requirement-bigquery.txt in modelhub, as the requirements should be the
-          # same as for Bach
-          pip install -r ../bach/requirements-bigquery.txt
       - name: Setup GCP Credentials
         run: |
           cd modelhub
