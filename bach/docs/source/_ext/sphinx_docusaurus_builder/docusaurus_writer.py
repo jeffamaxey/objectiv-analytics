@@ -565,10 +565,12 @@ class DocusaurusTranslator(Translator):
                 else:
                     break
             
+            known_output_languages = ['sql']
             for i, line in enumerate(node_lines[output_index:]):
-                if (i != 0): 
-                    node_output += "\n"
-                node_output += line
+                if (i==0 and line in known_output_languages):
+                    node_output += line + "\n"
+                else:
+                    node_output += "\n" + line
 
             # parse in- and output blocks separately
             self.add('\n<div className="jupyter-notebook-in-output">\n\n')
@@ -587,7 +589,7 @@ class DocusaurusTranslator(Translator):
                 self.add('\n<div className="jupyter-notebook-in-output">\n\n')
                 self.add('\n<div className="jupyter-notebook-out">Out:</div>\n\n')
                 self.add('<div className="jupyter-notebook-output">\n\n')
-                self.add('```\n')
+                self.add('```')
                 self.add(node_output)
                 self.add('\n```\n\n')
                 self.add('</div>\n\n') # end notebook output

@@ -175,6 +175,9 @@ It also means you can make product features very readable and easy to understand
 			end_date='2022-06-30',
 			table_name='data')
 	pd.set_option('display.max_colwidth', 93)
+	from IPython.display import display
+	def display_sql_as_markdown(arg):
+  		print("sql\n" + arg.view_sql() +"\n")
 
 .. doctest:: explore-data-features
 	:skipif: engine is None
@@ -231,7 +234,103 @@ directly in production.
 
 	>>> # show the underlying SQL for this dataframe - works for any dataframe/model in Objectiv
 	>>> display_sql_as_markdown(product_feature_data)
-	<IPython.core.display.Markdown object>
+	sql
+	with "from_table___7a4057e80babeec1c65913e0a773d65d" as (SELECT "value","event_id","day","moment","cookie_id" FROM "data"),
+	"getitem_where_boolean___fed67ee9d11d7631154f62679fc36a5b" as (select "value" as "value", "event_id" as "event_id", "day" as "day", "moment" as "moment", "cookie_id" as "user_id", "value"->>'_type' as "event_type", cast("value"->>'_types' as jsonb) as "stack_event_types", cast("value"->>'global_contexts' as jsonb) as "global_contexts", cast("value"->>'location_stack' as jsonb) as "location_stack", cast("value"->>'time' as bigint) as "time"
+	from "from_table___7a4057e80babeec1c65913e0a773d65d"
+	where ((("day" >= '2022-06-01')) AND (("day" <= '2022-06-30')))
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	),
+	"context_data___8b8b8232f369c68f2d1d5f3a9af30be5" as (select "event_id" as "event_id", "day" as "day", "moment" as "moment", "user_id" as "user_id", "global_contexts" as "global_contexts", "location_stack" as "location_stack", "event_type" as "event_type", "stack_event_types" as "stack_event_types"
+	from "getitem_where_boolean___fed67ee9d11d7631154f62679fc36a5b"
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	),
+	"session_starts___5a3db3fadd31b849fb8d6738e9780aaa" as (select "event_id" as "event_id", "day" as "day", "moment" as "moment", "user_id" as "user_id", "global_contexts" as "global_contexts", "location_stack" as "location_stack", "event_type" as "event_type", "stack_event_types" as "stack_event_types", CASE WHEN (extract(epoch from (("moment") - (lag("moment", 1, cast(NULL as timestamp without time zone)) over (partition by "user_id" order by "moment" asc, "event_id" asc RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)))) <= cast(1800 as bigint)) THEN NULL ELSE True END as "is_start_of_session"
+	from "context_data___8b8b8232f369c68f2d1d5f3a9af30be5"
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	),
+	"session_id_and_count___b100134b34b6c1239e97b7f22647a65b" as (select "event_id" as "event_id", "day" as "day", "moment" as "moment", "user_id" as "user_id", "global_contexts" as "global_contexts", "location_stack" as "location_stack", "event_type" as "event_type", "stack_event_types" as "stack_event_types", "is_start_of_session" as "is_start_of_session", CASE WHEN "is_start_of_session" THEN row_number() over (partition by "is_start_of_session" order by "moment" asc, "event_id" asc RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) ELSE cast(NULL as bigint) END as "session_start_id", count("is_start_of_session") over ( order by "user_id" asc, "moment" asc, "event_id" asc RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as "is_one_session"
+	from "session_starts___5a3db3fadd31b849fb8d6738e9780aaa"
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	),
+	"objectiv_sessionized_data___afce5f24ad2aa2dc026f57baf8beb13a" as (select "event_id" as "event_id", "day" as "day", "moment" as "moment", "user_id" as "user_id", "global_contexts" as "global_contexts", "location_stack" as "location_stack", "event_type" as "event_type", "stack_event_types" as "stack_event_types", "is_start_of_session" as "is_start_of_session", "session_start_id" as "session_start_id", "is_one_session" as "is_one_session", first_value("session_start_id") over (partition by "is_one_session" order by "moment" asc, "event_id" asc RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as "session_id", row_number() over (partition by "is_one_session" order by "moment" asc, "event_id" asc RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as "session_hit_number"
+	from "session_id_and_count___b100134b34b6c1239e97b7f22647a65b"
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	)
+	select (
+											select string_agg(
+															replace(
+																	regexp_replace(value ->> '_type', '([a-z])([A-Z])', '\1 \2', 'g'),
+																	' Context',
+																	''
+															) || ': ' || (value ->> 'id'),
+															' => ')
+											from jsonb_array_elements("location_stack") with ordinality
+											where ordinality = jsonb_array_length("location_stack")
+									) || (
+											case when jsonb_array_length("location_stack") > 1
+														then ' located at ' || (select string_agg(
+																	replace(
+																			regexp_replace(value ->> '_type', '([a-z])([A-Z])', '\1 \2', 'g'),
+																			' Context',
+																			''
+																	) || ': ' || (value ->> 'id'),
+																	' => ')
+															from jsonb_array_elements("location_stack") with ordinality
+															where ordinality < jsonb_array_length("location_stack")
+													)
+													else '' end
+									) as "feature_nice_name", "event_type" as "event_type", count(distinct "user_id") as "unique_users"
+	<BLANKLINE>
+	from "objectiv_sessionized_data___afce5f24ad2aa2dc026f57baf8beb13a"
+	<BLANKLINE>
+	group by (
+											select string_agg(
+															replace(
+																	regexp_replace(value ->> '_type', '([a-z])([A-Z])', '\1 \2', 'g'),
+																	' Context',
+																	''
+															) || ': ' || (value ->> 'id'),
+															' => ')
+											from jsonb_array_elements("location_stack") with ordinality
+											where ordinality = jsonb_array_length("location_stack")
+									) || (
+											case when jsonb_array_length("location_stack") > 1
+														then ' located at ' || (select string_agg(
+																	replace(
+																			regexp_replace(value ->> '_type', '([a-z])([A-Z])', '\1 \2', 'g'),
+																			' Context',
+																			''
+																	) || ': ' || (value ->> 'id'),
+																	' => ')
+															from jsonb_array_elements("location_stack") with ordinality
+															where ordinality < jsonb_array_length("location_stack")
+													)
+													else '' end
+									), "event_type"
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
+	<BLANKLINE>
 
 Where to go next
 ----------------
