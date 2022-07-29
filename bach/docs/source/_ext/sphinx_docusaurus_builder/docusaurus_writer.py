@@ -148,6 +148,7 @@ class DocusaurusTranslator(Translator):
         https://docutils.sourceforge.io/docs/ref/doctree.html#document"""
         self.title = getattr(self.builder, 'current_docname')
 
+
     def depart_document(self, node):
         """The root of the tree.
         https://docutils.sourceforge.io/docs/ref/doctree.html#document"""
@@ -1088,6 +1089,7 @@ class FrontMatterPositionDirective(SphinxDirective):
         reference = directives.uri(self.arguments[0])
         frontmatter.setdefault(docname, dict())
         frontmatter[docname]['position'] = reference
+        print("POSITION FOR DOCNAME" + docname + ": " + reference)
         empty_node = nodes.raw()
         return [empty_node]
 
