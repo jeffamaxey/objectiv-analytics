@@ -635,6 +635,16 @@ class DocusaurusTranslator(Translator):
         self.add('\n:::\n\n')
 
 
+    def visit_tip(self, node):
+        """Sphinx tip directive."""
+        self.add(':::tip\n\n')
+
+
+    def depart_tip(self, node):
+        """Sphinx tip directive."""
+        self.add('\n:::\n\n')
+
+
     def visit_caution(self, node):
         """Sphinx caution directive."""
         self.add(':::caution\n\n')
@@ -666,7 +676,11 @@ class DocusaurusTranslator(Translator):
 
 
     def visit_seealso(self, node):
-        self.add(':::tip see also\n\n')
+        if ('title' in node):
+            print("NODE HAS A TITLE:", node['title'])
+            self.add(':::info ' + node['title'] + '\n\n')
+        else:
+            self.add(':::info also see\n\n')
 
 
     def depart_seealso(self, node):
