@@ -152,10 +152,10 @@ relevant context about the event. :doc:`See the open taxonomy notebook <./open-t
 
 Understanding product features
 ------------------------------
-Objectiv captures the UI of your product in the data using the Location Context. This means, you can easily 
-slice the data on any part of the UI that you're interested in. See 
-:ref:`this example notebook <open_taxonomy_location_stack_and_global_contexts>`. It also means you can make 
-product features very readable and easy to understand for your internal data reports.
+For every event, Objectiv captures where it occurred in your product's UI, using a hierarchical stack of 
+`Location contexts </docs/taxonomy/location-contexts>`_. This means you can easily slice the data on any part 
+of the UI that you're interested in. :doc:`See the open taxonomy notebook <./open-taxonomy>` for more details. 
+It also means you can make product features very readable and easy to understand; see below how.
 
 .. 
 	The testsetup below sets the max_colwidth for this example, so it fits the code block.
@@ -175,7 +175,7 @@ product features very readable and easy to understand for your internal data rep
 .. doctest:: explore-data-features
 	:skipif: engine is None
 
-	>>> # add the readable product feature name to the dataframe as a column
+	>>> # add a readable product feature name to the dataframe as a column
 	>>> df['feature_nice_name'] = df.location_stack.ls.nice_name
 
 .. doctest:: explore-data-features
@@ -218,14 +218,24 @@ product features very readable and easy to understand for your internal data rep
 Get the SQL for any analysis
 ----------------------------
 
-.. code-block:: python
+Any dataframe or model built with Bach can be converted to an SQL statement with a single command to use 
+directly in production.
 
-	# just one analysis as an example, this works for anything you do with Objectiv Bach
-	display_sql_as_markdown(product_feature_data)
+.. doctest:: explore-data-features
+	:skipif: engine is None
+
+	>>> # show the underlying SQL for this dataframe - works for any dataframe/model in Objectiv
+	>>> display_sql_as_markdown(product_feature_data)
+	<IPython.core.display.Markdown object>
+
+.. .. code-block:: python
+
+.. 	# show the underlying SQL for this dataframe - works for any dataframe/model in Objectiv
+.. 	display_sql_as_markdown(product_feature_data)
 
 Where to go next
 ----------------
 
-Now that you had a first look at your new data collected with Objectiv, the best place to go next is looking 
-at the :doc:`basic product analytics example notebook <./product-analytics>`. This will help you get familiar 
-with product analytics metrics from Objectiv, straight from your raw data & ready to go.
+Now that you've had a first look at your new data collected with Objectiv, the best next step is to 
+:doc:`see the basic product analytics example notebook <./product-analytics>`. It shows you to how to easily 
+get product analytics metrics straight from your raw Objectiv data.
