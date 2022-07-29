@@ -10,11 +10,13 @@ Visit [Objectiv Docs](https://objectiv.io/docs/modeling/bach/) to learn more
 To use Bach, use the following command:
 ```bash
 pip install objectiv-bach
+pip install objectiv-bach[bigquery] # for bigquery support
 ```
 
 If you want the latest and greatest from your local checkout, install objectiv_bach in edit mode:
 ```bash
 pip install -e .
+pip install -e .[bigquery] # for bigquery support
 ```
 
 This will install Bach in edit mode, meaning you get the latest version from the local checkout.
@@ -24,7 +26,7 @@ For detailed installation & usage instructions, visit [Objectiv Docs](https://ww
 ## Running Functional and Unit Tests
 In case you are interested on running tests, install all dev requirements through:
 ```bash
-pip install -e .[dev]
+pip install -e .[dev,bigquery]
 ```
 
 ### Setting up environmental variables
