@@ -39,7 +39,8 @@ CLICK_EVENT_JSON = '''
             "id":"d8b0f1ca-4ebe-45b6-b7fb-7858cf46082a"
         }
     ],
-    "transport_time":1630049335313
+    "transport_time":1630049335313,
+    "client_session_id":"d227e473-b177-4cdc-9f49-a96e59dbcf0c"
 }
 '''
 
@@ -80,6 +81,17 @@ def test_make_event_from_dict():
 
     assert (validate_structure_event_list([event]) == [])
     assert(validate_event_adheres_to_schema(event_schema=event_schema, event=event) != [])
+
+
+def test_event_list_validates():
+    event_list = json.loads(CLICK_EVENT_JSON)
+
+    assert(validate_structure_event_list(event_list) == [])
+
+    # check validation actually fails if a required property `transport_time` is not there
+    del event_list['transport_time']
+
+    assert(validate_structure_event_list(event_list) != [])
 
 
 def test_make_content_context():

@@ -2,11 +2,25 @@
  * Copyright 2021-2022 Objectiv B.V.
  */
 
+import { generateUUID } from './helpers';
 import { TrackerGlobalsInterface } from './TrackerGlobalsInterface';
 
 declare global {
   var objectiv: TrackerGlobalsInterface;
 }
+globalThis.objectiv = globalThis.objectiv ?? {};
+
+/**
+ * Set package version in globals
+ */
+import pkg from '../package.json';
+globalThis.objectiv.versions = globalThis.objectiv.versions ?? new Map();
+globalThis.objectiv.versions.set(pkg.name, pkg.version);
+
+/**
+ * Create a client session. This can be used to detect whether a user deleted its cookies in the middle of a session.
+ */
+globalThis.objectiv.clientSessionId = generateUUID();
 
 export * from './generated/ContextFactories';
 export * from './generated/ContextNames';

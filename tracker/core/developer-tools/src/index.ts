@@ -12,6 +12,14 @@ import { makeGlobalContextValidationRule } from './validationRules/makeGlobalCon
 import { makeLocationContextValidationRule } from './validationRules/makeLocationContextValidationRule';
 
 /**
+ * Set package version in globals
+ */
+import pkg from '../package.json';
+globalThis.objectiv = globalThis.objectiv ?? {};
+globalThis.objectiv.versions = globalThis.objectiv.versions ?? new Map();
+globalThis.objectiv.versions.set(pkg.name, pkg.version);
+
+/**
  * A global object containing all DeveloperTools
  */
 const developerTools: TrackerDeveloperToolsInterface = {
