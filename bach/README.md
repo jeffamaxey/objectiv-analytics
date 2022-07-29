@@ -22,7 +22,10 @@ For detailed installation & usage instructions, visit [Objectiv Docs](https://ww
 
 
 ## Running Functional and Unit Tests
-In case you are interested on running tests, install all requirements from ``requirements-dev.txt``
+In case you are interested on running tests, install all dev requirements through:
+```bash
+pip install -e .[dev]
+```
 
 ### Setting up environmental variables
 Functional tests require reading from multiple databases, in order to run them you should define
