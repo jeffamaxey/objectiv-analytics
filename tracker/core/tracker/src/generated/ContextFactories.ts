@@ -169,13 +169,21 @@ export const makeLinkContext = (props: { id: string; href: string }): LinkContex
  * @param {Object} props - factory properties
  * @param {string} props.id - A unique string identifier to be combined with the Context Type (`_type`)
  *         for Context instance uniqueness.
- * @returns {LocaleContext} - LocaleContext: A GlobalContext describing the locale used by the user. E.g. an ISO 639-1 code.
+ * @param {string | null} props.language_code - Case sensitive ISO 639-1 language code. E.g. en, nl, fr, de, it, etc.
+ * @param {string | null} props.country_code - Case sensitive ISO 3166-1 alpha-2 country code. E.g. US, NL, FR, DE, IT, etc.
+ * @returns {LocaleContext} - LocaleContext: A GlobalContext describing the users' language (ISO 639-1) and country (ISO 3166-1 alpha-2).
  */
-export const makeLocaleContext = (props: { id: string }): LocaleContext => ({
+export const makeLocaleContext = (props: {
+  id: string;
+  language_code?: string | null;
+  country_code?: string | null;
+}): LocaleContext => ({
   __instance_id: generateUUID(),
   __global_context: true,
   _type: GlobalContextName.LocaleContext,
   id: props.id,
+  language_code: props.language_code ?? null,
+  country_code: props.country_code ?? null,
 });
 
 /** Creates instance of MarketingContext

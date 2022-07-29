@@ -125,6 +125,35 @@ describe('Context Factories', () => {
       __global_context: true,
       _type: GlobalContextName.LocaleContext,
       id: 'en',
+      language_code: null,
+      country_code: null,
+    });
+
+    expect(makeLocaleContext({ id: 'en', language_code: 'en' })).toStrictEqual({
+      __instance_id: matchUUID,
+      __global_context: true,
+      _type: GlobalContextName.LocaleContext,
+      id: 'en',
+      language_code: 'en',
+      country_code: null,
+    });
+
+    expect(makeLocaleContext({ id: 'US', country_code: 'US' })).toStrictEqual({
+      __instance_id: matchUUID,
+      __global_context: true,
+      _type: GlobalContextName.LocaleContext,
+      id: 'US',
+      language_code: null,
+      country_code: 'US',
+    });
+
+    expect(makeLocaleContext({ id: 'en_US', language_code: 'en', country_code: 'US' })).toStrictEqual({
+      __instance_id: matchUUID,
+      __global_context: true,
+      _type: GlobalContextName.LocaleContext,
+      id: 'en_US',
+      language_code: 'en',
+      country_code: 'US',
     });
   });
 

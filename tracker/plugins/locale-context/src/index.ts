@@ -10,4 +10,6 @@ globalThis.objectiv = globalThis.objectiv ?? {};
 globalThis.objectiv.versions = globalThis.objectiv.versions ?? new Map();
 globalThis.objectiv.versions.set(pkg.name, pkg.version);
 
+export * from './generated/CountryCodes';
+export * from './generated/LanguageCodes';
 export * from './LocaleContextPlugin';
