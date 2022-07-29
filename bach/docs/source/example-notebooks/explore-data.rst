@@ -42,7 +42,8 @@ A first look at the data
 	8543f519-d3a4-4af6-89f5-cb04393944b8  2022-06-30 2022-06-30 20:43:50.962  bb127c9e-3067-4375-9c73-cb86be332660  [{'id': 'http_context', '_type': 'HttpContext'...  [{'id': 'home', '_type': 'RootLocationContext'...          MediaLoadEvent  [AbstractEvent, MediaEvent, MediaLoadEvent, No...         871                   2
 	a0ad4364-57e0-4da9-a266-057744550cc2  2022-06-30 2022-06-30 20:43:49.820  bb127c9e-3067-4375-9c73-cb86be332660  [{'id': 'http_context', '_type': 'HttpContext'...  [{'id': 'home', '_type': 'RootLocationContext'...  ApplicationLoadedEvent  [AbstractEvent, ApplicationLoadedEvent, NonInt...         871                   1
 
-.. seealso::
+.. admonition:: Reference
+	:class: api-reference
 
 	* :doc:`bach.DataFrame.sort_values <../bach/api-reference/DataFrame/bach.DataFrame.sort_values>`
 	* :doc:`bach.DataFrame.head <../bach/api-reference/DataFrame/bach.DataFrame.head>`
@@ -66,7 +67,8 @@ Understanding the columns
 	'session_id': 'int64',
 	'session_hit_number': 'int64'}
 
-.. seealso::
+.. admonition:: Reference
+	:class: api-reference
 
 	* :doc:`bach.DataFrame.dtypes <../bach/api-reference/DataFrame/bach.DataFrame.dtypes>`
 
@@ -86,7 +88,8 @@ What's in these columns:
   DataFrame.
 * `session_hit_number`: an incremented integer ID for each hit in the session, ordered by moment.
 
-.. seealso::
+.. admonition:: Reference
+	:class: api-reference
 
 	For a more detailed understanding of Objectiv events in general, and especially the `global_contexts` and 
 	`location_stack` data columns, see the open analytics taxonomy documentation:
@@ -141,7 +144,8 @@ relevant context about the event. :doc:`See the open taxonomy notebook <./open-t
 	                    tracking        NaN                                             VisibleEvent                    25
 	                    modeling        NaN                                             ApplicationLoadedEvent          24
 
-.. seealso::
+.. admonition:: Reference
+	:class: api-reference
 
 	* :doc:`modelhub.SeriesGlobalContexts.gc <../open-model-hub/api-reference/SeriesGlobalContexts/modelhub.SeriesGlobalContexts.gc>`
 	* :doc:`modelhub.SeriesLocationStack.ls <../open-model-hub/api-reference/SeriesLocationStack/modelhub.SeriesLocationStack.ls>`
@@ -207,7 +211,8 @@ It also means you can make product features very readable and easy to understand
 	Link: docs located at Root Location: home => Navigation: navbar-top                            PressEvent                        23
 	Pressable: hamburger located at Root Location: home => Navigation: navbar-top                  PressEvent                        21
 
-.. seealso::
+.. admonition:: Reference
+	:class: api-reference
 
 	* :doc:`modelhub.SeriesLocationStack.ls <../open-model-hub/api-reference/SeriesLocationStack/modelhub.SeriesLocationStack.ls>`
 	* :doc:`modelhub.Aggregate.unique_users <../open-model-hub/models/aggregation/modelhub.Aggregate.unique_users>`
@@ -227,11 +232,6 @@ directly in production.
 	>>> # show the underlying SQL for this dataframe - works for any dataframe/model in Objectiv
 	>>> display_sql_as_markdown(product_feature_data)
 	<IPython.core.display.Markdown object>
-
-.. .. code-block:: python
-
-.. 	# show the underlying SQL for this dataframe - works for any dataframe/model in Objectiv
-.. 	display_sql_as_markdown(product_feature_data)
 
 Where to go next
 ----------------

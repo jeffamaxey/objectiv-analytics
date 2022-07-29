@@ -675,12 +675,34 @@ class DocusaurusTranslator(Translator):
         self.add('\n:::\n\n')
 
 
+    def visit_admonition(self, node):
+        """Sphinx admonition directive.
+        
+        If the `class` parameter specifies that it's an 'api-reference', it's formatted differently.
+        
+        """
+        type = 'note'
+        if(node.hasattr('classes')):
+            if('api-reference' in node['classes']):
+                type = 'info'
+            
+        for child in node.children:
+            if ('title' in child.tagname):
+                self.add(':::' + type + ' ' + child.astext() + '\n\n')
+                node.remove(child)
+                break
+            else:
+                self.add(':::' + type + ' ALSO SEE\n\n')
+            
+            child.walkabout(self)
+
+
+    def depart_admonition(self, node):
+        self.add('\n:::\n\n')
+
+
     def visit_seealso(self, node):
-        if ('title' in node):
-            print("NODE HAS A TITLE:", node['title'])
-            self.add(':::info ' + node['title'] + '\n\n')
-        else:
-            self.add(':::info also see\n\n')
+        self.add(':::info also see\n\n')
 
 
     def depart_seealso(self, node):
