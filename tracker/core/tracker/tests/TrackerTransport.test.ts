@@ -380,30 +380,17 @@ describe('TrackerTransportRetry', () => {
   });
 
   it('should stop retrying if we reached maxRetryMs', async () => {
-    const slowFailingTransport = {
-      transportName: 'SlowFailingTransport',
-      handle: async () => new Promise((_, reject) => setTimeout(() => reject(makeTransportSendError()), 100)),
-      isUsable: () => true,
-    };
-    jest.spyOn(slowFailingTransport, 'handle');
-    const retryTransport = new TrackerTransportRetry({
-      transport: slowFailingTransport,
-      minTimeoutMs: 1,
-      maxTimeoutMs: 1,
-      retryFactor: 1,
-      maxRetryMs: 1,
-    });
+    const logTransport = new LogTransport();
+    const retryTransport = new TrackerTransportRetry({ transport: logTransport });
     const retryTransportAttempt = new TrackerTransportRetryAttempt(retryTransport, [testEvent]);
-    jest.spyOn(retryTransportAttempt, 'retry');
 
-    await expect(retryTransportAttempt.run()).rejects.toEqual(
-      expect.arrayContaining([new Error('maxRetryMs reached')])
-    );
+    // @ts-ignore Set the start time to yesterday
+    retryTransportAttempt.startTime = new Date(new Date().setDate(new Date().getDate() - 1));
 
-    expect(retryTransportAttempt.retry).toHaveBeenCalledTimes(1);
-    expect(slowFailingTransport.handle).toHaveBeenCalledTimes(1);
+    const result = await retryTransportAttempt.run();
+
+    expect(result[0]).toStrictEqual(retryTransportAttempt.errors[0]);
+    expect(result[0]).toStrictEqual(new Error('maxRetryMs reached'));
     expect(retryTransportAttempt.errors[0]).toStrictEqual(new Error('maxRetryMs reached'));
   });
-
-  // TODO write test to verify everything works as expected also when wrapped in a concurrency > 1 Queue
 });

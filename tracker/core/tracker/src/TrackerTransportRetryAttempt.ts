@@ -90,7 +90,8 @@ export class TrackerTransportRetryAttempt implements TrackerTransportRetryAttemp
     }
 
     // Stop if we reached maxRetryMs
-    if (this.startTime && Date.now() - this.startTime >= this.maxRetryMs) {
+    console.log(Date.now(), this.startTime, Date.now() - this.startTime, this.maxRetryMs)
+    if (Date.now() - this.startTime >= this.maxRetryMs) {
       this.errors.unshift(new Error('maxRetryMs reached'));
       return Promise.reject(this.errors);
     }
