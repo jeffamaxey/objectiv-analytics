@@ -1,6 +1,0 @@
-# Later on we'll create a separate packages `bach` and `bach[bigquery]`. `bach[bigquery]` will then have
-# these packages as requirement
-sqlalchemy-bigquery
-psycopg2-binary
-google-cloud-bigquery-storage
-pyarrow
