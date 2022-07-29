@@ -381,16 +381,16 @@ describe('TrackerTransportRetry', () => {
 
   it('should stop retrying if we reached maxRetryMs', async () => {
     const logTransport = new LogTransport();
-    const retryTransport = new TrackerTransportRetry({ transport: logTransport });
+    const retryTransport = new TrackerTransportRetry({ transport: logTransport, maxRetryMs: 1 });
     const retryTransportAttempt = new TrackerTransportRetryAttempt(retryTransport, [testEvent]);
 
     // @ts-ignore Set the start time to yesterday
-    retryTransportAttempt.startTime = new Date(new Date().setDate(new Date().getDate() - 1));
+    retryTransportAttempt.startTime = Date.now() - 1000;
 
-    const result = await retryTransportAttempt.run();
+    await expect(retryTransportAttempt.run()).rejects.toEqual(
+      expect.arrayContaining([new Error('maxRetryMs reached')])
+    );
 
-    expect(result[0]).toStrictEqual(retryTransportAttempt.errors[0]);
-    expect(result[0]).toStrictEqual(new Error('maxRetryMs reached'));
     expect(retryTransportAttempt.errors[0]).toStrictEqual(new Error('maxRetryMs reached'));
   });
 });
