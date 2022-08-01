@@ -23,8 +23,8 @@ author = 'Objectiv B.V.'
 
 doctest_global_setup = f'''
 import pandas as pd
-pd.set_option('display.max_columns', None)
-pd.set_option('display.expand_frame_repr', False)
+pd.set_option('display.max_columns', None) # show all columns where possible, so dataframes don't get unneccesarily cut off
+pd.set_option('display.expand_frame_repr', False)  # do not output dataframes on multiple lines, but over full width
 
 from bach.dataframe import DataFrame
 try:
@@ -41,7 +41,7 @@ modelhub = ModelHub(time_aggregation='%Y-%m-%d')
 from bach import display_sql_as_markdown
 from IPython.display import display
 def display_sql_as_markdown(arg):
-    print('sql\\n' + arg.view_sql() + '\\n')
+    print('sql\\n' + arg.view_sql() + '\\n') # print out SQL instead of an object
 '''
 
 doctest_default_flags = (
