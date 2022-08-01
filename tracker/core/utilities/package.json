@@ -1,6 +1,6 @@
 {
   "name": "@objectiv/utilities",
-  "version": "0.0.24-next.0",
+  "version": "0.0.24-next.4",
   "private": true,
   "license": "Apache-2.0",
   "description": "Objectiv Core Utilities",
@@ -19,7 +19,7 @@
     "depcheck": "npx depcheck --ignores uuid"
   },
   "devDependencies": {
-    "@objectiv/tracker-core": "^0.0.24-next.0",
+    "@objectiv/tracker-core": "^0.0.24-next.4",
     "axios": "^0.27.2",
     "cheerio": "^1.0.0-rc.12",
     "json5": "^2.2.0",

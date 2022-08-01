@@ -1,6 +1,6 @@
 {
   "name": "@objectiv/tracker-angular",
-  "version": "0.0.24-next.0",
+  "version": "0.0.24-next.4",
   "description": "Objectiv Angular framework analytics tracker for the open analytics taxonomy",
   "license": "Apache-2.0",
   "homepage": "https://objectiv.io",
@@ -26,8 +26,18 @@
       "url": "https://github.com/sdirosa"
     }
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/bundles/objectiv-tracker-angular.umd.js",
+  "module": "./dist/fesm5/objectiv-tracker-angular.js",
+  "es2015": "./dist/fesm2015/objectiv-tracker-angular.js",
+  "esm5": "./dist/esm5/objectiv-tracker-angular.js",
+  "esm2015": "./dist/esm2015/objectiv-tracker-angular.js",
+  "fesm5": "./dist/fesm5/objectiv-tracker-angular.js",
+  "fesm2015": "./dist/fesm2015/objectiv-tracker-angular.js",
+  "typings": "./dist/objectiv-tracker-angular.d.ts",
+  "metadata": "./dist/objectiv-tracker-angular.metadata.json",
   "scripts": {
     "build": "ng-packagr -p ng-package.json",
     "deploy:verdaccio": "npm publish",
@@ -35,15 +45,15 @@
     "tsc": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@angular/common": "^9.0.0",
-    "@angular/core": "^9.0.0",
-    "@objectiv/tracker-browser": "^0.0.24-next.0"
+    "@angular/common": ">=9.0.0",
+    "@angular/core": ">=9.0.0",
+    "@objectiv/tracker-browser": "^0.0.24-next.4"
   },
   "devDependencies": {
     "@angular/compiler": "~9.1.13",
     "@angular/compiler-cli": "~9.1.13",
     "@angular/core": "~9.1.13",
-    "@objectiv/tracker-browser": "^0.0.24-next.0",
+    "@objectiv/tracker-browser": "^0.0.24-next.4",
     "ng-packagr": "^9.0.0",
     "prettier": "^2.5.1",
     "rxjs": "~6.5.4",

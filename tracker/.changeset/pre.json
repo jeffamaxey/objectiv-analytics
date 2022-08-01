@@ -26,6 +26,9 @@
     "@objectiv/transport-xhr": "0.0.23"
   },
   "changesets": [
-    "late-dolls-sneeze"
+    "angry-glasses-talk",
+    "hip-kids-flash",
+    "late-dolls-sneeze",
+    "wet-knives-joke"
   ]
 }
