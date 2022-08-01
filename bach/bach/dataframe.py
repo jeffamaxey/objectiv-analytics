@@ -3220,21 +3220,12 @@ class DataFrame:
             d           4
             Name: feature, dtype: int64
 
-        .. doctest:: scale
-            :skipif: engine is None
-
             >>> scaled_feature = feature.copy()
             >>> if with_mean:
             ...     scaled_feature -= mean_feature
 
-        .. doctest:: scale
-            :skipif: engine is None
-
             >>> if with_std:
             ...     scaled_feature /= std_feature
-
-        .. doctest:: scale
-            :skipif: engine is None
 
             >>> scaled_feature.to_pandas()
             index
