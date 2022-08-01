@@ -17,20 +17,18 @@
     "@objectiv/plugin-react-router-tracked-components": "0.0.23",
     "@objectiv/plugin-root-location-context-from-url": "0.0.23",
     "@objectiv/queue-local-storage": "0.0.23",
+    "@objectiv/tracker-angular": "0.0.23",
     "@objectiv/tracker-browser": "0.0.23",
     "@objectiv/tracker-react": "0.0.23",
     "@objectiv/tracker-react-native": "0.0.23",
     "@objectiv/transport-debug": "0.0.23",
     "@objectiv/transport-fetch": "0.0.23",
-    "@objectiv/transport-xhr": "0.0.23",
-    "@objectiv/tracker-angular": "0.0.24-next.2"
+    "@objectiv/transport-xhr": "0.0.23"
   },
   "changesets": [
     "angry-glasses-talk",
     "hip-kids-flash",
     "late-dolls-sneeze",
-    "mean-impalas-sing",
-    "silly-tools-check",
     "wet-knives-joke"
   ]
 }
