@@ -26,9 +26,13 @@
       "url": "https://github.com/sdirosa"
     }
   ],
+  "files": [
+//    FIXME
+    "dist"
+  ],
   "scripts": {
     "build": "ng-packagr -p ng-package.json",
-    "deploy:verdaccio": "cd dist && npm publish",
+    "deploy:verdaccio": "npm publish",
     "prettify": "prettier --write .",
     "tsc": "tsc --noEmit"
   },
