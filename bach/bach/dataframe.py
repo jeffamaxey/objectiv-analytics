@@ -3224,7 +3224,6 @@ class DataFrame:
             >>> if with_mean:
             ...     scaled_feature -= mean_feature
 
-
             >>> if with_std:
             ...     scaled_feature /= std_feature
 

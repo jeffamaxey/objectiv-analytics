@@ -22,15 +22,25 @@ copyright = '2021, Objectiv'
 author = 'Objectiv B.V.'
 
 doctest_global_setup = f'''
-from bach.dataframe import DataFrame
 import pandas as pd
+pd.set_option('display.max_columns', None) # show all columns where possible, so dataframes don't get unneccesarily cut off
+pd.set_option('display.expand_frame_repr', False)  # do not output dataframes on multiple lines, but over full width
+
+from bach.dataframe import DataFrame
 try:
     import os
     import sqlalchemy
-    DB_PG_TEST_URL = os.environ.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
-    engine = sqlalchemy.create_engine(DB_PG_TEST_URL)
+    DB_URL = os.environ.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
+    engine = sqlalchemy.create_engine(DB_URL)
 except Exception:
     engine = None
+
+from modelhub import ModelHub
+modelhub = ModelHub(time_aggregation='%Y-%m-%d')
+
+# replace display_sql_as_markdown() with an implementation that prints nicely in MD
+def display_sql_as_markdown(arg):
+    print('sql\\n' + arg.view_sql() + '\\n') # print out SQL instead of an object
 '''
 
 doctest_default_flags = (
