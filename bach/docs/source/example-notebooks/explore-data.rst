@@ -11,23 +11,31 @@ Explore your data
 This example notebook shows how you can easily explore your data collected with Objectiv. It's also available 
 as a `full Jupyter notebook 
 <https://github.com/objectiv/objectiv-analytics/blob/main/notebooks/explore-your-data.ipynb>`_
-to run on your own data, or you can instead `run the Demo </docs/home/quickstart-guide/>`_ to quickly try it 
-out. The dataset used here is the same as in the Demo.
+to run on your own data (see how to :doc:`get started in your notebook <../get-started-in-your-notebook>`), 
+or you can instead `run the Demo </docs/home/quickstart-guide/>`_ to quickly try it out. The dataset used 
+here is the same as in the Demo.
 
-We assume below that you've installed the open model hub and instantiated an Objectiv DataFrame object; see 
-how to :doc:`get started in your notebook <../get-started-in-your-notebook>`.
+Get started
+-----------
+We first have to instantiate the model hub and an Objectiv DataFrame object.
+
+.. doctest:: explore-data
+	:skipif: engine is None
+
+	>>> # instantiate the model hub, and set the default time aggregation to daily
+	>>> from modelhub import ModelHub
+	>>> modelhub = ModelHub(time_aggregation='%Y-%m-%d')
+	>>> # get an Objectiv DataFrame within a defined timeframe
+	>>> df = modelhub.get_objectiv_dataframe(db_url=DB_URL, start_date='2022-06-01', end_date='2022-06-30')
+
+.. admonition:: Reference
+	:class: api-reference
+
+	* :doc:`modelhub.ModelHub.get_objectiv_dataframe <../open-model-hub/api-reference/ModelHub/modelhub.ModelHub.get_objectiv_dataframe>`
+
 
 A first look at the data
 ------------------------
-
-.. testsetup:: explore-data
-	:skipif: engine is None
-
-	df = modelhub.get_objectiv_dataframe(
-			db_url=DB_PG_TEST_URL,
-			start_date='2022-06-01',
-			end_date='2022-06-30',
-			table_name='data')
 
 .. doctest:: explore-data
 	:skipif: engine is None
@@ -171,7 +179,7 @@ It also means you can make product features very readable and easy to understand
 	:skipif: engine is None
 
 	df = modelhub.get_objectiv_dataframe(
-			db_url=DB_PG_TEST_URL,
+			db_url=DB_URL,
 			start_date='2022-06-01',
 			end_date='2022-06-30',
 			table_name='data')
