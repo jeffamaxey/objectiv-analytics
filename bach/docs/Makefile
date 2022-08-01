@@ -31,6 +31,11 @@ clean:
 clean-target:
 	rm -rf $(DOCSTARGETDIR)modeling/*
 
+# Also runs the doctest, and does so _after_ docusaurus, so it doesn't interfere with custom directives
+docusaurus:
+	@$(SPHINXBUILD) -M docusaurus "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) 
+	@$(SPHINXBUILD) -M doctest "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)	
+
 copy-target:
 	cp -a $(BUILDDIR)/$(DOCUSAURUSDIR)/* $(DOCSTARGETDIR)modeling/
 
