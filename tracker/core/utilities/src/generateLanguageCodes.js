@@ -43,7 +43,7 @@ try {
       .filter((languageCode) => languageCode);
 
     // Sort alphabetically and filter out duplicates
-    const filteredAndSortedLanguageCodes = [...new Set(languageCodes.filter((languageCode) => languageCode).sort())];
+    const uniqueSortedLanguageCodes = [...new Set(languageCodes)].sort();
 
     fs.writeFileSync(DESTINATION_FILENAME, `/*\n * Copyright ${new Date().getFullYear()} Objectiv B.V.\n */\n\n`);
 
@@ -54,7 +54,7 @@ try {
 
     fs.appendFileSync(
       DESTINATION_FILENAME,
-      `export const LanguageCodes = [\n  '${filteredAndSortedLanguageCodes.join(`',\n  '`)}',\n];\n`
+      `export const LanguageCodes = [\n  '${uniqueSortedLanguageCodes.join(`',\n  '`)}',\n];\n`
     );
 
     console.log(`Language Codes saved to ${DESTINATION_FILENAME}.`);
