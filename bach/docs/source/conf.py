@@ -38,8 +38,7 @@ except Exception:
 from modelhub import ModelHub
 modelhub = ModelHub(time_aggregation='%Y-%m-%d')
 
-from bach import display_sql_as_markdown
-from IPython.display import display
+# replace display_sql_as_markdown() with an implementation that prints nicely in MD
 def display_sql_as_markdown(arg):
     print('sql\\n' + arg.view_sql() + '\\n') # print out SQL instead of an object
 '''
