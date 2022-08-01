@@ -16,6 +16,7 @@ Generating and publishing the docs for `Bach` involve a few steps:
 
 2. Generate Docusaurus modeling docs:
 ```bash
+  # note that the order of 'docusaurus' and 'doctest' matters; if switched, not all docs are built
   make clean docusaurus doctest
   # OR to also clean up the objectiv.io repo's /docs/modeling folder
   # make clean clean-target docusaurus doctest
@@ -25,7 +26,7 @@ Generating and publishing the docs for `Bach` involve a few steps:
    2. Run:
 ```bash
    make copy-target
-  # OR to run a fully clean build from scratch and copy it
+  # OR to run a fully clean build from scratch and copy it (again note the order of commands matters)
   # make clean clean-target docusaurus doctest copy-target
 ```
 
