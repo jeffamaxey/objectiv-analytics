@@ -22,4 +22,4 @@
 "@objectiv/transport-xhr": patch
 ---
 
-Optimized export for Angular
+Prerelease with package fix for angular

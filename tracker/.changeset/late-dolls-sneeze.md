@@ -14,7 +14,6 @@
 "@objectiv/plugin-react-router-tracked-components": patch
 "@objectiv/plugin-root-location-context-from-url": patch
 "@objectiv/queue-local-storage": patch
-"@objectiv/tracker-angular": patch
 "@objectiv/tracker-browser": patch
 "@objectiv/tracker-react": patch
 "@objectiv/tracker-react-native": patch
