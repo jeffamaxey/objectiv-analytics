@@ -43,46 +43,7 @@ make tests
 ```
 
 ### Running BigQuery-only tests
-Before running tests for BigQuery, please make sure you have the following tables in your dataset:
-
-**Cities**
-```sql
-insert into `<YOUR_PROJECT>.<YOUR_DATASET>.cities`(skating_order, city, municipality, inhabitants, founding)
-values
-    (1, 'Ljouwert', 'Leeuwarden', 93485, 1285),
-    (2, 'Snits', 'Súdwest-Fryslân', 33520, 1456),
-    (3, 'Drylts', 'Súdwest-Fryslân', 3055, 1268),
-    (4, 'Sleat', 'De Friese Meren', 700, 1426),
-    (5, 'Starum', 'Súdwest-Fryslân', 960, 1061),
-    (6, 'Hylpen', 'Súdwest-Fryslân', 870, 1225),
-    (7, 'Warkum', 'Súdwest-Fryslân', 4440, 1399),
-    (8, 'Boalsert', 'Súdwest-Fryslân', 10120, 1455),
-    (9, 'Harns', 'Harlingen', 14740, 1234),
-    (10, 'Frjentsjer', 'Waadhoeke', 12760, 1374),
-    (11, 'Dokkum', 'Noardeast-Fryslân', 12675, 1298);
-```
-**Foods**
-```sql
-insert into `<YOUR_PROJECT>.<YOUR_DATASET>.foods`(skating_order, food, moment, date)
-values
-    (1, 'Sûkerbôlle', '2021-05-03 11:28:36.388', '2021-05-03'),
-    (2, 'Dúmkes', '2021-05-04 23:28:36.388', '2021-05-04'),
-    (4, 'Grutte Pier Bier', '2022-05-03 14:13:13.388', '2022-05-03');
-```
-**Railways**
-```sql
-insert into `<YOUR_PROJECT>.<YOUR_DATASET>.railways`(station_id, town, station, platforms)
-values
-    (1, 'Drylts', 'IJlst', 1),
-    (2, 'It Hearrenfean', 'Heerenveen', 1),
-    (3, 'It Hearrenfean', 'Heerenveen IJsstadion', 2),
-    (4, 'Ljouwert', 'Leeuwarden', 4),
-    (5, 'Ljouwert', 'Camminghaburen', 1),
-    (6, 'Snits', 'Sneek', 2),
-    (7, 'Snits', 'Sneek Noord', 2);
-```
-
-After setting up your tables, run the following command:
+For running tests for BigQuery, run the following command:
 ```bash
 make tests-bigquery
 ```
