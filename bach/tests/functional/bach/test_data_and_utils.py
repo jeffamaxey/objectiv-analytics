@@ -9,7 +9,7 @@ as a test file. This makes pytest rewrite the asserts to give clearer errors.
 import datetime
 import uuid
 from decimal import Decimal
-from typing import List, Union, Type, Dict, Any
+from typing import List, Union, Type, Any
 
 import sqlalchemy
 from sqlalchemy.engine import ResultProxy, Engine, Dialect
@@ -125,78 +125,38 @@ JSON_COLUMNS = ['row', 'dict_column', 'list_column', 'mixed_column']
 JSON_INDEX_AND_COLUMNS = ['_row_id'] + JSON_COLUMNS
 
 
-def get_bt(
-    dataset: List[List[Any]],
-    columns: List[str],
-    convert_objects: bool
-) -> DataFrame:
-    """
-    DEPRECATED: Call directly DataFrame.from_pandas instead
-    """
-    return DataFrame.from_pandas(
-        engine=sqlalchemy.create_engine(DB_PG_TEST_URL),
-        df=get_pandas_df(dataset, columns),
-        convert_objects=convert_objects,
-    )
-
-
 def get_df_with_test_data(engine: Engine, full_data_set: bool = False) -> DataFrame:
-    if is_postgres(engine):
-        if full_data_set:
-            return get_bt(TEST_DATA_CITIES_FULL, CITIES_COLUMNS, True)
-        return get_bt(TEST_DATA_CITIES, CITIES_COLUMNS, True)
-    if is_bigquery(engine):
-        df = _get_big_query_data(
-            engine=engine,
-            table_name='cities',
-            index='skating_order',
-            dtypes=CITIES_COLUMNS_X_DTYPES,
-        )
-        if full_data_set:
-            return df
-
-        # skating_orders in (1, 2, 3)
-        skating_orders = list(range(1, ROW_LIMIT + 1))
-        return df.loc[skating_orders]
-    raise ValueError(f'engine of type {engine.name} is not supported.')
+    dataset = TEST_DATA_CITIES_FULL if full_data_set else TEST_DATA_CITIES
+    return DataFrame.from_pandas(
+        engine=engine,
+        df=get_pandas_df(dataset, CITIES_COLUMNS),
+        convert_objects=True
+    )
 
 
 def get_bt_with_test_data(full_data_set: bool = False) -> DataFrame:
     """
     DEPRECATED: Use get_df_with_test_data()
     """
-    if full_data_set:
-        return get_bt(TEST_DATA_CITIES_FULL, CITIES_COLUMNS, True)
-    return get_bt(TEST_DATA_CITIES, CITIES_COLUMNS, True)
+    # This is probably a cause of the number of database connections increasing during testing
+    engine = sqlalchemy.create_engine(DB_PG_TEST_URL)
+    return get_df_with_test_data(engine=engine, full_data_set=full_data_set)
 
 
 def get_df_with_food_data(engine: Engine) -> DataFrame:
-    if is_postgres(engine):
-        return get_bt(TEST_DATA_FOOD, FOOD_COLUMNS, True)
-
-    if is_bigquery(engine):
-        return _get_big_query_data(
-            engine=engine,
-            table_name='foods',
-            index='skating_order',
-            dtypes=FOOD_COLUMNS_X_DTYPES,
-        )
-
-    raise ValueError(f'engine of type {engine.name} is not supported.')
+    return DataFrame.from_pandas(
+        engine=engine,
+        df=get_pandas_df(TEST_DATA_FOOD, FOOD_COLUMNS),
+        convert_objects=True,
+    )
 
 
 def get_df_with_railway_data(engine: Engine) -> DataFrame:
-    if is_postgres(engine):
-        return get_bt(TEST_DATA_RAILWAYS, RAILWAYS_COLUMNS, True)
-
-    if is_bigquery(engine):
-        return _get_big_query_data(
-            engine=engine,
-            table_name='railways',
-            index='station_id',
-            dtypes=RAILWAYS_COLUMNS_X_DTYPES,
-        )
-    raise ValueError(f'engine of type {engine.name} is not supported.')
+    return DataFrame.from_pandas(
+        engine=engine,
+        df=get_pandas_df(TEST_DATA_RAILWAYS, RAILWAYS_COLUMNS),
+        convert_objects=True,
+    )
 
 
 def get_df_with_json_data(engine: Engine, dtype='json') -> DataFrame:
@@ -313,22 +273,6 @@ def _get_to_pandas_data(df: DataFrame):
         db_values.append(value_row if df.index else value_row[1:])  # don't include default index value
     print(db_values)
     return column_names, db_values
-
-
-# todo: rename this function to a more generic name since we might need to use it for other engines
-def _get_big_query_data(engine: Engine, table_name: str, index: str, dtypes: Dict[str, str]) -> DataFrame:
-    df = DataFrame.from_table(
-        engine=engine,
-        table_name=table_name,
-        index=[index],
-        all_dtypes=dtypes
-    )
-    # todo: update actual table to match the postgres test data. so we don't need this magic here
-    df = df.reset_index()
-    df[f'_index_{index}'] = df[index]
-    df = df.set_index(f'_index_{index}')
-    df = df.materialize()
-    return df
 
 
 def assert_postgres_type(
