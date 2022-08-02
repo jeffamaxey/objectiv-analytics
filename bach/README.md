@@ -25,31 +25,50 @@ For detailed installation & usage instructions, visit [Objectiv Docs](https://ww
 In case you are interested on running tests, install all requirements from ``requirements-dev.txt``
 
 ### Setting up environmental variables
-Functional tests require reading from multiple databases, in order to run them you should define
-any of the following variables (based on the engine you want to test):
+Functional tests require access to multiple databases. In order to run them you should define
+the variables shown in the below table, depending on the engine you want to test.
+Variables can be set as environment variables, or can be defined in the file `.secrets/.test_env`.
 
-|    Database     |                  |           Variables          |
-|:---------------:|------------------|:----------------------------:|
-|    Postgres     | Database URL     |     `OBJ_DB_PG_TEST_URL`     |
-|    BigQuery     | Database URL     |     `OBJ_DB_BQ_TEST_URL`     |
-|    BigQuery     | Credentials Path | `OBJ_DB_BQ_CREDENTIALS_PATH` |
+| Database | Variables                              | Description                  |
+|:--------:|----------------------------------------|------------------------------|
+| Postgres | `OBJ_DB_PG_TEST_URL`                   | Database URL                 |
+|          |                                        |                              |
+|  Athena  | `OBJ_DB_ATHENA_TEST_URL`               | Database URL                 |
+|  Athena  | `OBJ_DB_ATHENA_AWS_ACCESS_KEY_ID`      | Access key id*               |
+|  Athena  | `OBJ_DB_ATHENA_AWS_SECRET_ACCESS_KEY`  | Secret key*                  |
+|  Athena  | `OBJ_DB_ATHENA_REGION_NAME`            | Region*                      |
+|  Athena  | `OBJ_DB_ATHENA_SCHEMA_NAME`            | Schema name*                 |
+|  Athena  | `OBJ_DB_ATHENA_S3_STAGING_DIR`         | S3 staging dir*              |
+|  Athena  | `OBJ_DB_ATHENA_WORK_GROUP`             | Workgroup to run queries as* |
+|          |                                        |                              |
+| BigQuery | `OBJ_DB_BQ_TEST_URL`                   |                              |
+| BigQuery | `OBJ_DB_BQ_CREDENTIALS_PATH`           | Database URL                 |
+
+For Athena one can either specify the full connection string as `OBJ_DB_ATHENA_TEST_URL`, or set
+all the fields marked with an asterisk . The asterisk marked fields are ignored if `OBJ_DB_ATHENA_TEST_URL`
+is set.
+
+For more information on creating the correct database setup, see the markdown files in the `tests/` folder.
 
 
-
-### Running Postgres-only tests
-For running tests for Postgres, run the following command:
+### Running Tests for different databases
+For running tests for Postgres, as well as database independent tests, run the following command:
 ```bash
 make tests
 ```
 
-### Running BigQuery-only tests
-For running tests for BigQuery, run the following command:
+For running tests for Athena, as well as database independent tests, run the following command:
+```bash
+make tests-athena
+```
+
+For running tests for BigQuery, as well as database independent tests, run the following command:
 ```bash
 make tests-bigquery
 ```
 
-### Running tests for all databases
-In case you want to run all tests for multiple database, run the following command:
+In case you want to run all tests for all supported databases, as well as database independent tests, run
+the following command:
 ```bash
 make tests-all
 ```

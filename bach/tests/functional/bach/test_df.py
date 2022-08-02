@@ -8,6 +8,7 @@ from bach import DataFrame, SeriesBoolean
 from tests.functional.bach.test_data_and_utils import assert_equals_data, get_df_with_test_data
 
 
+@pytest.mark.athena
 def test_basic(engine):
     bt = get_df_with_test_data(engine)
     assert_equals_data(

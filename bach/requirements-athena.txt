@@ -1,0 +1,3 @@
+# Later on we'll create a separate packages `bach` and `bach[athena]`. `bach[athena]` will then have
+# these packages as requirement
+pyathena>=2.10.0

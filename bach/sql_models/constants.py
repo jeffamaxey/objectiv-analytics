@@ -30,6 +30,7 @@ class DBDialect(Enum):
     """
     POSTGRES = 'postgresql'  # value of PGDialect.name
     BIGQUERY = 'bigquery'  # value of BigQueryDialect.name
+    ATHENA = 'awsathena'  # value of AthenaDialect.name
 
     def is_dialect(self, dialect_engine: Union[Dialect, Engine]) -> bool:
         return dialect_engine.name == self.value

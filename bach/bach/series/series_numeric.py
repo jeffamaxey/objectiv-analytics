@@ -13,7 +13,7 @@ from bach.expression import Expression, AggregateFunctionExpression
 from bach.series.series import WrappedPartition
 from bach.types import StructuredDtype
 from sql_models.constants import DBDialect
-from sql_models.util import is_postgres, is_bigquery, DatabaseNotSupportedException
+from sql_models.util import is_postgres, is_bigquery, DatabaseNotSupportedException, is_athena
 
 if TYPE_CHECKING:
     from bach.series import SeriesBoolean, SeriesNumericInterval
@@ -236,6 +236,7 @@ class SeriesInt64(SeriesAbstractNumeric):
     dtype_aliases = ('integer', 'bigint', 'i8', int, numpy.int64, 'int32')
     supported_db_dtype = {
         DBDialect.POSTGRES: 'bigint',
+        DBDialect.ATHENA: 'bigint',
         DBDialect.BIGQUERY: 'INT64'
     }
     supported_value_types = (int, numpy.int64, numpy.int32)
@@ -246,11 +247,12 @@ class SeriesInt64(SeriesAbstractNumeric):
         # to cast all of them for BigQuery. Not casting integer literals greatly improves the readability of
         # the generated SQL.
 
-        if is_postgres(dialect):
+        if is_postgres(dialect) or is_athena(dialect):
             # A stringified integer is a valid integer or bigint literal, depending on the size. We want to
             # consistently get bigints, so always cast the result
-            # See the section on numeric constants in the Postgres documentation
+            # PG: See the section on numeric constants in the Postgres documentation
             # https://www.postgresql.org/docs/14/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS
+            # Athena: experimentally established that the integer typing mimicks Postgres's behaviour
             return super().supported_literal_to_expression(dialect=dialect, literal=literal)
         if is_bigquery(dialect):
             # BigQuery has only one integer type, so there is no confusion between 32-bit and 64-bit integers
