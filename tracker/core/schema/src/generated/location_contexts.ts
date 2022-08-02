@@ -12,7 +12,7 @@ export interface InputContext extends AbstractLocationContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'InputContext';
+  _type: 'InputContext';
 }
 
 /**
@@ -24,7 +24,7 @@ export interface PressableContext extends AbstractPressableContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'PressableContext';
+  _type: 'PressableContext';
 }
 
 /**
@@ -35,7 +35,7 @@ export interface LinkContext extends AbstractPressableContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'LinkContext';
+  _type: 'LinkContext';
 
   /**
    * URL (href) the link points to.
@@ -51,7 +51,7 @@ export interface RootLocationContext extends AbstractLocationContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'RootLocationContext';
+  _type: 'RootLocationContext';
 }
 
 /**
@@ -62,7 +62,7 @@ export interface ExpandableContext extends AbstractLocationContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'ExpandableContext';
+  _type: 'ExpandableContext';
 }
 
 /**
@@ -73,7 +73,7 @@ export interface MediaPlayerContext extends AbstractLocationContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'MediaPlayerContext';
+  _type: 'MediaPlayerContext';
 }
 
 /**
@@ -84,7 +84,7 @@ export interface NavigationContext extends AbstractLocationContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'NavigationContext';
+  _type: 'NavigationContext';
 }
 
 /**
@@ -95,7 +95,7 @@ export interface OverlayContext extends AbstractLocationContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'OverlayContext';
+  _type: 'OverlayContext';
 }
 
 /**
@@ -107,5 +107,5 @@ export interface ContentContext extends AbstractLocationContext {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'ContentContext';
+  _type: 'ContentContext';
 }

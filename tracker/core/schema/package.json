@@ -1,6 +1,6 @@
 {
   "name": "@objectiv/schema",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Objectiv TypeScript implementation of the open analytics taxonomy",
   "license": "Apache-2.0",
   "homepage": "https://objectiv.io",
@@ -25,7 +25,7 @@
       "url": "https://github.com/sdirosa"
     }
   ],
-  "types": "src/index.d.ts",
+  "types": "src/index.ts",
   "files": [
     "src"
   ],

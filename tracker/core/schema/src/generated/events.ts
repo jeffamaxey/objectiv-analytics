@@ -12,7 +12,7 @@ export interface InteractiveEvent extends AbstractInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'InteractiveEvent';
+  _type: 'InteractiveEvent';
 }
 
 /**
@@ -23,7 +23,7 @@ export interface NonInteractiveEvent extends AbstractNonInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'NonInteractiveEvent';
+  _type: 'NonInteractiveEvent';
 }
 
 /**
@@ -34,7 +34,7 @@ export interface ApplicationLoadedEvent extends AbstractNonInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'ApplicationLoadedEvent';
+  _type: 'ApplicationLoadedEvent';
 }
 
 /**
@@ -46,7 +46,7 @@ export interface FailureEvent extends AbstractNonInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'FailureEvent';
+  _type: 'FailureEvent';
 
   /**
    * Failure message.
@@ -62,7 +62,7 @@ export interface InputChangeEvent extends AbstractInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'InputChangeEvent';
+  _type: 'InputChangeEvent';
 }
 
 /**
@@ -74,7 +74,7 @@ export interface PressEvent extends AbstractInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'PressEvent';
+  _type: 'PressEvent';
 }
 
 /**
@@ -85,7 +85,7 @@ export interface HiddenEvent extends AbstractNonInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'HiddenEvent';
+  _type: 'HiddenEvent';
 }
 
 /**
@@ -96,7 +96,7 @@ export interface VisibleEvent extends AbstractNonInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'VisibleEvent';
+  _type: 'VisibleEvent';
 }
 
 /**
@@ -108,7 +108,7 @@ export interface SuccessEvent extends AbstractNonInteractiveEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'SuccessEvent';
+  _type: 'SuccessEvent';
 
   /**
    * Success message.
@@ -125,7 +125,7 @@ export interface MediaEvent extends AbstractMediaEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'MediaEvent';
+  _type: 'MediaEvent';
 }
 
 /**
@@ -136,7 +136,7 @@ export interface MediaLoadEvent extends AbstractMediaEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'MediaLoadEvent';
+  _type: 'MediaLoadEvent';
 }
 
 /**
@@ -147,7 +147,7 @@ export interface MediaPauseEvent extends AbstractMediaEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'MediaPauseEvent';
+  _type: 'MediaPauseEvent';
 }
 
 /**
@@ -158,7 +158,7 @@ export interface MediaStartEvent extends AbstractMediaEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'MediaStartEvent';
+  _type: 'MediaStartEvent';
 }
 
 /**
@@ -169,5 +169,5 @@ export interface MediaStopEvent extends AbstractMediaEvent {
   /**
    * Typescript discriminator
    */
-  readonly _type: 'MediaStopEvent';
+  _type: 'MediaStopEvent';
 }

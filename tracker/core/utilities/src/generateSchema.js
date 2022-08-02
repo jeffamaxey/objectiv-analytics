@@ -56,7 +56,7 @@ const object_declarations = {
   location_contexts: {},
 };
 
-// holds a list of event discriminators, to generate discriminators.d.ts in the schema
+// holds a list of event discriminators, to generate discriminators.ts in the schema
 const discriminators = [];
 
 // contains factories to create instances of events / contexts
@@ -94,7 +94,7 @@ function createDefinition(
     properties: [],
     abstract: false,
     parent: false,
-    definition_type: 'class',
+    definition_type: 'interface',
     description: '',
   }
 ) {
@@ -107,9 +107,9 @@ function createDefinition(
     if (params.properties[property]['type']) {
       p_list.push(`${property}: ${get_property_definition(params.properties[property])};\n`);
     } else if (params.properties[property]['discriminator']) {
-      p_list.push(`readonly ${property} = ${params.properties[property]['discriminator']};\n`);
+      p_list.push(`${property}: ${params.properties[property]['discriminator']};\n`);
     } else {
-      p_list.push(`readonly ${property}: ${params.properties[property]['value']};\n`);
+      p_list.push(`${property}: ${params.properties[property]['value']};\n`);
     }
   });
 
@@ -126,7 +126,7 @@ function createDefinition(
     ` * ${description}\n` +
     ` * Inheritance: ${inheritance}\n` +
     ` */\n` +
-    `export ${params.abstract ? 'abstract ' : ''}${params.definition_type} ${params.class_name}` +
+    `export ${params.definition_type} ${params.class_name}` +
     `${params.parent ? ' extends ' + params.parent : ''}` +
     ` {\n` +
     `\t${p_list.join('\n\t')}\n` +
@@ -141,7 +141,7 @@ function createFactory(
     properties: [],
     abstract: false,
     parent: false,
-    definition_type: 'class',
+    definition_type: 'interface',
     description: '',
   }
 ) {
@@ -282,7 +282,7 @@ function createMissingAbstracts(
     properties: {},
     abstract: false,
     parent: false,
-    definition_type: 'class',
+    definition_type: 'interface',
     description: '',
   }
 ) {
@@ -340,7 +340,7 @@ function createMissingAbstracts(
         properties: properties,
         abstract: true,
         parent: parent,
-        definition_type: 'class',
+        definition_type: 'interface',
         description: '',
       };
 
@@ -470,7 +470,7 @@ Object.entries(events).forEach(([event_type, event]) => {
       properties[DISCRIMINATING_PROPERTY_PREFIX + discriminator] = { discriminator: true };
     }
     abstract = true;
-    definition_type = 'class';
+    definition_type = 'interface';
   } else {
     properties[EVENT_DISCRIMINATOR] = {
       description: 'Typescript discriminator',
@@ -543,7 +543,7 @@ Object.entries(contexts).forEach(([context_type, context]) => {
     }
 
     abstract = true;
-    definition_type = 'class';
+    definition_type = 'interface';
     stack_type = 'abstracts';
   } else {
     // check ancestry of context, if this is a location or global context
@@ -687,7 +687,7 @@ Object.keys(object_factories).forEach((factory_type) => {
 
 // now write some files
 Object.keys(object_declarations).forEach((definition_type) => {
-  const filename = `${core_schema_package_dir}${definition_type}.d.ts`;
+  const filename = `${core_schema_package_dir}${definition_type}.ts`;
 
   // list of (abstract) classes to import (as they represent the top of the hierarchy)
   const imports = [];
@@ -717,8 +717,8 @@ Object.keys(object_declarations).forEach((definition_type) => {
   console.log(`Written ${Object.values(object_declarations[definition_type]).length} definitions to ${filename}`);
 });
 
-// Generate discriminators.d.ts
-const discriminators_filename = `${core_schema_package_dir}discriminators.d.ts`;
+// Generate discriminators.ts
+const discriminators_filename = `${core_schema_package_dir}discriminators.ts`;
 let discriminators_content = '';
 
 discriminators_content += `
@@ -792,9 +792,9 @@ if (contentEventNamesTsFile) {
 }
 
 // generate index for all declarations
-// this includes all generated types, as well as those in static.d.ts
+// this includes all generated types, as well as those in static.ts
 const export_file_list = [...Object.keys(object_declarations), 'discriminators'].sort();
-const index_filename = `${core_schema_package_dir}index.d.ts`;
+const index_filename = `${core_schema_package_dir}index.ts`;
 fs.writeFileSync(index_filename, COPYRIGHT);
 fs.appendFileSync(
   index_filename,

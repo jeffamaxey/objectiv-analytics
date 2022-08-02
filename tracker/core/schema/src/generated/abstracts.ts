@@ -6,7 +6,7 @@
  * This is the abstract parent of all Events.
  * Inheritance: AbstractEvent
  */
-export abstract class AbstractEvent {
+export interface AbstractEvent {
   /**
    * The location stack is an ordered list (stack), that contains a hierarchy of location contexts that
    *deterministically describes where an event took place from global to specific.
@@ -42,7 +42,7 @@ export abstract class AbstractEvent {
  * AbstractContext defines the bare minimum properties for every Context. All Contexts inherit from it.
  * Inheritance: AbstractContext
  */
-export abstract class AbstractContext {
+export interface AbstractContext {
   /**
    * A unique identifier to discriminate Context instances across Location Stacks.
    */
@@ -64,8 +64,8 @@ export abstract class AbstractContext {
  * This is the abstract parent of all Global Contexts. Global contexts add general information to an Event.
  * Inheritance: AbstractGlobalContext -> AbstractContext
  */
-export abstract class AbstractGlobalContext extends AbstractContext {
-  readonly __global_context = true;
+export interface AbstractGlobalContext extends AbstractContext {
+  __global_context: true;
 }
 
 /**
@@ -73,38 +73,38 @@ export abstract class AbstractGlobalContext extends AbstractContext {
  * Location Contexts are meant to describe where an event originated from in the visual UI.
  * Inheritance: AbstractLocationContext -> AbstractContext
  */
-export abstract class AbstractLocationContext extends AbstractContext {
-  readonly __location_context = true;
+export interface AbstractLocationContext extends AbstractContext {
+  __location_context: true;
 }
 
 /**
  *
  * Inheritance: AbstractNonInteractiveEvent -> AbstractEvent
  */
-export abstract class AbstractNonInteractiveEvent extends AbstractEvent {
-  readonly __non_interactive_event = true;
+export interface AbstractNonInteractiveEvent extends AbstractEvent {
+  __non_interactive_event: true;
 }
 
 /**
  *
  * Inheritance: AbstractInteractiveEvent -> AbstractEvent
  */
-export abstract class AbstractInteractiveEvent extends AbstractEvent {
-  readonly __interactive_event = true;
+export interface AbstractInteractiveEvent extends AbstractEvent {
+  __interactive_event: true;
 }
 
 /**
  *
  * Inheritance: AbstractMediaEvent -> AbstractNonInteractiveEvent -> AbstractEvent
  */
-export abstract class AbstractMediaEvent extends AbstractNonInteractiveEvent {
-  readonly __media_event = true;
+export interface AbstractMediaEvent extends AbstractNonInteractiveEvent {
+  __media_event: true;
 }
 
 /**
  *
  * Inheritance: AbstractPressableContext -> AbstractLocationContext -> AbstractContext
  */
-export abstract class AbstractPressableContext extends AbstractLocationContext {
-  readonly __pressable_context = true;
+export interface AbstractPressableContext extends AbstractLocationContext {
+  __pressable_context: true;
 }

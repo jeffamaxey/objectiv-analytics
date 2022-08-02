@@ -2,7 +2,7 @@
  * Copyright 2021-2022 Objectiv B.V.
  */
 
-import { AbstractGlobalContext, AbstractLocationContext } from './abstracts';
+import { AbstractGlobalContext, AbstractLocationContext } from './generated';
 
 /**
  * All discriminating properties start with this prefix.
