@@ -16,6 +16,8 @@ from tests.functional.bach.test_data_and_utils import assert_equals_data
 
 
 def _create_test_table(engine: Engine, table_name: str):
+    # TODO: insert data too, and check in the tests below that we get that data back in the DataFrame
+    #
     if is_postgres(engine):
         sql = f'drop table if exists {table_name}; ' \
               f'create table {table_name}(a bigint, b text, c double precision, d date, e timestamp, f boolean); '
