@@ -18,7 +18,6 @@ from bach import DataFrame, Series
 from bach.types import get_series_type_from_db_dtype
 from sql_models.constants import DBDialect
 from sql_models.util import is_bigquery, is_postgres
-from tests.conftest import DB_PG_TEST_URL
 from tests.unit.bach.util import get_pandas_df
 
 # Three data tables for testing are defined here that can be used in tests
