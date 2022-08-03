@@ -11,3 +11,6 @@ filelock==3.7.1
 
 # Types used by mypy
 types-requests
+
+# Used by bach's conftest.py, which we indirectly use
+python-dotenv==0.20.0
