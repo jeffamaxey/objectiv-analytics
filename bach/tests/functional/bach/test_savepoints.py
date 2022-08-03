@@ -4,16 +4,15 @@ Copyright 2021 Objectiv B.V.
 from typing import List
 
 import pytest
-from sqlalchemy.dialects.postgresql.base import PGDialect
 from sqlalchemy.future import Engine
 
 from bach.savepoints import Savepoints, CreatedObject
 from sql_models.model import Materialization
-from tests.functional.bach.test_data_and_utils import get_bt_with_test_data, assert_equals_data
+from tests.functional.bach.test_data_and_utils import get_df_with_test_data, assert_equals_data
 
 
-def test_add_savepoint():
-    df = get_bt_with_test_data()
+def test_add_savepoint(pg_engine):
+    df = get_df_with_test_data(engine=pg_engine)
     sps = Savepoints()
     sps.add_savepoint('test', df, Materialization.TABLE)
     df2 = df.groupby('municipality').min()
@@ -29,8 +28,8 @@ def test_add_savepoint():
     assert len(sps.all) == 2
 
 
-def test_add_savepoint_double():
-    df = get_bt_with_test_data()
+def test_add_savepoint_double(pg_engine):
+    df = get_df_with_test_data(engine=pg_engine)
     sps = Savepoints()
     df = df.materialize()
     sps.add_savepoint('first', df, Materialization.TABLE)
@@ -38,8 +37,8 @@ def test_add_savepoint_double():
         sps.add_savepoint('second', df, Materialization.QUERY)
 
 
-def test_write_to_db_queries_only(testrun_uid):
-    df = get_bt_with_test_data()
+def test_write_to_db_queries_only(pg_engine, testrun_uid):
+    df = get_df_with_test_data(engine=pg_engine)
     engine = df.engine
     sps = Savepoints()
     sps.add_savepoint('the_name', df, Materialization.QUERY)
@@ -66,9 +65,10 @@ def test_write_to_db_queries_only(testrun_uid):
     )
 
 
-def test_write_to_db_create_objects(testrun_uid: str):
-    dialect = PGDialect()  # TODO: BigQuery
-    df = get_bt_with_test_data()
+def test_write_to_db_create_objects(pg_engine, testrun_uid: str):
+    engine = pg_engine
+    dialect = engine.dialect
+    df = get_df_with_test_data(engine)
     engine = df.engine
     sps = Savepoints()
 

@@ -134,15 +134,6 @@ def get_df_with_test_data(engine: Engine, full_data_set: bool = False) -> DataFr
     )
 
 
-def get_bt_with_test_data(full_data_set: bool = False) -> DataFrame:
-    """
-    DEPRECATED: Use get_df_with_test_data()
-    """
-    # This is probably a cause of the number of database connections increasing during testing
-    engine = sqlalchemy.create_engine(DB_PG_TEST_URL)
-    return get_df_with_test_data(engine=engine, full_data_set=full_data_set)
-
-
 def get_df_with_food_data(engine: Engine) -> DataFrame:
     return DataFrame.from_pandas(
         engine=engine,

@@ -5,13 +5,13 @@ import pytest
 
 from bach.savepoints import CreatedObject
 from sql_models.model import Materialization
-from tests.functional.bach.test_data_and_utils import get_bt_with_test_data, assert_equals_data
+from tests.functional.bach.test_data_and_utils import assert_equals_data, get_df_with_test_data
 from tests.functional.bach.test_savepoints import remove_created_db_objects
 
 
 @pytest.mark.xdist_group(name="db_writers")
-def test_savepoint_materialization():
-    df = get_bt_with_test_data()
+def test_savepoint_materialization(pg_engine):
+    df = get_df_with_test_data(engine=pg_engine)
 
     engine = df.engine
     df.set_savepoint("savepoint1")
