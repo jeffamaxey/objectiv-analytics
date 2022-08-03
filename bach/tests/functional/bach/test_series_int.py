@@ -1,10 +1,15 @@
 """
 Copyright 2021 Objectiv B.V.
 """
+import pytest
+
 from bach import Series, SeriesInt64
 from tests.functional.bach.test_data_and_utils import assert_equals_data, assert_postgres_type,\
     get_df_with_test_data
 from tests.functional.bach.test_series_numeric import helper_test_simple_arithmetic
+
+
+pytestmark = pytest.mark.athena()
 
 
 def test_add_int_constant(engine):
