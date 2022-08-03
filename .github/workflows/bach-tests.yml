@@ -49,6 +49,8 @@ jobs:
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       # Just the path to a temp file, the actual secret is fully contained in the env var above.
       OBJ_DB_BQ_CREDENTIALS_PATH: './sa.json'
+      OBJ_DB_ATHENA_AWS_ACCESS_KEY_ID: ${{ secrets.OBJ_DB_ATHENA_AWS_ACCESS_KEY_ID }}
+      OBJ_DB_ATHENA_AWS_SECRET_ACCESS_KEY: ${{ secrets.OBJ_DB_ATHENA_AWS_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -90,11 +92,25 @@ jobs:
       - name: Install bigquery dependencies
         run: |
           pip install -e bach[bigquery]
-      - name: Unit tests big-query
+      - name: Unit tests BigQuery
         run: |
           cd bach
           pytest --big-query tests/unit
-      - name: Functional tests big-query
+      - name: Functional tests BigQuery
         run: |
           cd bach
           pytest -n 4 --dist loadgroup --big-query tests/functional
+      # In an ideal world we would start with a clean virtual-env and only install `bach[athena]` and
+      # `bach[dev]`, but the time it takes to setup these environments is also a consideration, so we don't
+      # start with a clean environment here and just build on top of the environment we used for BigQuery.
+      - name: Install Athena dependencies
+        run: |
+          pip install -e bach[athena]
+      - name: Unit tests Athena
+        run: |
+          cd bach
+          pytest --athena tests/unit
+      - name: Functional tests Athena
+        run: |
+          cd bach
+          pytest -n 4 --dist loadgroup --athena tests/functional
