@@ -43,32 +43,51 @@ import os
 from collections import defaultdict
 from enum import Enum
 from typing import Dict, List
+from urllib.parse import quote_plus
 
 import pytest
 from _pytest.fixtures import SubRequest
 from _pytest.main import Session
 from _pytest.python import Metafunc, Function
 from _pytest.config.argparsing import Parser
+from dotenv import dotenv_values
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
+# Load settings from .test_env file, but allow overrides from Environment variables
+_DOT_ENV_FILE = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + '/.secrets/.test_env'
+_ENV = {
+    **dotenv_values(_DOT_ENV_FILE),
+    **os.environ
+}
 
-DB_PG_TEST_URL = os.environ.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
-DB_BQ_TEST_URL = os.environ.get('OBJ_DB_BQ_TEST_URL', 'bigquery://objectiv-snowplow-test-2/bach_test')
-DB_BQ_CREDENTIALS_PATH = os.environ.get(
+DB_PG_TEST_URL = _ENV.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
+_DB_BQ_TEST_URL = _ENV.get('OBJ_DB_BQ_TEST_URL', 'bigquery://objectiv-snowplow-test-2/bach_test')
+_DB_BQ_CREDENTIALS_PATH = _ENV.get(
     'OBJ_DB_BQ_CREDENTIALS_PATH',
     os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + '/.secrets/bach-big-query-testing.json'
 )
+_DB_ATHENA_TEST_URL = _ENV.get('OBJ_DB_ATHENA_TEST_URL')
+_DB_ATHENA_AWS_ACCESS_KEY_ID = _ENV.get('OBJ_DB_ATHENA_AWS_ACCESS_KEY_ID')
+_DB_ATHENA_AWS_SECRET_ACCESS_KEY = _ENV.get('OBJ_DB_ATHENA_AWS_SECRET_ACCESS_KEY')
+_DB_ATHENA_REGION_NAME = _ENV.get('OBJ_DB_ATHENA_REGION_NAME', 'eu-west-1')
+_DB_ATHENA_SCHEMA_NAME = _ENV.get('OBJ_DB_ATHENA_SCHEMA_NAME', 'automated_tests.bach_test')
+_DB_ATHENA_S3_STAGING_DIR = _ENV.get('OBJ_DB_ATHENA_S3_STAGING_DIR', 's3://obj-automated-tests/bach_test/staging/')
+_DB_ATHENA_WORK_GROUP = _ENV.get('OBJ_DB_ATHENA_WORK_GROUP', 'automated_tests_work_group')
 
 
 MARK_DB_INDEPENDENT = 'db_independent'
 MARK_SKIP_POSTGRES = 'skip_postgres'
 MARK_SKIP_BIGQUERY = 'skip_bigquery'
+# Temporary mark 'athena' will be used to annotate tests that work on Athena.
+# Once all tests work on athena we'll ignore the mark, after which we can remove it.
+MARK_ATHENA_SUPPORTED = 'athena_supported'
 
 
 class DB(Enum):
     POSTGRES = 'postgres'
     BIGQUERY = 'bigquery'
+    ATHENA = 'athena'
 
 
 _ENGINE_CACHE: Dict[DB, Engine] = {}
@@ -78,7 +97,7 @@ _RECORDED_TEST_TABLES_PER_ENGINE: [Engine, List[str]] = defaultdict(list)
 @pytest.fixture()
 def pg_engine(request: SubRequest) -> Engine:
     if DB.POSTGRES not in _ENGINE_CACHE:
-        # Skip tests using this fixture when running only for big_query
+        # Skip tests using this fixture when running only for big_query or athena
         pytest.skip()
 
     # TODO: port all tests that use this to be multi-database. Or explicitly mark them as skip-bigquery
@@ -129,7 +148,8 @@ def pytest_addoption(parser: Parser):
     # https://docs.pytest.org/en/6.2.x/reference.html#initialization-hooks
     parser.addoption('--postgres', action='store_true', help='run the functional tests for Postgres')
     parser.addoption('--big-query', action='store_true', help='run the functional tests for BigQuery')
-    parser.addoption('--all', action='store_true', help='run the functional tests for Postgres & BigQuery')
+    parser.addoption('--athena', action='store_true', help='run the functional tests for Athena')
+    parser.addoption('--all', action='store_true', help='run the functional tests for all databases.')
 
 
 def pytest_sessionstart(session: Session):
@@ -144,9 +164,16 @@ def pytest_sessionstart(session: Session):
     if session.config.getoption("all"):
         _ENGINE_CACHE[DB.POSTGRES] = _get_postgres_engine()
         _ENGINE_CACHE[DB.BIGQUERY] = _get_bigquery_engine()
-    elif session.config.getoption("big_query"):
-        _ENGINE_CACHE[DB.BIGQUERY] = _get_bigquery_engine()
-    else:  # default option, don't even check if --postgres is set
+        _ENGINE_CACHE[DB.ATHENA] = _get_athena_engine()
+    else:
+        if session.config.getoption("athena"):
+            _ENGINE_CACHE[DB.ATHENA] = _get_athena_engine()
+        if session.config.getoption("big_query"):
+            _ENGINE_CACHE[DB.BIGQUERY] = _get_bigquery_engine()
+        if session.config.getoption("postgres"):
+            _ENGINE_CACHE[DB.POSTGRES] = _get_postgres_engine()
+    if not _ENGINE_CACHE:
+        # default option: always run tests on postgres
         _ENGINE_CACHE[DB.POSTGRES] = _get_postgres_engine()
 
 
@@ -172,12 +199,15 @@ def pytest_generate_tests(metafunc: Metafunc):
     markers = list(metafunc.definition.iter_markers())
     skip_postgres = any(mark.name == MARK_SKIP_POSTGRES for mark in markers)
     skip_bigquery = any(mark.name == MARK_SKIP_BIGQUERY for mark in markers)
+    athena_support = any(mark.name == MARK_ATHENA_SUPPORTED for mark in markers)
 
     engines = []
     for name, engine_dialect in _ENGINE_CACHE.items():
         if name == DB.POSTGRES and skip_postgres:
             continue
         if name == DB.BIGQUERY and skip_bigquery:
+            continue
+        if name == DB.ATHENA and not athena_support:
             continue
         engines.append(engine_dialect)
 
@@ -223,4 +253,22 @@ def _get_postgres_engine() -> Engine:
 
 
 def _get_bigquery_engine() -> Engine:
-    return create_engine(DB_BQ_TEST_URL, credentials_path=DB_BQ_CREDENTIALS_PATH)
+    return create_engine(_DB_BQ_TEST_URL, credentials_path=_DB_BQ_CREDENTIALS_PATH)
+
+
+def _get_athena_engine() -> Engine:
+    if _DB_ATHENA_TEST_URL:
+        return create_engine(_DB_ATHENA_TEST_URL)
+    aws_access_key_id = quote_plus(_DB_ATHENA_AWS_ACCESS_KEY_ID)
+    aws_secret_access_key = quote_plus(_DB_ATHENA_AWS_SECRET_ACCESS_KEY)
+    region_name = quote_plus(_DB_ATHENA_REGION_NAME)
+    schema_name = quote_plus(_DB_ATHENA_SCHEMA_NAME)
+    s3_staging_dir = quote_plus(_DB_ATHENA_S3_STAGING_DIR)
+    athena_work_group = quote_plus(_DB_ATHENA_WORK_GROUP)
+
+    url = (
+        f'awsathena+rest://'
+        f'{aws_access_key_id}:{aws_secret_access_key}'
+        f'@athena.{region_name}.amazonaws.com:443/'
+        f'{schema_name}?s3_staging_dir={s3_staging_dir}&work_group={athena_work_group}')
+    return create_engine(url)
