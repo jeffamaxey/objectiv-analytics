@@ -32,16 +32,16 @@ def test__assert_column_names_valid_generic(dialect):
     with pytest.raises(ValueError, match='Not all columns names are strings'):
         _assert_column_names_valid(dialect=dialect, df=pdf)
 
-
+@pytest.mark.athena_supported()
 def test__assert_column_names_valid_db_specific(dialect):
     # test whether column names are allowed for specific dialects
     # We'll just test a few combinations here
     tests = [
-        #            column name              PG     BQ
-        ColNameValid('test',                  True, True),
-        ColNameValid('test' * 15 + 'test',    False, True),   # 64 characters
-        ColNameValid('abcdefghij' * 30 + 'a', False, False),  # 301 characters
-        ColNameValid('#@*&O*JALDSJK',         True, False),
+        #            column name              PG    Athena BQ
+        ColNameValid('test',                  True,  True,  True),
+        ColNameValid('test' * 15 + 'test',    False, True,  True),   # 64 characters
+        ColNameValid('abcdefghij' * 30 + 'a', False, False, False),  # 301 characters
+        ColNameValid('#@*&O*JALDSJK',         True,  False, False),
     ]
     for test in tests:
         data = [[1, 2, 3], [3, 4, 5]]
