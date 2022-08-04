@@ -61,7 +61,7 @@ _ENV = {
     **os.environ
 }
 
-DB_PG_TEST_URL = _ENV.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
+_DB_PG_TEST_URL = _ENV.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
 _DB_BQ_TEST_URL = _ENV.get('OBJ_DB_BQ_TEST_URL', 'bigquery://objectiv-snowplow-test-2/bach_test')
 _DB_BQ_CREDENTIALS_PATH = _ENV.get(
     'OBJ_DB_BQ_CREDENTIALS_PATH',
