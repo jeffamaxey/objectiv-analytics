@@ -12,7 +12,7 @@ from tests.functional.bach.test_data_and_utils import assert_equals_data, get_df
 from tests.functional.bach.test_series_numeric import helper_test_simple_arithmetic
 
 
-pytestmark = pytest.mark.athena()
+pytestmark = pytest.mark.athena_supported()
 
 
 def test_from_value(engine):

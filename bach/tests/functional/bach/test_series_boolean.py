@@ -4,7 +4,7 @@ import pytest
 from tests.functional.bach.test_data_and_utils import assert_equals_data, get_df_with_test_data
 
 
-pytestmark = pytest.mark.athena()
+pytestmark = pytest.mark.athena_supported()
 
 
 def test_from_const(engine):
