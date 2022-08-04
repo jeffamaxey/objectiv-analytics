@@ -46,11 +46,11 @@ Variables can be set as environment variables, or can be defined in the file `.s
 |  Athena  | `OBJ_DB_ATHENA_S3_STAGING_DIR`         | S3 staging dir*              |
 |  Athena  | `OBJ_DB_ATHENA_WORK_GROUP`             | Workgroup to run queries as* |
 |          |                                        |                              |
-| BigQuery | `OBJ_DB_BQ_TEST_URL`                   |                              |
-| BigQuery | `OBJ_DB_BQ_CREDENTIALS_PATH`           | Database URL                 |
+| BigQuery | `OBJ_DB_BQ_TEST_URL`                   | Database URL                 |
+| BigQuery | `OBJ_DB_BQ_CREDENTIALS_PATH`           | Credentials Path             |
 
-For Athena one can either specify the full connection string as `OBJ_DB_ATHENA_TEST_URL`, or set
-all the fields marked with an asterisk . The asterisk marked fields are ignored if `OBJ_DB_ATHENA_TEST_URL`
+For Athena one can either specify the full connection string as `OBJ_DB_ATHENA_TEST_URL` or set
+all the fields marked with an asterisk. The asterisk marked fields are ignored if `OBJ_DB_ATHENA_TEST_URL`
 is set.
 
 For more information on creating the correct database setup, see the markdown files in the `tests/` folder.
