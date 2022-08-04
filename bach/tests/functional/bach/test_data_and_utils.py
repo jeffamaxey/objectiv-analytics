@@ -18,7 +18,6 @@ from bach import DataFrame, Series
 from bach.types import get_series_type_from_db_dtype
 from sql_models.constants import DBDialect
 from sql_models.util import is_bigquery, is_postgres
-from tests.conftest import DB_PG_TEST_URL
 from tests.unit.bach.util import get_pandas_df
 
 # Three data tables for testing are defined here that can be used in tests
@@ -132,15 +131,6 @@ def get_df_with_test_data(engine: Engine, full_data_set: bool = False) -> DataFr
         df=get_pandas_df(dataset, CITIES_COLUMNS),
         convert_objects=True
     )
-
-
-def get_bt_with_test_data(full_data_set: bool = False) -> DataFrame:
-    """
-    DEPRECATED: Use get_df_with_test_data()
-    """
-    # This is probably a cause of the number of database connections increasing during testing
-    engine = sqlalchemy.create_engine(DB_PG_TEST_URL)
-    return get_df_with_test_data(engine=engine, full_data_set=full_data_set)
 
 
 def get_df_with_food_data(engine: Engine) -> DataFrame:
