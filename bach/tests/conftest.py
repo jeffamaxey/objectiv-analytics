@@ -84,7 +84,7 @@ MARK_SKIP_POSTGRES = 'skip_postgres'
 MARK_SKIP_BIGQUERY = 'skip_bigquery'
 # Temporary mark 'athena' will be used to annotate tests that work on Athena.
 # Once all tests work on athena we'll ignore the mark, after which we can remove it.
-MARK_ATHENA = 'athena'
+MARK_ATHENA_SUPPORTED = 'athena_supported'
 
 
 class DB(Enum):
@@ -202,7 +202,7 @@ def pytest_generate_tests(metafunc: Metafunc):
     markers = list(metafunc.definition.iter_markers())
     skip_postgres = any(mark.name == MARK_SKIP_POSTGRES for mark in markers)
     skip_bigquery = any(mark.name == MARK_SKIP_BIGQUERY for mark in markers)
-    athena_support = any(mark.name == MARK_ATHENA for mark in markers)
+    athena_support = any(mark.name == MARK_ATHENA_SUPPORTED for mark in markers)
 
     engines = []
     for name, engine_dialect in _ENGINE_CACHE.items():
