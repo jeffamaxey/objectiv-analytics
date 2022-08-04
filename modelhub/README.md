@@ -47,11 +47,8 @@ export PYTHONPATH=.
 
 # This will fail if the postgres lib development headers are not present if so, then on Ubuntu that can
 # be fixed with: sudo apt-get install libpq-dev
+pip install -e ../bach
 pip install -e .[dev]
-
-# The above command installed objectiv-bach from PyPi. For development we need the local copy instead.
-pip uninstall objectiv-bach
-pip install -e ../bach/
 ```
 
 ### PyCharm
