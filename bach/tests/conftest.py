@@ -32,9 +32,6 @@ Category 4 and 5 are for functionality that we explicitly not support on some da
 Category 2, 4, and 5 are the exception, these need to be marked with the `db_independent`, `skip_postgres`,
 or `skip_bigquery` marks.
 
-### Database settings
-Settings for TODO
-
 ### Other
 For all unittests we add a timeout of 1 second. If they take longer they will be stopped and considered
 failed.
@@ -100,7 +97,7 @@ _RECORDED_TEST_TABLES_PER_ENGINE: [Engine, List[str]] = defaultdict(list)
 @pytest.fixture()
 def pg_engine(request: SubRequest) -> Engine:
     if DB.POSTGRES not in _ENGINE_CACHE:
-        # Skip tests using this fixture when running only for big_query
+        # Skip tests using this fixture when running only for big_query or athena
         pytest.skip()
 
     # TODO: port all tests that use this to be multi-database. Or explicitly mark them as skip-bigquery
