@@ -10,7 +10,7 @@ from bach.expression import Expression
 from sql_models.util import is_postgres, is_bigquery
 from tests.functional.bach.test_data_and_utils import (
     get_df_with_test_data, assert_equals_data, df_to_list,
-    get_df_with_railway_data, get_df_with_food_data, get_bt_with_test_data, TEST_DATA_CITIES_FULL, CITIES_COLUMNS,
+    get_df_with_railway_data, get_df_with_food_data, TEST_DATA_CITIES_FULL, CITIES_COLUMNS,
 )
 from tests.unit.bach.util import get_pandas_df
 
@@ -41,8 +41,8 @@ def test_series__getitem__(engine):
         non_existing_value_ref.value
 
 
-def test_positional_slicing():
-    bt = get_bt_with_test_data(full_data_set=True)['inhabitants'].sort_values()
+def test_positional_slicing(pg_engine):
+    bt = get_df_with_test_data(engine=pg_engine, full_data_set=True)['inhabitants'].sort_values()
 
     class ReturnSlice:
         def __getitem__(self, key):
@@ -236,8 +236,8 @@ def test_aggregation(engine):
         s.agg(['sum','sum'])
 
 
-def test_type_agnostic_aggregation_functions():
-    bt = get_bt_with_test_data(full_data_set=True)
+def test_type_agnostic_aggregation_functions(pg_engine):
+    bt = get_df_with_test_data(engine=pg_engine, full_data_set=True)
     btg = bt.groupby()
 
     # type agnostic aggregations
@@ -366,8 +366,8 @@ def test_series_inherit_flag(engine):
     assert not bts_derived.expression.has_aggregate_function
 
 
-def test_series_independant_subquery_any_value_all_values():
-    bt = get_bt_with_test_data(full_data_set=True)
+def test_series_independant_subquery_any_value_all_values(pg_engine):
+    bt = get_df_with_test_data(engine=pg_engine, full_data_set=True)
     s = bt.inhabitants.max() // 4
 
     bt[bt.inhabitants > s.any_value()].head()
@@ -488,8 +488,9 @@ def test_series_dropna(engine) -> None:
     )
 
 
-def test_series_unstack():
-    bt = get_bt_with_test_data(full_data_set=True)
+def test_series_unstack(pg_engine):
+    engine = pg_engine
+    bt = get_df_with_test_data(engine=engine, full_data_set=True)
 
     stacked_bt = bt.groupby(['city','municipality']).inhabitants.sum()
     unstacked_bt = stacked_bt.unstack()
@@ -541,7 +542,7 @@ def test_series_unstack():
     )
 
     # test with column that references another column and grouping on that column
-    bt = get_bt_with_test_data(full_data_set=False)
+    bt = get_df_with_test_data(engine=engine, full_data_set=False)
     bt['village'] = bt.city + ' village'
     unstacked_bt = bt.groupby(['skating_order', 'village']).inhabitants.sum().unstack()
     # unstacked_bt = bt.set_index(['skating_order', 'village']).inhabitants.unstack()

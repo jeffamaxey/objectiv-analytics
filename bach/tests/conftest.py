@@ -32,9 +32,6 @@ Category 4 and 5 are for functionality that we explicitly not support on some da
 Category 2, 4, and 5 are the exception, these need to be marked with the `db_independent`, `skip_postgres`,
 or `skip_bigquery` marks.
 
-### Database settings
-Settings for TODO
-
 ### Other
 For all unittests we add a timeout of 1 second. If they take longer they will be stopped and considered
 failed.
@@ -84,7 +81,7 @@ MARK_SKIP_POSTGRES = 'skip_postgres'
 MARK_SKIP_BIGQUERY = 'skip_bigquery'
 # Temporary mark 'athena' will be used to annotate tests that work on Athena.
 # Once all tests work on athena we'll ignore the mark, after which we can remove it.
-MARK_ATHENA = 'athena'
+MARK_ATHENA_SUPPORTED = 'athena_supported'
 
 
 class DB(Enum):
@@ -100,7 +97,7 @@ _RECORDED_TEST_TABLES_PER_ENGINE: [Engine, List[str]] = defaultdict(list)
 @pytest.fixture()
 def pg_engine(request: SubRequest) -> Engine:
     if DB.POSTGRES not in _ENGINE_CACHE:
-        # Skip tests using this fixture when running only for big_query
+        # Skip tests using this fixture when running only for big_query or athena
         pytest.skip()
 
     # TODO: port all tests that use this to be multi-database. Or explicitly mark them as skip-bigquery
@@ -167,10 +164,10 @@ def pytest_sessionstart(session: Session):
     if session.config.getoption("all"):
         _ENGINE_CACHE[DB.POSTGRES] = _get_postgres_engine()
         _ENGINE_CACHE[DB.BIGQUERY] = _get_bigquery_engine()
-        _ENGINE_CACHE[DB.ATHENA] = _get_athene_engine()
+        _ENGINE_CACHE[DB.ATHENA] = _get_athena_engine()
     else:
         if session.config.getoption("athena"):
-            _ENGINE_CACHE[DB.ATHENA] = _get_athene_engine()
+            _ENGINE_CACHE[DB.ATHENA] = _get_athena_engine()
         if session.config.getoption("big_query"):
             _ENGINE_CACHE[DB.BIGQUERY] = _get_bigquery_engine()
         if session.config.getoption("postgres"):
@@ -202,7 +199,7 @@ def pytest_generate_tests(metafunc: Metafunc):
     markers = list(metafunc.definition.iter_markers())
     skip_postgres = any(mark.name == MARK_SKIP_POSTGRES for mark in markers)
     skip_bigquery = any(mark.name == MARK_SKIP_BIGQUERY for mark in markers)
-    athena_support = any(mark.name == MARK_ATHENA for mark in markers)
+    athena_support = any(mark.name == MARK_ATHENA_SUPPORTED for mark in markers)
 
     engines = []
     for name, engine_dialect in _ENGINE_CACHE.items():
@@ -259,7 +256,7 @@ def _get_bigquery_engine() -> Engine:
     return create_engine(_DB_BQ_TEST_URL, credentials_path=_DB_BQ_CREDENTIALS_PATH)
 
 
-def _get_athene_engine() -> Engine:
+def _get_athena_engine() -> Engine:
     if _DB_ATHENA_TEST_URL:
         return create_engine(_DB_ATHENA_TEST_URL)
     aws_access_key_id = quote_plus(_DB_ATHENA_AWS_ACCESS_KEY_ID)
