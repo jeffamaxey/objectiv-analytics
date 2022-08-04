@@ -70,7 +70,7 @@ def is_valid_column_name(dialect: Dialect, name: str) -> bool:
         return len(name) < 64
     if is_athena(dialect):
         # Source: https://docs.aws.amazon.com/athena/latest/ug/tables-databases-columns-names.html
-        regex = '^[a-zA-Z0-9_]*$'
+        regex = '^[a-z0-9_]*$'
         len_ok = len(name) <= 255
         pattern_ok = bool(re.match(pattern=regex, string=name))
         return len_ok and pattern_ok

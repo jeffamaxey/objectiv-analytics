@@ -8,8 +8,8 @@ tests:
 
 tests-athena:
 # Similar to `tests`, but tests that can run against multiple databases will be run against Athena instead
-# of Postgres. Note that a lot of test are not yet supported for athena. The postgres-only tests will still run
-# against Postgres
+# of Postgres. Note that a lot of tests are not yet supported for athena. The postgres-only tests will still
+# run against Postgres
 	mypy bach sql_models
 	pycodestyle bach sql_models
 	pytest -n 8 --dist loadgroup --athena tests/unit tests/functional tests/
