@@ -2,9 +2,10 @@
 Copyright 2021 Objectiv B.V.
 """
 import bach
+from bach.series import Series
 
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from modelhub.series import series_objectiv
 
@@ -159,3 +160,31 @@ def check_objectiv_dataframe(
             dtype = supported_dtypes[col]
             if df.all_series[col].dtype != dtype:
                 raise ValueError(f'{col} must be {dtype} dtype.')
+
+
+def check_groupby(
+        data: bach.DataFrame,
+        groupby: Union[List[Union[str, Series]], str, Series],
+        not_allowed_in_groupby: str = None
+):
+
+    if data.group_by:
+        raise ValueError("can't run model hub models on a grouped DataFrame, please use parameters "
+                         "(ie groupby of the model")
+
+    groupby_list = groupby if isinstance(groupby, list) else [groupby]
+    groupby_list = [] if groupby is None else groupby_list
+
+    if not_allowed_in_groupby is not None and not_allowed_in_groupby not in data.data_columns:
+        raise ValueError(f'{not_allowed_in_groupby} column is required for this model but it is not in '
+                         f'the DataFrame')
+
+    if not_allowed_in_groupby:
+        for key in groupby_list:
+            new_key = data[key] if isinstance(key, str) else key
+            if new_key.equals(data[not_allowed_in_groupby]):
+                raise KeyError(f'"{not_allowed_in_groupby}" is in groupby but is needed for aggregation: '
+                               f'not allowed to group on that')
+
+    grouped_data = data.groupby(groupby_list)
+    return grouped_data

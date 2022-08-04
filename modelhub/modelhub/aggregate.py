@@ -4,11 +4,12 @@ Copyright 2021 Objectiv B.V.
 import bach
 from bach.series import Series
 from sql_models.constants import NotSet, not_set
-from typing import cast, List, Union, TYPE_CHECKING, Optional
+from typing import cast, List, Union, TYPE_CHECKING
 
 from sql_models.util import is_bigquery, is_postgres
 
 from modelhub.decorators import use_only_required_objectiv_series
+from modelhub.util import check_groupby
 
 if TYPE_CHECKING:
     from modelhub import ModelHub
@@ -25,42 +26,15 @@ class Aggregate:
     def __init__(self, mh: 'ModelHub'):
         self._mh = mh
 
-    def _check_groupby(self,
-                       data: bach.DataFrame,
-                       groupby: Union[List[Union[str, Series]], str, Series],
-                       not_allowed_in_groupby: str = None
-                       ):
-
-        if data.group_by:
-            raise ValueError("can't run model hub models on a grouped DataFrame, please use parameters "
-                             "(ie groupby of the model")
-
-        groupby_list = groupby if isinstance(groupby, list) else [groupby]
-        groupby_list = [] if groupby is None else groupby_list
-
-        if not_allowed_in_groupby is not None and not_allowed_in_groupby not in data.data_columns:
-            raise ValueError(f'{not_allowed_in_groupby} column is required for this model but it is not in '
-                             f'the DataFrame')
-
-        if not_allowed_in_groupby:
-            for key in groupby_list:
-                new_key = data[key] if isinstance(key, str) else key
-                if new_key.equals(data[not_allowed_in_groupby]):
-                    raise KeyError(f'"{not_allowed_in_groupby}" is in groupby but is needed for aggregation: '
-                                   f'not allowed to group on that')
-
-        grouped_data = data.groupby(groupby_list)
-        return grouped_data
-
     def _generic_aggregation(self,
                              data: bach.DataFrame,
                              groupby: Union[List[Union[str, Series]], str, Series],
                              column: str,
                              name: str):
 
-        data = self._check_groupby(data=data,
-                                   groupby=groupby,
-                                   not_allowed_in_groupby=column)
+        data = check_groupby(data=data,
+                             groupby=groupby,
+                             not_allowed_in_groupby=column)
 
         series = data[column].nunique()
         return series.copy_override(name=name)
@@ -147,7 +121,7 @@ class Aggregate:
             new_groupby = groupby
         new_groupby.append(data.session_id.copy_override(name='__session_id'))
 
-        gdata = self._check_groupby(data=data, groupby=new_groupby)
+        gdata = check_groupby(data=data, groupby=new_groupby)
         session_duration = gdata.aggregate({'moment': ['min', 'max']})
         session_duration['session_duration'] = session_duration['moment_max'] - session_duration['moment_min']
 
@@ -549,7 +523,7 @@ class Aggregate:
         partition = None
         sort_nice_names_by = []
         if groupby is not None and groupby is not not_set:
-            partition = self._check_groupby(
+            partition = check_groupby(
                 data=data, groupby=groupby, not_allowed_in_groupby='location_stack',
             )
             sort_nice_names_by = [data[idx] for idx in partition.index_columns]
