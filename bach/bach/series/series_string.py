@@ -164,6 +164,7 @@ class SeriesString(Series):
     dtype_aliases = ('text', str)
     supported_db_dtype = {
         DBDialect.POSTGRES: 'text',
+        DBDialect.ATHENA: 'varchar',
         DBDialect.BIGQUERY: 'STRING'
     }
     supported_value_types = (str, type(None))  # NoneType ends up as a string for now

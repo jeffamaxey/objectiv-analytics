@@ -62,14 +62,18 @@ For running tests for Postgres, as well as database independent tests, run the f
 make tests
 ```
 
-### Running BigQuery-only tests
-For running tests for BigQuery, run the following command:
+For running tests for Athena, as well as database independent tests, run the following command:
+```bash
+make tests-athena
+```
+
+For running tests for BigQuery, as well as database independent tests, run the following command:
 ```bash
 make tests-bigquery
 ```
 
-### Running tests for all databases
-In case you want to run all tests for multiple database, run the following command:
+In case you want to run all tests for all supported databases, as well as database independent tests, run
+the following command:
 ```bash
 make tests-all
 ```

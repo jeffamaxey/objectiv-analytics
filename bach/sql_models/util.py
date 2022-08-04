@@ -56,12 +56,13 @@ def quote_identifier(dialect: Dialect, name: str) -> str:
     >>> quote_identifier(PGDialect(), '"te""st"')
     '\"\"\"te\"\"\"\"st\"\"\"'
     """
-    if is_postgres(dialect):
+    if is_postgres(dialect) or is_athena(dialect):
         # more 'logical' would be: dialect.preparer(dialect).quote_identifier(value=name)
         # But it seems that goes wrong in case there is a `%` in the value. Which sort of makes sense, as
         # sqlalchemy already escapes that for later on.
 
         # postgres spec: https://www.postgresql.org/docs/14/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+        # Athena spec: https://prestodb.io/docs/0.217/language/reserved.html
         replaced_chars = name.replace('"', '""')
         return f'"{replaced_chars}"'
 
@@ -104,6 +105,10 @@ def quote_string(dialect_engine: Union[Dialect, Engine], value: str) -> str:
 
 def is_postgres(dialect_engine: Union[Dialect, Engine]) -> bool:
     return DBDialect.POSTGRES.is_dialect(dialect_engine)
+
+
+def is_athena(dialect_engine: Union[Dialect, Engine]) -> bool:
+    return DBDialect.ATHENA.is_dialect(dialect_engine)
 
 
 def is_bigquery(dialect_engine: Union[Dialect, Engine]) -> bool:

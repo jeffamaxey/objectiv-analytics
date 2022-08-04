@@ -4,7 +4,7 @@ from sqlalchemy.engine import Connection, Dialect
 
 from bach.expression import Expression, ColumnReferenceToken
 from bach.sql_model import BachSqlModel
-from sql_models.util import is_postgres, DatabaseNotSupportedException, is_bigquery
+from sql_models.util import is_postgres, DatabaseNotSupportedException, is_bigquery, is_athena
 
 
 class SortColumn(NamedTuple):
@@ -68,6 +68,12 @@ def is_valid_column_name(dialect: Dialect, name: str) -> bool:
         # could lead to identifier collisions, so we just disallow it.
         # source: https://www.postgresql.org/docs/14/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
         return len(name) < 64
+    if is_athena(dialect):
+        # Source: https://docs.aws.amazon.com/athena/latest/ug/tables-databases-columns-names.html
+        regex = '^[a-z0-9_]*$'
+        len_ok = len(name) <= 255
+        pattern_ok = bool(re.match(pattern=regex, string=name))
+        return len_ok and pattern_ok
     if is_bigquery(dialect):
         # sources:
         #  https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#column_names

@@ -12,7 +12,8 @@ from bach.types import value_to_dtype, DtypeOrAlias, Dtype
 from bach.expression import Expression, join_expressions
 from bach.utils import is_valid_column_name
 from sql_models.model import CustomSqlModelBuilder
-from sql_models.util import quote_identifier, DatabaseNotSupportedException, is_postgres, is_bigquery
+from sql_models.util import quote_identifier, DatabaseNotSupportedException, is_postgres, is_bigquery, \
+    is_athena
 
 
 def from_pandas(engine: Engine,
@@ -122,7 +123,7 @@ def from_pandas_ephemeral(
         per_row_expr.append(row_expr)
     all_values_str = join_expressions(per_row_expr, join_str=',\n').to_sql(engine.dialect)
 
-    if is_postgres(engine):
+    if is_postgres(engine) or is_athena(engine):
         # We are building sql of the form:
         #     select * from (values
         #         ('row 1', cast(1234 as bigint), cast(-13.37 as double precision)),
