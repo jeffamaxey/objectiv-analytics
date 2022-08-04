@@ -167,10 +167,10 @@ def pytest_sessionstart(session: Session):
     if session.config.getoption("all"):
         _ENGINE_CACHE[DB.POSTGRES] = _get_postgres_engine()
         _ENGINE_CACHE[DB.BIGQUERY] = _get_bigquery_engine()
-        _ENGINE_CACHE[DB.ATHENA] = _get_athene_engine()
+        _ENGINE_CACHE[DB.ATHENA] = _get_athena_engine()
     else:
         if session.config.getoption("athena"):
-            _ENGINE_CACHE[DB.ATHENA] = _get_athene_engine()
+            _ENGINE_CACHE[DB.ATHENA] = _get_athena_engine()
         if session.config.getoption("big_query"):
             _ENGINE_CACHE[DB.BIGQUERY] = _get_bigquery_engine()
         if session.config.getoption("postgres"):
@@ -259,7 +259,7 @@ def _get_bigquery_engine() -> Engine:
     return create_engine(_DB_BQ_TEST_URL, credentials_path=_DB_BQ_CREDENTIALS_PATH)
 
 
-def _get_athene_engine() -> Engine:
+def _get_athena_engine() -> Engine:
     if _DB_ATHENA_TEST_URL:
         return create_engine(_DB_ATHENA_TEST_URL)
     aws_access_key_id = quote_plus(_DB_ATHENA_AWS_ACCESS_KEY_ID)
