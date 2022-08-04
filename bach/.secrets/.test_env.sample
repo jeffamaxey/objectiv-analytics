@@ -3,7 +3,7 @@
 # ###################################
 
 # To use:
-# 1) Rename this file to .test_env
+# 1) Copy and rename this file to .test_env
 # 2) Fill out relevant values.
 
 # Note that values that are left out, often have default values in `conftest.py` too. Those defaults make it

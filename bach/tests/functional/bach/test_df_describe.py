@@ -8,9 +8,7 @@ import pandas as pd
 
 from bach import DataFrame
 from sql_models.util import is_bigquery
-from tests.functional.bach.test_data_and_utils import (
-    get_bt_with_test_data, assert_equals_data, get_df_with_test_data,
-)
+from tests.functional.bach.test_data_and_utils import get_df_with_test_data, assert_equals_data
 from unittest.mock import ANY
 
 
@@ -79,8 +77,8 @@ def test_df_numerical_describe(engine) -> None:
     )
 
 
-def test_include_mixed() -> None:
-    df = get_bt_with_test_data()
+def test_include_mixed(pg_engine) -> None:
+    df = get_df_with_test_data(engine=pg_engine)
     # duplicate last row. This will make the `mode` well-defined for all columns
     df = df.append(df.sort_index()[2:3])
 

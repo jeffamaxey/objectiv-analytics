@@ -2,14 +2,10 @@
 Below are instructions for setting up Athena and S3 for functional tests.
 
 **Important** - All descriptions, code fragments, and configuration in this section assume that:
-1. The aws-account-id is `629557902407`
+1. The aws-account-id is `123456789012`
 2. The s3 staging bucket (to be created) is named `obj-automated-tests`
 
 When setting up a new Athena/S3 environment make sure to edit those values appropriately.
-
-TODO:
-* Add similar file for BigQuery
-* Improve this file
 
 
 ## Create Athena DataCatalog, Athena WorkGroup, and S3 bucket
@@ -19,7 +15,7 @@ aws --region eu-west-1 athena create-data-catalog \
     --name automated_tests \
     --type GLUE \
     --description "DataCatalog for automated tests" \
-    --parameters catalog-id=629557902407
+    --parameters catalog-id=123456789012
 
 
 aws --region eu-west-1 athena create-work-group \
@@ -105,8 +101,8 @@ name: `athena-objectiv-automated-tests`
                 "athena:BatchGetQueryExecution"
             ],
             "Resource": [
-                "arn:aws:athena:eu-west-1:629557902407:workgroup/automated_tests_work_group",
-                "arn:aws:athena:eu-west-1:629557902407:datacatalog/automated_tests"
+                "arn:aws:athena:eu-west-1:123456789012:workgroup/automated_tests_work_group",
+                "arn:aws:athena:eu-west-1:123456789012:datacatalog/automated_tests"
             ]
         },
         {
