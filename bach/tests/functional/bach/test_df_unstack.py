@@ -1,11 +1,10 @@
 import pytest
 
-from tests.functional.bach.test_data_and_utils import get_bt_with_test_data, assert_equals_data, \
-    get_df_with_test_data
+from tests.functional.bach.test_data_and_utils import get_df_with_test_data, assert_equals_data
 
 
-def test_basic_unstack() -> None:
-    bt = get_bt_with_test_data(full_data_set=False)
+def test_basic_unstack(pg_engine) -> None:
+    bt = get_df_with_test_data(engine=pg_engine, full_data_set=False)
 
     with pytest.raises(NotImplementedError, match=r'index must be a multi level'):
         bt.unstack()
@@ -35,8 +34,8 @@ def test_basic_unstack() -> None:
     )
 
 
-def test_unstack_level() -> None:
-    bt = get_bt_with_test_data(full_data_set=False)
+def test_unstack_level(pg_engine) -> None:
+    bt = get_df_with_test_data(engine=pg_engine, full_data_set=False)
     bt = bt.set_index(keys=['city', 'skating_order', 'municipality'])
 
     result = bt.unstack(level=1)
