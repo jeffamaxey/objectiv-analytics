@@ -12,7 +12,7 @@ from bach.expression import Expression
 from bach.series.series import WrappedPartition, ToPandasInfo
 from bach.types import StructuredDtype
 from sql_models.constants import DBDialect
-from sql_models.util import is_postgres, DatabaseNotSupportedException, is_bigquery
+from sql_models.util import is_postgres, DatabaseNotSupportedException, is_bigquery, is_athena
 
 
 class SeriesUuid(Series):
@@ -28,9 +28,10 @@ class SeriesUuid(Series):
     dtype_aliases = ()
     supported_db_dtype = {
         DBDialect.POSTGRES: 'uuid',
-        # None here for BIGQUERY, because BigQuery doesn't have a uuid type.
-        # We do support the UUID Series, but on BQ we store data as STRING data-type, which by default is
-        # handled by SeriesString
+        # None here for BQ and Athena, because they don't have a uuid type.
+        # We do support the UUID Series, but we store the data as a string data-type, which by default is
+        # handled by SeriesString,
+        DBDialect.ATHENA: None,
         DBDialect.BIGQUERY: None
     }
 
@@ -38,17 +39,17 @@ class SeriesUuid(Series):
 
     @classmethod
     def get_db_dtype(cls, dialect: Dialect) -> Optional[str]:
-        if not is_bigquery(dialect):
-            return super().get_db_dtype(dialect)
+        if is_athena(dialect) or is_bigquery(dialect):
+            from bach.series import SeriesString
+            return SeriesString.get_db_dtype(dialect)
+        return super().get_db_dtype(dialect)
 
-        from bach.series import SeriesString
-        return SeriesString.get_db_dtype(dialect)
 
     @classmethod
     def supported_literal_to_expression(cls, dialect: Dialect, literal: Expression) -> Expression:
         if is_postgres(dialect):
             return super().supported_literal_to_expression(dialect=dialect, literal=literal)
-        if is_bigquery(dialect):
+        if is_athena(dialect) or is_bigquery(dialect):
             from bach import SeriesString
             return SeriesString.supported_literal_to_expression(dialect=dialect, literal=literal)
         raise DatabaseNotSupportedException(dialect)
@@ -75,7 +76,7 @@ class SeriesUuid(Series):
                 # If the format is wrong, then this will give an error later on, but there is not much we can
                 # do about that here.
                 return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
-            if is_bigquery(dialect):
+            if is_athena(dialect) or is_bigquery(dialect):
                 return expression
             raise DatabaseNotSupportedException(dialect)
         # As far as we know the other types we support cannot be directly cast to uuid.
@@ -110,6 +111,13 @@ class SeriesUuid(Series):
         """
         if is_postgres(base.engine):
             expr_str = 'gen_random_uuid()'
+        elif is_athena(base.engine):
+            # This works, which is interesting. Athena uses version 0.217 of prestodb [1], whose
+            # documentation doesn't list this function [2]. The current version's docs do list it [3].
+            # [1] https://docs.aws.amazon.com/athena/latest/ug/ddl-sql-reference.html
+            # [2] https://prestodb.io/docs/0.217/index.html
+            # [3] https://prestodb.io/docs/current/functions/uuid.html
+            expr_str = 'uuid()'
         elif is_bigquery(base.engine):
             expr_str = 'GENERATE_UUID()'
         else:
@@ -126,7 +134,7 @@ class SeriesUuid(Series):
         )
 
     def to_pandas_info(self) -> Optional[ToPandasInfo]:
-        if is_bigquery(self.engine):
+        if is_athena(self.engine) or is_bigquery(self.engine):
             return ToPandasInfo('object', UUID)
         return None
 
