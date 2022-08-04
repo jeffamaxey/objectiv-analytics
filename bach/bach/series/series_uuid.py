@@ -44,7 +44,6 @@ class SeriesUuid(Series):
             return SeriesString.get_db_dtype(dialect)
         return super().get_db_dtype(dialect)
 
-
     @classmethod
     def supported_literal_to_expression(cls, dialect: Dialect, literal: Expression) -> Expression:
         if is_postgres(dialect):
