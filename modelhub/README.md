@@ -45,10 +45,12 @@ virtualenv venv
 source venv/bin/activate
 export PYTHONPATH=.
 
-# This will fail if the postgres lib development headers are not present if so, then on Ubuntu that can
-# be fixed with: sudo apt-get install libpq-dev
+# Install both Bach and ModelHub in local 'edit' mode
 pip install -e ../bach
 pip install -e .[dev]
+# The above will fail if the postgres lib development headers are not present. On Ubuntu that can be fixed
+# with: sudo apt-get install libpq-dev
+
 ```
 
 ### PyCharm
