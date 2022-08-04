@@ -7,10 +7,6 @@ Below are instructions for setting up Athena and S3 for functional tests.
 
 When setting up a new Athena/S3 environment make sure to edit those values appropriately.
 
-TODO:
-* Add similar file for BigQuery
-* Improve this file
-
 
 ## Create Athena DataCatalog, Athena WorkGroup, and S3 bucket
 

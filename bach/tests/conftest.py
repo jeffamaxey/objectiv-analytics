@@ -61,7 +61,7 @@ _ENV = {
     **os.environ
 }
 
-DB_PG_TEST_URL = _ENV.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
+_DB_PG_TEST_URL = _ENV.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localhost:5432/objectiv')
 _DB_BQ_TEST_URL = _ENV.get('OBJ_DB_BQ_TEST_URL', 'bigquery://objectiv-snowplow-test-2/bach_test')
 _DB_BQ_CREDENTIALS_PATH = _ENV.get(
     'OBJ_DB_BQ_CREDENTIALS_PATH',
@@ -249,7 +249,7 @@ def pytest_runtest_setup(item: Function):
 
 
 def _get_postgres_engine() -> Engine:
-    return create_engine(DB_PG_TEST_URL)
+    return create_engine(_DB_PG_TEST_URL)
 
 
 def _get_bigquery_engine() -> Engine:
