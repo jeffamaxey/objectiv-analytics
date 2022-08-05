@@ -12,6 +12,7 @@ from sqlalchemy.engine import Engine
 from modelhub.aggregate import Aggregate
 from modelhub.map import Map
 from modelhub.models.logistic_regression import LogisticRegression
+from modelhub.models.funnel_discovery import FunnelDiscovery
 from modelhub.series.series_objectiv import MetaBase
 from sql_models.constants import NotSet
 from sql_models.util import is_bigquery
@@ -272,3 +273,10 @@ class ModelHub:
         """
 
         return LogisticRegression(*args, **kwargs)
+
+    def get_funnel_discovery(self) -> FunnelDiscovery:
+        """
+        Return an instance of the :py:class:`FunnelDiscovery` from the model hub.
+        """
+
+        return FunnelDiscovery()
