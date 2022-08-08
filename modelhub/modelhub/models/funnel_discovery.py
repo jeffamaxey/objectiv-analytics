@@ -112,11 +112,10 @@ class FunnelDiscovery:
         :returns: copy of steps_df bach DataFrame, with the addition
             `CONVERSTION_STEP_COLUMN` column.
         """
+
+        if 'is_conversion_event' not in conversion_events_df.data_columns:
+            raise ValueError('The is_conversion_event column is missing in the dataframe.')
         conversion_events_df_columns = [conversion_location_column, 'is_conversion_event']
-        if not all(col in conversion_events_df.data_columns
-                   for col in conversion_events_df_columns):
-            raise ValueError(f'The {", ".join(conversion_events_df_columns)} '
-                             f'columns should be in the main dataframe')
 
         _steps_df = steps_df.copy()
 
