@@ -4,6 +4,7 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
+import pytest
 from psycopg2._range import NumericRange
 from sqlalchemy.engine import Engine
 
@@ -47,6 +48,7 @@ def helper_test_simple_arithmetic(engine: Engine, a: Union[int, float], b: Union
     )
 
 
+@pytest.mark.athena_supported()
 def test_round(engine):
     values = [1.9, 3.0, 4.123, 6.425124, 2.00000000001, 2.1, np.nan, 7.]
     pdf = pd.DataFrame(data={'num': values})
@@ -68,6 +70,7 @@ def test_round(engine):
     )
 
 
+@pytest.mark.athena_supported()
 def test_round_integer(engine):
     values = [1, 3, 4, 6, 2, 2, 6, 7]
     pdf = pd.DataFrame(data={'num': values})
@@ -85,6 +88,7 @@ def test_round_integer(engine):
     )
 
 
+@pytest.mark.athena_supported()
 def test_aggregations_simple_tests(engine):
     values = [1, 3, 4, 6, 2, 2, np.nan, 7, 8]
     pdf = pd.DataFrame(data={'num': values})
@@ -101,6 +105,7 @@ def test_aggregations_simple_tests(engine):
         assert pd_agg == bt_agg.value
 
 
+@pytest.mark.athena_supported()
 def test_aggregations_sum_mincount(engine):
     pdf = pd.DataFrame(data={'num': [1, np.nan, 7, 8]})
     bt = DataFrame.from_pandas(engine=engine, df=pdf, convert_objects=True)
@@ -307,6 +312,7 @@ def test_series_qcut(engine) -> None:
             np.testing.assert_almost_equal(exp.right, float(res.right), decimal=2)
 
 
+@pytest.mark.athena_supported()
 def test_series_scale(engine) -> None:
     inhabitants = get_df_with_test_data(engine, full_data_set=True)['inhabitants']
     result = inhabitants.scale()
@@ -337,6 +343,7 @@ def test_series_scale(engine) -> None:
     )
 
 
+@pytest.mark.athena_supported()
 def test_series_minmax_scale(engine) -> None:
     inhabitants = get_df_with_test_data(engine, full_data_set=True)['inhabitants']
     result = inhabitants.minmax_scale()
@@ -366,10 +373,10 @@ def test_series_minmax_scale(engine) -> None:
     )
 
 
+@pytest.mark.athena_supported()
 def test_exp(engine) -> None:
     skating_order = get_df_with_test_data(engine, full_data_set=True)['skating_order']
     result = skating_order.exp()
-
     assert_equals_data(
         result,
         expected_columns=['_index_skating_order', 'skating_order'],
@@ -386,5 +393,12 @@ def test_exp(engine) -> None:
             [10, 22026.465794806718],
             [11, 59874.14171519782]
         ],
+        # on Athena exp(1) can evalaute to two different values:
+        # `2.718281828459045`
+        # `2.7182818284590455`
+        # This might be a result of the query being executed by servers with different in CPU architectures.
+        # Bottom-line: We don't really care about such precision, so we round to 14 decimals here.
+        round_decimals=True,
+        decimal=14
     )
 
