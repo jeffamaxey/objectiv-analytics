@@ -377,7 +377,6 @@ def test_series_minmax_scale(engine) -> None:
 def test_exp(engine) -> None:
     skating_order = get_df_with_test_data(engine, full_data_set=True)['skating_order']
     result = skating_order.exp()
-
     assert_equals_data(
         result,
         expected_columns=['_index_skating_order', 'skating_order'],
@@ -394,5 +393,12 @@ def test_exp(engine) -> None:
             [10, 22026.465794806718],
             [11, 59874.14171519782]
         ],
+        # on Athena exp(1) can evalaute to two different values:
+        # `2.718281828459045`
+        # `2.7182818284590455`
+        # This might be a result of the query being executed by servers with different in CPU architectures.
+        # Bottom-line: We don't really care about such precision, so we round to 14 decimals here.
+        round_decimals=True,
+        decimal=14
     )
 
