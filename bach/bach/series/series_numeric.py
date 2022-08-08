@@ -396,7 +396,6 @@ class SeriesFloat64(SeriesAbstractNumeric):
                     return Expression.raw('infinity()')
                 else:
                     return Expression.raw('-infinity()')
-            raise Exception('value is not finite, but not nan or infinite')  # should never happen
         return Expression.string_value(str(value))
 
     @classmethod
