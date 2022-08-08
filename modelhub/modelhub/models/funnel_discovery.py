@@ -30,8 +30,8 @@ class FunnelDiscovery:
     For the visualization of the user flow one can use `plot_sankey_diagram` method.
     """
 
-    def __init__(self):
-        self.conversion_step_column = 'first_conversion_step_number'
+    CONVERSTION_STEP_COLUMN = '_first_conversion_step_number'
+    STEP_TAG_COLUMN = '_step_tag'
 
     @staticmethod
     def _tag_step(step_series: bach.Series) -> bach.Series:
@@ -47,7 +47,7 @@ class FunnelDiscovery:
 
         :returns: series with step number in the index:
 
-                index    step_tag
+                index    STEP_TAG_COLUMN
                 index1   ith      val1_step_ith
                 index2   ith      val2_step_ith
                 index3   ith      val3_step_ith
@@ -57,8 +57,8 @@ class FunnelDiscovery:
 
         step_df = step_series.to_frame()
         # add the step name as index
-        step_df['step_tag'] = int(step_series.name.split('_')[-1])
-        step_df = step_df.set_index(keys='step_tag', append=True)
+        step_df[FunnelDiscovery.STEP_TAG_COLUMN] = int(step_series.name.split('_')[-1])
+        step_df = step_df.set_index(keys=FunnelDiscovery.STEP_TAG_COLUMN, append=True)
         step_df = step_df.materialize(node_name='tagged_step')
         return step_df[step_series.name]
 
@@ -75,13 +75,13 @@ class FunnelDiscovery:
 
         :returns: transformed steps_df to the following series:
 
-            index   step_tag
-            index1	1 	      v11
-                    2         v12
-                    3 	      v13
-            index2	1 	      v21
-                    2 	      v22
-                    3 	      v23
+            index   STEP_TAG_COLUMN
+            index1  1               v11
+                    2               v12
+                    3               v13
+            index2  1               v21
+                    2               v22
+                    3               v23
 
         """
         # tags the steps numbers
@@ -110,7 +110,7 @@ class FunnelDiscovery:
             dataframes in order to get converted steps df.
 
         :returns: copy of steps_df bach DataFrame, with the addition
-            `first_conversion_step_number` column.
+            `CONVERSTION_STEP_COLUMN` column.
         """
         conversion_events_df_columns = [conversion_location_column, 'is_conversion_event']
         if not all(col in conversion_events_df.data_columns
@@ -124,7 +124,7 @@ class FunnelDiscovery:
         first_column = _steps_df.data_columns[0]
         _steps_df['_index'] = steps_df.groupby().window()[first_column].window_row_number()
         # need add also steps_df 'old' index
-        initial_index = list(steps_df.index.keys())
+        initial_index = steps_df.index_columns
         index_columns = ['_index'] + initial_index
         _steps_df = _steps_df.reset_index().set_index(index_columns)
 
@@ -147,17 +147,17 @@ class FunnelDiscovery:
                                                               'is_conversion_event']).reset_index(drop=True)
         # consider only first conversion step
         first_converted_step_df = converted_steps_df.drop_duplicates(subset=index_columns,
-                                                                     keep='first', sort_by=['step_tag'])
-        first_converted_step_df = first_converted_step_df[index_columns + ['step_tag']]
+                                                                     keep='first',
+                                                                     sort_by=[self.STEP_TAG_COLUMN])
+        first_converted_step_df = first_converted_step_df[index_columns + [self.STEP_TAG_COLUMN]]
         first_converted_step_df = first_converted_step_df.rename(
-            columns={'step_tag': self.conversion_step_column})
+            columns={self.STEP_TAG_COLUMN: self.CONVERSTION_STEP_COLUMN})
 
-        # final steps df with first_conversion_step_number column
+        # final steps df with CONVERSTION_STEP_COLUMN column
         result_df = _steps_df.materialize().merge(first_converted_step_df.materialize(),
                                                   how='left', on=index_columns)
 
-        result_df = result_df.reset_index().drop(columns=['_index'])
-        result_df = result_df.set_index(initial_index)
+        result_df = result_df.reset_index(level='_index',  drop=True)
 
         return result_df
 
@@ -180,7 +180,7 @@ class FunnelDiscovery:
         :returns: bach DataFrame, filtered each row of steps_df to the conversion location.
         """
 
-        conv_step_num_column = self.conversion_step_column
+        conv_step_num_column = self.CONVERSTION_STEP_COLUMN
         if conv_step_num_column not in steps_df.data_columns:
             raise ValueError(f'{conv_step_num_column} column is missing in the dataframe.')
 
@@ -330,20 +330,20 @@ class FunnelDiscovery:
         result = result.drop(columns=[offset_lc.name])
 
         # conversion part
-        if add_conversion_step_column or only_converted_paths:
-            if 'feature_nice_name' not in data.data_columns:
-                data['feature_nice_name'] = data.location_stack.ls.nice_name
+        if not (add_conversion_step_column or only_converted_paths):
+            return result
 
-            if add_conversion_step_column:
-                result = self._add_first_conversion_step_number_column(result,
-                                                                       data)
-            if only_converted_paths:
-                if self.conversion_step_column not in result.data_columns:
-                    result = self._add_first_conversion_step_number_column(result,
-                                                                           data)
-                result = self._filter_navigation_paths_to_conversion(result)
-                if add_conversion_step_column is False:
-                    result = result.drop(columns=[self.conversion_step_column])
+        if 'feature_nice_name' not in data.data_columns:
+            data['feature_nice_name'] = data.location_stack.ls.nice_name
+        result = self._add_first_conversion_step_number_column(result, data)
+
+        if not only_converted_paths:
+            return result
+
+        result = self._filter_navigation_paths_to_conversion(result)
+
+        if add_conversion_step_column is False:
+            result = result.drop(columns=[self.CONVERSTION_STEP_COLUMN])
 
         return result
 
@@ -374,7 +374,7 @@ class FunnelDiscovery:
 
         # count navigation paths
         columns = [i for i in steps_df.data_columns
-                   if i != self.conversion_step_column]
+                   if i != self.CONVERSTION_STEP_COLUMN]
         steps_counter_df = steps_df[columns].value_counts().to_frame()
 
         _steps_counter_df = steps_counter_df.reset_index().to_pandas()
