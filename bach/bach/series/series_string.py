@@ -136,11 +136,17 @@ class StringOperation:
         return self._base.copy_override(expression=expr)
 
     def upper(self) -> 'SeriesString':
+        """
+        converts string values into uppercase.
+        """
         return self._base.copy_override(
             expression=Expression.construct('upper({})', self._base)
         )
 
     def lower(self) -> 'SeriesString':
+        """
+        converts string values into lowercase.
+        """
         return self._base.copy_override(
             expression=Expression.construct('lower({})', self._base)
         )
