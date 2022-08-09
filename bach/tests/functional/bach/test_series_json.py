@@ -152,7 +152,7 @@ def test_json_getitem_special_chars(engine, dtype):
     # We support 'special' characters, except for double quotes because of limitations in BigQuery
     # see comments in bach.series.series_json.JsonBigQueryAccessor.get_value for more information
     df = get_df_with_json_data(engine=engine, dtype=dtype)
-    df = df[['row']][:1].materialize()
+    df = df[['row']].sort_index()[:1].materialize()
     data = {
         'test.test': 'a',
         'test': {'test': 'b'},
@@ -161,6 +161,7 @@ def test_json_getitem_special_chars(engine, dtype):
         '"double quote is "not" allowed"': 'e',
     }
     df['data'] = data
+    df = df.materialize()
     df['select_a'] = df['data'].json['test.test']
     df['select_b'] = df['data'].json['test'].json['test']
     df['select_c'] = df['data'].json['123test']
@@ -177,56 +178,56 @@ def test_json_getitem_special_chars(engine, dtype):
 
 
 def test_json_getitem_slice(engine, dtype):
-    # TODO: make this a one-query test
-
     bt = get_df_with_json_data(engine=engine, dtype=dtype)
-    bts = bt.list_column.json[1:]
+    bt = bt[['list_column']]
+    bt['one_to_end'] = bt.list_column.json[1:]
+    bt['one_to_minus_one'] = bt.list_column.json[1:-1]
+    bt['end_to_end'] = bt.list_column.json[:]
+    bt = bt.drop(columns=['list_column'])
+
+    # for readability we define the expected output per column, format: [row_id, expected_data]
+    expected_one_to_end = [
+        [0, [{"c": "d"}]],
+        [1, ["b", "c", "d"]],
+        [2, [{"_type": "c", "id": "d"}, {"_type": "e", "id": "f"}]],
+        [3, [{"_type": "SectionContext", "id": "home"}, {"_type": "SectionContext", "id": "top-10"},
+             {"_type": "ItemContext", "id": "5o7Wv5Q5ZE"}]],
+        [4, []]
+    ]
+    expected_one_to_minus_one = [
+        [0, []],
+        [1, ["b", "c"]],
+        [2, [{"_type": "c", "id": "d"}]],
+        [3, [{"_type": "SectionContext", "id": "home"}, {"_type": "SectionContext", "id": "top-10"}]],
+        [4, []]
+    ]
+    expected_end_to_end = [
+        [0, [{'a': 'b'}, {'c': 'd'}]],
+        [1, ['a', 'b', 'c', 'd']],
+        [2, [{'id': 'b', '_type': 'a'}, {'id': 'd', '_type': 'c'}, {'id': 'f', '_type': 'e'}]],
+        [3, [
+            {'id': '#document', '_type': 'WebDocumentContext'},
+            {'id': 'home', '_type': 'SectionContext'},
+            {'id': 'top-10', '_type': 'SectionContext'}, {'id': '5o7Wv5Q5ZE', '_type': 'ItemContext'}]],
+        [4, []]
+    ]
+    expected_data = [
+        [i, expected_one_to_end[i][1], expected_one_to_minus_one[i][1], expected_end_to_end[i][1]]
+        for i in range(5)
+    ]
     assert_equals_data(
-        bts,
+        bt,
         use_to_pandas=True,
-        expected_columns=['_index_row', 'list_column'],
-        expected_data=[
-            [0, [{"c": "d"}]],
-            [1, ["b", "c", "d"]],
-            [2, [{"_type": "c", "id": "d"}, {"_type": "e", "id": "f"}]],
-            [3, [{"_type": "SectionContext", "id": "home"}, {"_type": "SectionContext", "id": "top-10"},
-                 {"_type": "ItemContext", "id": "5o7Wv5Q5ZE"}]],
-            [4, []]
-        ]
-    )
-    bts = bt.list_column.json[1:-1]
-    assert_equals_data(
-        bts,
-        use_to_pandas=True,
-        expected_columns=['_index_row', 'list_column'],
-        expected_data=[
-            [0, []],
-            [1, ["b", "c"]],
-            [2, [{"_type": "c", "id": "d"}]],
-            [3, [{"_type": "SectionContext", "id": "home"}, {"_type": "SectionContext", "id": "top-10"}]],
-            [4, []]
-        ]
-    )
-    bts = bt.list_column.json[:]
-    assert_equals_data(
-        bts,
-        use_to_pandas=True,
-        expected_columns=['_index_row', 'list_column'],
-        expected_data=[
-            [0, [{'a': 'b'}, {'c': 'd'}]],
-            [1, ['a', 'b', 'c', 'd']],
-            [2, [{'id': 'b', '_type': 'a'}, {'id': 'd', '_type': 'c'}, {'id': 'f', '_type': 'e'}]],
-            [3, [
-                {'id': '#document', '_type': 'WebDocumentContext'},
-                {'id': 'home', '_type': 'SectionContext'},
-                {'id': 'top-10', '_type': 'SectionContext'}, {'id': '5o7Wv5Q5ZE', '_type': 'ItemContext'}]],
-            [4, []]
-        ]
+        expected_columns=['_index_row', 'one_to_end', 'one_to_minus_one', 'end_to_end'],
+        expected_data=expected_data
     )
 
-    bts = bt.mixed_column.json[1:-1]
+
+def test_json_getitem_slice_non_happy_mixed_data(engine, dtype):
     # slices only work on columns with only lists
     # But behaviour of Postgres and BigQuery is different. For now we just accept that's the way it is.
+    bt = get_df_with_json_data(engine=engine, dtype=dtype)
+    bts = bt.mixed_column.json[1:-1]
     if is_postgres(engine):
         with pytest.raises(Exception):
            bts.head()
@@ -248,47 +249,41 @@ def test_json_getitem_slice(engine, dtype):
 # tests below are for functions kind of specific to the objectiv (location) stack
 def test_json_getitem_query(engine, dtype):
     bt = get_df_with_json_data(engine=engine, dtype=dtype)
-    # if dict is contained in any of the dicts in the json list, the first index of the first match is
-    # returned to the slice.
-    bts = bt.list_column.json[{"_type": "SectionContext"}: ]
+    bt = bt[['list_column']]
+    bt['a'] = bt.list_column.json[{"_type": "SectionContext"}: ]
+    bt['b'] = bt.list_column.json[1:{"id": "d"}]
+    bt['c'] = bt.list_column.json[{'_type': 'a'}: {'id': 'd'}]
+    bt = bt.drop(columns=['list_column'])
+
+    # if dict in slice is contained in any of the dicts in the json list, the first index of the first match
+    # is returned to the slice.
     assert_equals_data(
-        bts,
-        expected_columns=['_index_row', 'list_column'],
-        expected_data=[
-            [0, []],
-            [1, []],
-            [2, []],
-            [3, [{"_type": "SectionContext", "id": "home"}, {"_type": "SectionContext", "id": "top-10"},
-                 {"_type": "ItemContext", "id": "5o7Wv5Q5ZE"}]],
-            [4, []]
-        ],
+        bt,
         use_to_pandas=True,
-    )
-    bts = bt.list_column.json[1:{"id": "d"}]
-    assert_equals_data(
-        bts,
-        expected_columns=['_index_row', 'list_column'],
+        expected_columns=['_index_row', 'a', 'b', 'c'],
         expected_data=[
-            [0, []],
-            [1, []],
-            [2, [{"_type": "c", "id": "d"}]],
-            [3, []],
-            [4, []]
-        ],
-        use_to_pandas=True,
-    )
-    bts = bt.list_column.json[{'_type': 'a'}: {'id': 'd'}]
-    assert_equals_data(
-        bts,
-        expected_columns=['_index_row', 'list_column'],
-        expected_data=[
-            [0, []],
-            [1, []],
-            [2, [{"_type": "a", "id": "b"}, {"_type": "c", "id": "d"}]],
-            [3, []],
-            [4, []]
-        ],
-        use_to_pandas=True,
+            [0, [],
+                [],
+                []
+            ], [1,
+                [],
+                [],
+                []
+            ], [2,
+                [],
+                [{'id': 'd', '_type': 'c'}],
+                [{'id': 'b', '_type': 'a'}, {'id': 'd', '_type': 'c'}]
+            ], [3,
+                [{"_type": "SectionContext", "id": "home"}, {"_type": "SectionContext", "id": "top-10"},
+                 {"_type": "ItemContext", "id": "5o7Wv5Q5ZE"}],
+                [],
+                []
+            ], [4,
+                [],
+                [],
+                []
+            ]
+        ]
     )
 
 
