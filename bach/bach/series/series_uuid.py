@@ -22,6 +22,7 @@ class SeriesUuid(Series):
     **Database support and types**
 
     * Postgres: utilizes the native 'uuid' database type.
+    * Athena: utilizes the generic 'varchar' database type.
     * BigQuery: utilizes the generic 'STRING' database type.
     """
     dtype = 'uuid'

@@ -36,6 +36,7 @@ class SeriesBoolean(Series, ABC):
     **Database support and types**
 
     * Postgres: utilizes the 'boolean' database type.
+    * Athena: : utilizes the 'boolean' database type.
     * BigQuery: utilizes the 'BOOL' database type.
     """
     dtype = 'bool'

@@ -157,6 +157,7 @@ class SeriesString(Series):
     **Database support and types**
 
     * Postgres: utilizes the 'text' database type.
+    * Athena: utilizes the 'varchar' database type.
     * BigQuery: utilizes the 'STRING' database type.
     """
 
