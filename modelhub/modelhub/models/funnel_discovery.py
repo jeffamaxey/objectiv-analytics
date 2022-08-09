@@ -201,9 +201,10 @@ class FunnelDiscovery:
         steps: int,
         by: GroupByType = not_set,
         location_stack: 'SeriesLocationStack' = None,
-        add_conversion_step_column=False,
-        only_converted_paths=False,
-        n_examples: int = None
+        add_conversion_step_column: bool = False,
+        only_converted_paths: bool = False,
+        n_examples: int = None,
+        reverse: bool = False
     ) -> bach.DataFrame:
         """
         Get the navigation paths for each event's location stack.
@@ -240,10 +241,20 @@ class FunnelDiscovery:
             conversion location.
         :param n_examples: limit the amount of navigation paths.
                            if None - all the navigation paths are taken.
+        :param reverse: get the reversed navigation paths.
+                Having, `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
+                Will generate the following paths:
+                - `'b', 'c', 'd'`
+                - `'a', 'b', 'c'`
+                - `None, 'a', 'b'`
 
         :returns: bach DataFrame containing a new series for each step containing the nice name
             of the location.
         """
+
+        from modelhub.util import check_objectiv_dataframe
+        check_objectiv_dataframe(df=data,
+                                 columns_to_check=['location_stack', 'moment'])
 
         data = data.copy()
 
@@ -263,7 +274,12 @@ class FunnelDiscovery:
         # for getting the correct navigation paths based on event time
         sort_nice_names_by += [data['moment']]
 
-        nice_name = _location_stack.ls.nice_name.sort_by_series(by=sort_nice_names_by)
+        ascending = True
+        if reverse:
+            ascending = False
+        nice_name = _location_stack.ls.nice_name.sort_by_series(by=sort_nice_names_by,
+                                                                ascending=ascending)
+
         agg_steps = nice_name.to_json_array(partition=partition)
         flattened_lc, offset_lc = agg_steps.json.flatten_array()
 
@@ -305,7 +321,10 @@ class FunnelDiscovery:
             if step == 1:
                 next_step = root_step_series.copy_override(group_by=None)
             else:
-                next_step = root_step_series.window_lag(offset=step - 1)
+                if reverse:
+                    next_step = root_step_series.window_lead(offset=1 - step)
+                else:
+                    next_step = root_step_series.window_lag(offset=step - 1)
 
             all_step_series[step_series_name] = (
                 next_step.copy_override(name=step_series_name)
@@ -335,6 +354,16 @@ class FunnelDiscovery:
 
         # drop offset column
         result = result.drop(columns=[offset_lc.name])
+
+        if reverse:
+            # need to reverse column order
+            column_old_order = result.data_columns
+            column_new_order = column_old_order[::-1]
+
+            new_columns_name = {}
+            for old, new in zip(column_old_order, column_new_order):
+                new_columns_name[old] = new
+            result = result.rename(columns=new_columns_name)[column_old_order]
 
         # conversion part
         if not (add_conversion_step_column or only_converted_paths):

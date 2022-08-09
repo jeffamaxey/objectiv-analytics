@@ -320,6 +320,87 @@ def test_filter_navigation_paths_conversion(db_params) -> None:
     )
 
 
+def test_get_navigation_paths_reverse(db_params):
+
+    df, modelhub = get_objectiv_dataframe_test(db_params)
+    funnel = modelhub.get_funnel_discovery()
+
+    bts = funnel.get_navigation_paths(data=df, steps=4, reverse=True)
+    assert_equals_data(
+        bts,
+        expected_columns=[
+            'location_stack_step_1', 'location_stack_step_2', 'location_stack_step_3', 'location_stack_step_4',
+        ],
+        expected_data=[
+            [
+                'Link: Cookies located at Web Document: #document => Section: footer',
+                'Expandable Section: The Project located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: About Us located at Web Document: #document => Section: navbar-top',
+                'Link: Docs located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+            ],
+            [
+                'Link: Contact Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: Cookies located at Web Document: #document => Section: footer',
+                'Expandable Section: The Project located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: About Us located at Web Document: #document => Section: navbar-top',
+            ],
+            [
+                'Link: About Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: Contact Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: Cookies located at Web Document: #document => Section: footer',
+                'Expandable Section: The Project located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+            ],
+            [
+                'Link: cta-repo-button located at Web Document: #document => Section: header',
+                'Link: About Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: Contact Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: Cookies located at Web Document: #document => Section: footer',
+            ],
+            [
+                'Link: cta-docs-location-stack located at Web Document: #document => Section: main => Section: location-stack',
+                'Link: cta-repo-button located at Web Document: #document => Section: header',
+                'Link: About Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: Contact Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+            ],
+            [
+                'Link: GitHub located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: cta-docs-location-stack located at Web Document: #document => Section: main => Section: location-stack',
+                'Link: cta-repo-button located at Web Document: #document => Section: header',
+                'Link: About Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+            ],
+            [
+                'Link: notebook-product-analytics located at Web Document: #document',
+                'Link: GitHub located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: cta-docs-location-stack located at Web Document: #document => Section: main => Section: location-stack',
+                'Link: cta-repo-button located at Web Document: #document => Section: header',
+            ],
+            [
+                'Link: logo located at Web Document: #document => Section: navbar-top',
+                'Link: notebook-product-analytics located at Web Document: #document',
+                'Link: GitHub located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+                'Link: cta-docs-location-stack located at Web Document: #document => Section: main => Section: location-stack',
+            ],
+            [
+                'Link: cta-docs-taxonomy located at Web Document: #document => Section: main => Section: taxonomy',
+                'Link: logo located at Web Document: #document => Section: navbar-top',
+                'Link: notebook-product-analytics located at Web Document: #document',
+                'Link: GitHub located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
+            ],
+            [
+                None,
+                'Link: cta-docs-taxonomy located at Web Document: #document => Section: main => Section: taxonomy',
+                'Link: logo located at Web Document: #document => Section: navbar-top',
+                'Link: notebook-product-analytics located at Web Document: #document',
+            ],
+            [
+                None, None,
+                'Link: cta-docs-taxonomy located at Web Document: #document => Section: main => Section: taxonomy',
+                'Link: logo located at Web Document: #document => Section: navbar-top'],
+        ],
+        use_to_pandas=True,
+    )
+
+
 def test_tag_step(db_params) -> None:
     df, modelhub = get_objectiv_dataframe_test(db_params)
     funnel = modelhub.get_funnel_discovery()
