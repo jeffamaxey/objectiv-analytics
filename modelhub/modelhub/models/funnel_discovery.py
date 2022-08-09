@@ -311,14 +311,9 @@ class FunnelDiscovery:
         nav_df = flattened_lc.to_frame()
         nav_df[offset_lc.name] = offset_lc
 
-        if start_from_end:
-            ascending = True
-        else:
-            ascending = False
-
         nav_df = nav_df.sort_values(
             by=nav_df.index_columns + [offset_lc.name],
-            ascending=[ascending] * len(nav_df.index_columns) + [False]
+            ascending=[True if start_from_end else False] * len(nav_df.index_columns) + [False]
         )
 
         window = nav_df.groupby(by=nav_df.index_columns).window()
