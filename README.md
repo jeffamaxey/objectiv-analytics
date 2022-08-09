@@ -2,21 +2,19 @@
 <img src="https://user-images.githubusercontent.com/82152911/159266895-39f52604-83c1-438d-96bd-9a6d66e74b08.svg#gh-dark-mode-only" alt="objectiv_logo_dark" title="Objectiv Logo">
 
 
-[Objectiv](https://objectiv.io/) is ready-to-use infrastructure for advanced product analytics. Collect the best data for modeling, validate your tracking instrumentation, and run pre-built open-source models straight on your data warehouse.
-
-Self hosted, open-source & built for those who like their data raw and models in code.
+[Objectiv](https://objectiv.io/) is open-source infrastructure for product analytics modeling. Collect data with an event structure designed for modeling and quickly build & run custom product analytics models that run on the full dataset and are reusable between platforms & projects.
 
 ### Go to
 
+* [Demo notebooks](https://objectiv.io/docs/modeling/example-notebooks) - See Objectiv in action
 * [Objectiv Docs](https://www.objectiv.io/docs) - Technical documentation.
-* [Objectiv on Slack](https://objectiv.io/join-slack) - Get help & join the discussion.
-* [Objectiv.io](https://www.objectiv.io) - Our website.
-
-If you like what we do, give us a star!
+* [Objectiv on Slack](https://objectiv.io/join-slack) - Learn & share about Objectiv and product analytics modeling.
 
 ---
 
-## Everything you need to unlock a whole new level of product analytics
+## What's in the box?
+
+Objectiv integrates data collection & modeling to give teams everything they need to build and run custom product analytics models in minutes.
 
 ![objectiv_stack](https://user-images.githubusercontent.com/920184/180789710-94e7bf9c-f081-4a0f-9637-3edf6fe5f501.svg#gh-light-mode-only "Objectiv Stack")
 ![objectiv_stack_dark](https://user-images.githubusercontent.com/920184/180790336-4143f099-dee3-4e83-8fb2-5a71d35169bb.svg#gh-dark-mode-only "Objectiv Stack")
