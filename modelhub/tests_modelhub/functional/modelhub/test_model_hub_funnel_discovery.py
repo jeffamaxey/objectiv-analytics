@@ -107,11 +107,8 @@ def test_get_navigation_paths(db_params):
                 'Link: Docs located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
                 None, None
             ],
-            [
-                'Link: Docs located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
-                None, None, None
-            ],
-        ]
+        ],
+        use_to_pandas=True,
     )
 
 
@@ -182,12 +179,6 @@ def test_get_navigation_paths_grouped(db_params) -> None:
                 None,
             ],
             [
-                1,
-                'Link: logo located at Web Document: #document => Section: navbar-top',
-                None,
-                None,
-            ],
-            [
                 2,
                 'Link: notebook-product-analytics located at Web Document: #document',
                 None,
@@ -206,33 +197,15 @@ def test_get_navigation_paths_grouped(db_params) -> None:
                 None,
             ],
             [
-                3,
-                'Link: cta-repo-button located at Web Document: #document => Section: header',
-                None,
-                None,
-            ],
-            [
                 4,
                 'Link: About Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
                 'Link: Contact Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
                 None,
             ],
             [
-                4,
-                'Link: Contact Us located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
-                None,
-                None,
-            ],
-            [
                 5,
                 'Expandable Section: The Project located at Web Document: #document => Section: navbar-top => Overlay: hamburger-menu',
                 'Link: Cookies located at Web Document: #document => Section: footer',
-                None,
-            ],
-            [
-                5,
-                'Link: Cookies located at Web Document: #document => Section: footer',
-                None,
                 None,
             ],
             [

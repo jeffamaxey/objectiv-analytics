@@ -324,8 +324,16 @@ class FunnelDiscovery:
         if n_examples is not None:
             result = result[result[offset_lc.name] < n_examples]
 
+        # removing the last step with nulls
+        if steps > 2:
+            mask = (result['__root_step_offset'] != 0) & (result[f'{flattened_lc.name}_step_2'].isnull())
+            result.loc[mask, f'{flattened_lc.name}_step_1'] = None
+            result = result.dropna(subset=[f'{flattened_lc.name}_step_1'])
+
         # re-order rows
         result = result.sort_values(by=result.index_columns + [offset_lc.name])
+
+        # drop offset column
         result = result.drop(columns=[offset_lc.name])
 
         # conversion part
