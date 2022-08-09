@@ -1,6 +1,6 @@
 .. _example_logistic_regression:
 
-.. frontmatterposition:: 6
+.. frontmatterposition:: 7
 
 .. currentmodule:: bach
 
