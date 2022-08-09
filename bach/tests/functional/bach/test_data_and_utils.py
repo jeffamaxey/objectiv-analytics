@@ -9,7 +9,7 @@ as a test file. This makes pytest rewrite the asserts to give clearer errors.
 import datetime
 import uuid
 from decimal import Decimal
-from typing import List, Union, Type, Any
+from typing import List, Union, Type, Any, Dict
 
 import sqlalchemy
 from sqlalchemy.engine import ResultProxy, Engine, Dialect
@@ -295,6 +295,77 @@ def assert_postgres_type(
         assert db_type == expected_db_type
     series_type = get_series_type_from_db_dtype(DBDialect.POSTGRES, db_type)
     assert series_type == expected_series_type
+
+
+def assert_postgres_types(
+        df: DataFrame,
+        series_expected_db_type: Dict[str, str],
+):
+    """
+    Check that the given series in the DataFrame have the expected data types in Postgres.
+
+    Fails if df.engine is not a Postgres connection.
+
+    :param df: DataFrame object for which to check the database types
+    :param series_expected_db_type: mapping of series-names, to database types.
+    """
+    if not is_postgres(df.engine):
+        raise Exception(f'df.engine is not a postgres connection, but {df.engine.name}')
+    return _assert_db_types(
+        df=df,
+        series_expected_db_type=series_expected_db_type,
+        typeof_function_name='pg_typeof'
+    )
+
+
+def assert_athena_types(
+        df: DataFrame,
+        series_expected_db_type: Dict[str, str],
+):
+    """
+    Check that the given series in the DataFrame have the expected data types in Athena.
+
+    Fails if df.engine is not an Athena connection.
+
+    :param df: DataFrame object for which to check the database types
+    :param series_expected_db_type: mapping of series-names, to database types.
+    """
+    if not is_athena(df.engine):
+        raise Exception(f'df.engine is not an Athena connection, but {df.engine.name}')
+    return _assert_db_types(
+        df=df,
+        series_expected_db_type=series_expected_db_type,
+        typeof_function_name='typeof'
+    )
+
+
+def _assert_db_types(
+        df: DataFrame,
+        series_expected_db_type: Dict[str, str],
+        typeof_function_name: str
+):
+    """
+    Check that the given series in the DataFrame have the expected data types in the database.
+
+    This uses df.engine as the connection.
+
+    :param df: DataFrame object for which to check the database types
+    :param series_expected_db_type: mapping of series-names, to database types.
+    """
+    df_sql = df.view_sql()
+    types_sql = ', '.join(
+        f'{typeof_function_name}("{series_name}")'for series_name in series_expected_db_type.keys()
+    )
+    sql = f'with check_type as ({df_sql}) select {types_sql} from check_type limit 1'
+    db_rows = run_query(engine=df.engine, sql=sql)
+    db_values = [list(row) for row in db_rows]
+    for i, series_name in enumerate(series_expected_db_type.keys()):
+        expected_db_type = series_expected_db_type[series_name]
+        db_type = db_values[0][i]
+        msg = f"expected type {expected_db_type} for {series_name}, found {db_type}"
+        assert db_type == expected_db_type, msg
+
+
 
 
 def convert_expected_data_timestamps(dialect: Dialect, data: List[List[Any]]) -> List[List[Any]]:
