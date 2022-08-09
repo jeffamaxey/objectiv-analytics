@@ -320,12 +320,12 @@ def test_filter_navigation_paths_conversion(db_params) -> None:
     )
 
 
-def test_get_navigation_paths_reverse(db_params):
+def test_get_navigation_paths_start_from_end(db_params):
 
     df, modelhub = get_objectiv_dataframe_test(db_params)
     funnel = modelhub.get_funnel_discovery()
 
-    bts = funnel.get_navigation_paths(data=df, steps=4, reverse=True)
+    bts = funnel.get_navigation_paths(data=df, steps=4, start_from_end=True)
     assert_equals_data(
         bts,
         expected_columns=[

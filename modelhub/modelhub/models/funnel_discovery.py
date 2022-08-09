@@ -203,8 +203,8 @@ class FunnelDiscovery:
         location_stack: 'SeriesLocationStack' = None,
         add_conversion_step_column: bool = False,
         only_converted_paths: bool = False,
-        n_examples: int = None,
-        reverse: bool = False
+        start_from_end: bool = False,
+        n_examples: int = None
     ) -> bach.DataFrame:
         """
         Get the navigation paths for each event's location stack.
@@ -239,14 +239,19 @@ class FunnelDiscovery:
             per each navigation path and adds it as a column to the returned dataframe.
         :param only_converted_paths: if True filters each navigation path to first
             conversion location.
-        :param n_examples: limit the amount of navigation paths.
-                           if None - all the navigation paths are taken.
-        :param reverse: get the reversed navigation paths.
+        :param start_from_end: if True starts the construction of navigation paths from the end.
+                If there are too many steps, and we limit the amount with `n_examples` parameter
+                we can lose the last steps of the user, hence in order to 'prioritize' the last
+                steps one can use this parameter.
+
                 Having, `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
                 Will generate the following paths:
                 - `'b', 'c', 'd'`
                 - `'a', 'b', 'c'`
                 - `None, 'a', 'b'`
+
+        :param n_examples: limit the amount of navigation paths.
+                           if None - all the navigation paths are taken.
 
         :returns: bach DataFrame containing a new series for each step containing the nice name
             of the location.
@@ -275,7 +280,7 @@ class FunnelDiscovery:
         sort_nice_names_by += [data['moment']]
 
         ascending = True
-        if reverse:
+        if start_from_end:
             ascending = False
         nice_name = _location_stack.ls.nice_name.sort_by_series(by=sort_nice_names_by,
                                                                 ascending=ascending)
@@ -306,10 +311,14 @@ class FunnelDiscovery:
         nav_df = flattened_lc.to_frame()
         nav_df[offset_lc.name] = offset_lc
 
+        if start_from_end:
+            ascending = True
+        else:
+            ascending = False
+
         nav_df = nav_df.sort_values(
             by=nav_df.index_columns + [offset_lc.name],
-            # since we are using lag, we should reverse the step order
-            ascending=[True] * len(nav_df.index_columns) + [False],
+            ascending=[ascending] * len(nav_df.index_columns) + [False]
         )
 
         window = nav_df.groupby(by=nav_df.index_columns).window()
@@ -321,10 +330,7 @@ class FunnelDiscovery:
             if step == 1:
                 next_step = root_step_series.copy_override(group_by=None)
             else:
-                if reverse:
-                    next_step = root_step_series.window_lead(offset=1 - step)
-                else:
-                    next_step = root_step_series.window_lag(offset=step - 1)
+                next_step = root_step_series.window_lag(offset=step - 1)
 
             all_step_series[step_series_name] = (
                 next_step.copy_override(name=step_series_name)
@@ -355,7 +361,7 @@ class FunnelDiscovery:
         # drop offset column
         result = result.drop(columns=[offset_lc.name])
 
-        if reverse:
+        if start_from_end:
             # need to reverse column order
             column_old_order = result.data_columns
             column_new_order = column_old_order[::-1]
