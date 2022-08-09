@@ -9,8 +9,11 @@ import pytest
 from sqlalchemy.engine import Engine
 
 from bach import SeriesUuid
-from sql_models.util import is_postgres, is_bigquery
+from sql_models.util import is_postgres, is_bigquery, is_athena
 from tests.functional.bach.test_data_and_utils import assert_equals_data, run_query, get_df_with_test_data
+
+
+pytestmark = pytest.mark.athena_supported()
 
 
 def test_uuid_value_to_expression(engine):
@@ -100,7 +103,7 @@ def test_uuid_random(engine):
     uuid_values = [row['x'] for row in db_rows]
     if is_postgres(engine):
         assert all(isinstance(val, uuid.UUID) for val in uuid_values)
-    elif is_bigquery(engine):
+    elif is_athena(engine) or is_bigquery(engine):
         assert all(isinstance(val, str) for val in uuid_values)
     else:
         raise Exception()

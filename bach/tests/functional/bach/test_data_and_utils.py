@@ -17,7 +17,7 @@ from sqlalchemy.engine import ResultProxy, Engine, Dialect
 from bach import DataFrame, Series
 from bach.types import get_series_type_from_db_dtype
 from sql_models.constants import DBDialect
-from sql_models.util import is_bigquery, is_postgres
+from sql_models.util import is_bigquery, is_postgres, is_athena
 from tests.unit.bach.util import get_pandas_df
 
 # Three data tables for testing are defined here that can be used in tests
@@ -182,12 +182,13 @@ def _convert_uuid_expected_data(engine: Engine, data: List[List[Any]]) -> List[L
     """
     if is_postgres(engine):
         return data
-    if is_bigquery(engine):
+    if is_athena(engine) or is_bigquery(engine):
         result = [
             [str(cell) if isinstance(cell, uuid.UUID) else cell for cell in row]
             for row in data
         ]
         return result
+    raise Exception(f'engine not supported {engine}')
 
 
 def assert_equals_data(
