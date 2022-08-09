@@ -138,6 +138,8 @@ class StringOperation:
     def upper(self) -> 'SeriesString':
         """
         converts string values into uppercase.
+
+        :return: SeriesString with all alphabetic characters in uppercase
         """
         return self._base.copy_override(
             expression=Expression.construct('upper({})', self._base)
@@ -146,6 +148,8 @@ class StringOperation:
     def lower(self) -> 'SeriesString':
         """
         converts string values into lowercase.
+
+        :return: SeriesString with all alphabetic characters in lowercase
         """
         return self._base.copy_override(
             expression=Expression.construct('lower({})', self._base)
