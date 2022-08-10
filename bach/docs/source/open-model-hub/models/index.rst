@@ -85,3 +85,13 @@ and Series.
     :hidden:
 
     machine-learning/index
+
+Analysis
+---------------
+
+Currently we support :class:`FunnelDiscovery <modelhub.FunnelDiscovery>` directly on Bach DataFrames.
+
+.. toctree::
+    :hidden:
+
+    analysis/index
