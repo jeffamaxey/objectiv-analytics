@@ -266,7 +266,7 @@ class ModelHub:
 
     def get_logistic_regression(self, *args, **kwargs) -> LogisticRegression:
         """
-        Return an instance of the :py:class:`LogisticRegression` from the model hub.
+        Return an instance of the :py:class:`modelhub.LogisticRegression` class from the model hub.
 
         All parameters passed to this function are passed to the constructor of the LogisticRegression
         model.
@@ -276,7 +276,7 @@ class ModelHub:
 
     def get_funnel_discovery(self) -> FunnelDiscovery:
         """
-        Return an instance of the :py:class:`FunnelDiscovery` from the model hub.
+        Return an instance of the :py:class:`modelhub.FunnelDiscovery` class from the model hub.
         """
 
         return FunnelDiscovery()

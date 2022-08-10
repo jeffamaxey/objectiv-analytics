@@ -713,6 +713,7 @@ class DataFrame:
             converted to the 'string' dtype and loaded accordingly. Other types can only be loaded if
             materialization is 'cte' and the type is supported as Bach Series.
         :param name:
+
             * For 'table' materialization: name of the table that Pandas will write the data to.
             * For 'cte' materialization: name of the node in the underlying SqlModel graph.
         :param materialization: {'cte', 'table'}. How to materialize the data.
@@ -3236,9 +3237,10 @@ class DataFrame:
             Name: feature, dtype: float64
 
         Where:
-            * ``feature`` is the series to be scaled
-            * ``mean_feature`` is the mean of ``feature``
-            * ``std_feature`` is the (population-based) standard deviation of ``feature``
+
+        * ``feature`` is the series to be scaled
+        * ``mean_feature`` is the mean of ``feature``
+        * ``std_feature`` is the (population-based) standard deviation of ``feature``
 
         """
         from bach.preprocessing.scalers import StandardScaler
@@ -3284,10 +3286,11 @@ class DataFrame:
             Name: feature, dtype: float64
 
         Where:
-            * ``feature`` is the series to be scaled
-            * ``feature_min`` is the minimum value of ``feature``
-            * ``feature_max`` is the maximum value of ``feature``
-            * ``range_min, range_max`` = ``feature_range``
+
+        * ``feature`` is the series to be scaled
+        * ``feature_min`` is the minimum value of ``feature``
+        * ``feature_max`` is the maximum value of ``feature``
+        * ``range_min, range_max`` = ``feature_range``
         """
         from bach.preprocessing.scalers import MinMaxScaler
         return MinMaxScaler(training_df=self, feature_range=feature_range).transform()

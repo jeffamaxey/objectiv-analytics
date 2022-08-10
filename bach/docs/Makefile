@@ -8,7 +8,9 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
 DOCUSAURUSDIR = docusaurus
+IMGDIR 				= source/img
 DOCSTARGETDIR = ../../../objectiv.io/docs/docs/
+IMGTARGETDIR 	= ../../../objectiv.io/docs/static/img/
 
 # Don't allow modelhub to check online whether a newer version is available while generating docs
 export OBJECTIV_VERSION_CHECK_DISABLE = true
@@ -38,6 +40,7 @@ docusaurus:
 
 copy-target:
 	cp -a $(BUILDDIR)/$(DOCUSAURUSDIR)/* $(DOCSTARGETDIR)modeling/
+	cp -a $(IMGDIR)/* $(IMGTARGETDIR)
 
 .PHONY: help Makefile
 

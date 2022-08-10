@@ -18,3 +18,4 @@ Methods
 
     SeriesString.get_dummies
     SeriesString.str
+    SeriesString.to_json_array

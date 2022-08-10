@@ -6,7 +6,9 @@
 Funnels
 =======
 
-Currently we support :class:`FunnelDiscovery <modelhub.FunnelDiscovery>` directly on Bach DataFrames.
+Models & operations to analyze Funnels. Currently supported is 
+:class:`FunnelDiscovery <modelhub.FunnelDiscovery>`, to discover all the (top) user journeys that lead to 
+conversion or drop-off, and run subsequent analyses on them.
 
 .. currentmodule:: modelhub
 
