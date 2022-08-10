@@ -129,7 +129,8 @@ See step sequences per user
 Before we see what helped conversion and what didn't, let's have a look at which consecutive steps each user 
 took (aka the features they used) in general, after starting their session, based on the 
 `location stack <https://objectiv.io/docs/tracking/core-concepts/locations>`_. We have to specify the maximum 
-n steps, and use the `get_navigation_paths` (TODO) operation.
+n steps, and use the :doc:`get_navigation_paths 
+<../open-model-hub/models/funnels/FunnelDiscovery/modelhub.FunnelDiscovery.get_navigation_paths>` operation.
 
 .. doctest:: funnel-discovery
 	:skipif: engine is None
@@ -156,8 +157,8 @@ n steps, and use the `get_navigation_paths` (TODO) operation.
 .. admonition:: Reference
 	:class: api-reference
 
-	* TODO: modelhub.models.funnel_discovery.get_funnel_discovery
-	* TODO: modelhub.models.funnel_discovery.get_navigation_paths
+	* :doc:`modelhub.FunnelDiscovery.get_navigation_paths <../open-model-hub/models/funnels/FunnelDiscovery/modelhub.FunnelDiscovery.get_navigation_paths>`
+	* :doc:`modelhub.ModelHub.get_funnel_discovery <../open-model-hub/api-reference/ModelHub/modelhub.ModelHub.get_funnel_discovery>`
 	* :doc:`bach.DataFrame.head <../bach/api-reference/DataFrame/bach.DataFrame.head>`
 
 See top step sequences for all users
@@ -281,8 +282,8 @@ Showing 15 examples out of 265
 .. admonition:: Reference
 	:class: api-reference
 
-	* TODO: modelhub.models.funnel_discovery.get_navigation_paths
-	* TODO: modelhub.models.funnel_discovery.plot_sankey_diagram
+	* :doc:`modelhub.FunnelDiscovery.get_navigation_paths <../open-model-hub/models/funnels/FunnelDiscovery/modelhub.FunnelDiscovery.get_navigation_paths>`
+	* :doc:`modelhub.FunnelDiscovery.plot_sankey_diagram <../open-model-hub/models/funnels/FunnelDiscovery/modelhub.FunnelDiscovery.plot_sankey_diagram>`
 	* :doc:`bach.DataFrame.head <../bach/api-reference/DataFrame/bach.DataFrame.head>`
 
 Deep-dive: top drop-off features

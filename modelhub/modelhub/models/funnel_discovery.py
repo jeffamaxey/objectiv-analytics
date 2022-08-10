@@ -20,14 +20,13 @@ GroupByType = Union[List[Union[str, Series]], str, Series, NotSet]
 
 class FunnelDiscovery:
     """
-    This class allows one to construct and explore the marketing funnel of the
-    product via the navigation paths of the users through the product/website.
+    Class to discovery user journeys for funnel analysis.
 
-    The main method of this class is the `get_navigation_paths` where one can
-    get the navigation paths of the users. With this method one can get also
-    'filtered' navigation paths to the conversion locations.
+    The main method of this class is the `get_navigation_paths`, to get the navigation 
+    paths of the users. This method can also get 'filtered' navigation paths to the 
+    conversion locations.
 
-    For the visualization of the user flow one can use `plot_sankey_diagram` method.
+    For the visualization of the user flow, use the `plot_sankey_diagram` method.
     """
 
     CONVERSTION_STEP_COLUMN = '_first_conversion_step_number'
@@ -207,24 +206,25 @@ class FunnelDiscovery:
         n_examples: int = None
     ) -> bach.DataFrame:
         """
-        Get the navigation paths for each event's location stack.
-        Each navigation path is represented as a row, where each step is defined by
-        the nice name of the considered location.
+        Get the navigation paths for each event's location stack. Each navigation path 
+        is represented as a row, where each step is defined by the nice name of the 
+        considered location.
 
         For each location stack:
-            - The number of navigation paths to be generated is less than or equal to
-                `steps`.
-            - The locations to be considered as starting steps are those that have
-                an offset between 0 and `steps - 1` in the location stack.
-            - For each path, the rest of steps are defined by the `steps - 1` locations
-                that follow the start location in the location stack.
+        
+        - The number of navigation paths to be generated is less than or equal to
+            `steps`.
+        - The locations to be considered as starting steps are those that have
+            an offset between 0 and `steps - 1` in the location stack.
+        - For each path, the rest of steps are defined by the `steps - 1` locations
+            that follow the start location in the location stack.
 
-            For example:
-                Having, `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
-                Will generate the following paths:
-                - `'a', 'b', 'c'`
-                - `'b', 'c', 'd'`
-                - `'c', 'd', None`
+        For example, having `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3 
+        will generate the following paths:
+
+        - `'a', 'b', 'c'`
+        - `'b', 'c', 'd'`
+        - `'c', 'd', None`
 
         :param data: :py:class:`bach.DataFrame` to apply the method on.
         :param steps: Number of steps/locations to consider in navigation path.
@@ -245,16 +245,17 @@ class FunnelDiscovery:
                 we can lose the last steps of the user, hence in order to 'prioritize' the last
                 steps one can use this parameter.
 
-                Having, `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
-                Will generate the following paths:
-                - `'b', 'c', 'd'`
-                - `'a', 'b', 'c'`
-                - `None, 'a', 'b'`
+                Having `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
+                will generate the following paths:
+
+                    - `'b', 'c', 'd'`
+                    - `'a', 'b', 'c'`
+                    - `None, 'a', 'b'`
 
         :param n_examples: limit the amount of navigation paths.
-                           if None - all the navigation paths are taken.
+                           If `None`, all the navigation paths are taken.
 
-        :returns: bach DataFrame containing a new series for each step containing the nice name
+        :returns: Bach DataFrame containing a new Series for each step containing the nice name
             of the location.
         """
 
@@ -405,17 +406,17 @@ class FunnelDiscovery:
             n_top_examples: int = 15,
             max_n_top_examples: int = 50) -> None:
         """
-        Plot Sankey Diagram with Plotly.
+        Plot a Sankey Diagram of the Funnel with Plotly.
 
-        One has to pass dataframe from `FunnelDiscovery.get_navigation_paths`.
-        In this function we convert this Bach dataframe to Pandas dataframe, and
-        in order to plot sankey diagram we construct a new df_links pandas dataframe
-        out of it, df_links:
+        Tihs method requires the dataframe from `FunnelDiscovery.get_navigation_paths`.
+        In this function we convert this Bach dataframe to a Pandas dataframe, and
+        in order to plot the sankey diagram, we construct a new `df_links` pandas dataframe
+        out of it, with `df_links`:
 
-                - `'source', 'target', 'value'`
-                - `'step1', 'step2', 'val1'`
-                - `'step2', 'step3', 'val2'`
-                - `'...', '...', '...'`
+        - `'source', 'target', 'value'`
+        - `'step1', 'step2', 'val1'`
+        - `'step2', 'step3', 'val2'`
+        - `'...', '...', '...'`
 
         The navigation steps are our nodes (source and target), the value shows
         how many source -> target links we have.
@@ -423,7 +424,7 @@ class FunnelDiscovery:
         :param steps_df: the dataframe which we get from `FunnelDiscovery.get_navigation_paths` method.
         :param n_top_examples: number of top examples to plot.
         :param max_n_top_examples: if we have too many examples to plot it can slow down
-            the browser, so we plot only max_n_top_examples examples.
+            the browser, so you can limit to plot only the `max_n_top_examples` examples.
         """
 
         # count navigation paths
