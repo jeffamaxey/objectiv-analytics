@@ -15,7 +15,7 @@ analyzing the data.
 2. :doc:`Aggregation models <aggregation/index>`. These models consist of a combination of Bach
 instructions that run some of the more common data analyses or product analytics metrics.
 3. :doc:`Machine learning models <machine-learning/index>`.
-
+4. :doc:`Funnels <funnels/index>`.
 
 
 Helper functions
@@ -85,3 +85,13 @@ and Series.
     :hidden:
 
     machine-learning/index
+
+Funnels
+-------
+
+Currently we support :class:`FunnelDiscovery <modelhub.FunnelDiscovery>` directly on Bach DataFrames.
+
+.. toctree::
+    :hidden:
+
+    funnels/index
