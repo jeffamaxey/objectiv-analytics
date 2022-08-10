@@ -718,15 +718,17 @@ class DocusaurusTranslator(Translator):
 
     def visit_image(self, node):
         """Images: https://docutils.sourceforge.io/docs/ref/doctree.html#image."""
-        print("Unchecked 'image' directive found in document " + self.builder.current_docname + ":", node) 
         uri = node.attributes['uri']
-        doc_folder = os.path.dirname(self.builder.current_docname)
-        print("DOC FOLDER:", doc_folder)
-        if uri.startswith(doc_folder):
-            # drop docname prefix
-            uri = uri[len(doc_folder):]
-            if uri.startswith('/'):
-                uri = '.' + uri
+        # Make img path absolute for Docusaurus
+        if uri.startswith('img/'):
+            uri = '/' + uri
+        # Below is old
+        # doc_folder = os.path.dirname(self.builder.current_docname)
+        # if uri.startswith(doc_folder):
+        #     # drop docname prefix
+        #     uri = uri[len(doc_folder):]
+        #     if uri.startswith('/'):
+        #         uri = '.' + uri
         self.add('\n\n![image](%s)\n\n' % uri)
 
 

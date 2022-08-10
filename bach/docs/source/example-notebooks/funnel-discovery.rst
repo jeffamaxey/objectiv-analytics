@@ -218,3 +218,4 @@ Showing 15 examples out of 265
 	* TODO: modelhub.models.funnel_discovery.get_navigation_paths
 	* TODO: modelhub.models.funnel_discovery.plot_sankey_diagram
 	* :doc:`modelhub.models.funnel_discovery.get_navigation_paths <../bach/api-reference/DataFrame/bach.DataFrame.head>`
+
