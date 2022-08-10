@@ -219,7 +219,7 @@ class FunnelDiscovery:
         - For each path, the rest of steps are defined by the `steps - 1` locations
             that follow the start location in the location stack.
 
-        For example, having `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3 
+        For example, having `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
         will generate the following paths:
 
         - `'a', 'b', 'c'`
