@@ -13,8 +13,7 @@ from bach import SeriesInt64, SeriesString, SeriesFloat64, SeriesDate, SeriesTim
     SeriesTime, SeriesTimedelta, Series, SeriesJson, SeriesBoolean
 from sql_models.util import is_postgres, is_athena
 from tests.functional.bach.test_data_and_utils import assert_postgres_type, assert_equals_data, \
-    CITIES_INDEX_AND_COLUMNS, get_df_with_test_data, get_df_with_railway_data, assert_postgres_types, \
-    assert_athena_types
+    CITIES_INDEX_AND_COLUMNS, get_df_with_test_data, get_df_with_railway_data, assert_db_types
 
 
 def check_set_const(
@@ -56,10 +55,10 @@ def check_set_const(
 
     if is_postgres(engine):
         pg_types = {column_name: expected_pg_db_type for column_name in column_names}
-        assert_postgres_types(bt, pg_types)
+        assert_db_types(bt, pg_types)
     if is_athena(engine):
         athena_types = {column_name: expected_athena_db_type for column_name in column_names}
-        assert_athena_types(bt, athena_types)
+        assert_db_types(bt, athena_types)
     # we don't have an easy way to get the database type in BigQuery, so don't check type there
 
 
