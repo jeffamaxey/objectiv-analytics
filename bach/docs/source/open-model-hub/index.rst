@@ -19,6 +19,7 @@ Three types of functions/models are provided:
 2. :doc:`Aggregation models <./models/aggregation/index>`: enable running some of the more common data 
 analyses and product analytics metrics. 
 3. :doc:`Machine learning models <./models/machine-learning/index>`.
+4. :doc:`Funnels <./models/funnels/index>`.
 
 Modeling behavior of users and groups is enabled through configurable 
 :doc:`Identity Resolution <./identity-resolution>`.

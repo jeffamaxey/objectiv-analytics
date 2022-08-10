@@ -411,7 +411,7 @@ class FunnelDiscovery:
         In this function we convert this Bach dataframe to Pandas dataframe, and
         in order to plot sankey diagram we construct a new df_links pandas dataframe
         out of it, df_links:
-        
+
                 - `'source', 'target', 'value'`
                 - `'step1', 'step2', 'val1'`
                 - `'step2', 'step3', 'val2'`
