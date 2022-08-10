@@ -718,7 +718,6 @@ class DocusaurusTranslator(Translator):
 
     def visit_image(self, node):
         """Images: https://docutils.sourceforge.io/docs/ref/doctree.html#image."""
-        print("IMAGE:", node)
         uri = node.attributes['uri']
         alt = "image"
         if 'alt' in node.attributes:

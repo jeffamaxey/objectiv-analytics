@@ -326,7 +326,7 @@ by finding all *last used* features by non-converted users, and calculating thei
 
 	* :doc:`bach.DataFrame.sort_values <../bach/api-reference/DataFrame/bach.DataFrame.sort_values>`
 	* :doc:`bach.DataFrame.groupby <../bach/api-reference/DataFrame/bach.DataFrame.groupby>`
-	* :doc:`bach.Series.to_json_array <../bach/api-reference/Series/bach.Series.to_json_array>`
+	* :doc:`bach.SeriesString.to_json_array <../bach/api-reference/Series/String/bach.SeriesString.to_json_array>`
 	* :doc:`bach.Series.materialize <../bach/api-reference/Series/bach.Series.materialize>`
 	* :doc:`bach.DataFrame.count <../bach/api-reference/DataFrame/bach.DataFrame.count>`
 	* :doc:`bach.Series.value_counts <../bach/api-reference/Series/bach.Series.value_counts>`
@@ -451,7 +451,7 @@ Showing 20 examples out of 98
 	* :doc:`bach.DataFrame.count <../bach/api-reference/DataFrame/bach.DataFrame.count>`
 	* :doc:`bach.DataFrame.sort_values <../bach/api-reference/DataFrame/bach.DataFrame.sort_values>`
 	* :doc:`bach.DataFrame.groupby <../bach/api-reference/DataFrame/bach.DataFrame.groupby>`
-	* :doc:`bach.Series.to_json_array <../bach/api-reference/Series/bach.Series.to_json_array>`
+	* :doc:`bach.SeriesString.to_json_array <../bach/api-reference/Series/String/bach.SeriesString.to_json_array>`
 	* :doc:`bach.Series.materialize <../bach/api-reference/Series/bach.Series.materialize>`
 	* :doc:`bach.Series.value_counts <../bach/api-reference/Series/bach.Series.value_counts>`
 	* :doc:`bach.Series.to_frame <../bach/api-reference/Series/bach.Series.to_frame>`

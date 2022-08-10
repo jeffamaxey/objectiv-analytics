@@ -52,6 +52,6 @@ See how you can get up-and-running with your own notebook and data store in minu
     :hidden:
 
     Get started in your notebook <./get-started-in-your-notebook>
-    Open model hub <open-model-hub/models/index>
+    Open model hub <open-model-hub/index>
     Bach <bach/index>
     Example notebooks <example-notebooks/index>
