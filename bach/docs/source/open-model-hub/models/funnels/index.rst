@@ -1,10 +1,10 @@
-.. _models_reference_analysis:
+.. _models_reference_funnels:
 
-.. frontmatterposition:: 3
+.. frontmatterposition:: 4
 
-========
-Analysis
-========
+=======
+Funnels
+=======
 
 Currently we support :class:`FunnelDiscovery <modelhub.FunnelDiscovery>` directly on Bach DataFrames.
 
