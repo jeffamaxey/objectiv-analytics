@@ -239,7 +239,8 @@ class FunnelDiscovery:
             per each navigation path and adds it as a column to the returned dataframe.
         :param only_converted_paths: if True filters each navigation path to first
             conversion location.
-        :param start_from_end: if True starts the construction of navigation paths from the end.
+        :param start_from_end: if True starts the construction of navigation paths from the last
+                context from the stack, otherwise it starts from the first.
                 If there are too many steps, and we limit the amount with `n_examples` parameter
                 we can lose the last steps of the user, hence in order to 'prioritize' the last
                 steps one can use this parameter.
@@ -358,6 +359,20 @@ class FunnelDiscovery:
 
         if start_from_end:
             # need to reverse column order
+            # if path is `a, b, c, d` and steps=3, the current format is:
+
+            # step_1 step_2 step_3
+            #   d     c      b
+            #   c     b      a
+            #   b     a      None
+
+            # but we expect this:
+
+            # step_1 step_2  step_3
+            #  b      c       d
+            #  a      b       c
+            #  None   b       a
+
             column_old_order = result.data_columns
             column_new_order = column_old_order[::-1]
 
