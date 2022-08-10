@@ -580,7 +580,7 @@ class DocusaurusTranslator(Translator):
             self.add('\n<div className="jupyter-notebook-in-output">\n\n')
             self.add('\n<div className="jupyter-notebook-in">In:</div>\n\n')
             self.add('<div className="jupyter-notebook-input">\n\n')
-            if node['language'] == 'pycon3':
+            if node['language'] == 'pycon3' or node['language'] == 'jupyter-notebook':
                 self.add('```python\n')
             else:
                 self.add('```\n')
@@ -718,7 +718,11 @@ class DocusaurusTranslator(Translator):
 
     def visit_image(self, node):
         """Images: https://docutils.sourceforge.io/docs/ref/doctree.html#image."""
+        print("IMAGE:", node)
         uri = node.attributes['uri']
+        alt = "image"
+        if 'alt' in node.attributes:
+            alt = node.attributes['alt']
         # Make img path absolute for Docusaurus
         if uri.startswith('img/'):
             uri = '/' + uri
@@ -729,7 +733,7 @@ class DocusaurusTranslator(Translator):
         #     uri = uri[len(doc_folder):]
         #     if uri.startswith('/'):
         #         uri = '.' + uri
-        self.add('\n\n![image](%s)\n\n' % uri)
+        self.add('\n\n![' + alt + '](%s)\n\n' % uri)
 
 
     def depart_image(self, node):
