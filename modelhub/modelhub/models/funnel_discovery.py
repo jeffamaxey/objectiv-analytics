@@ -407,14 +407,16 @@ class FunnelDiscovery:
         """
         Plot Sankey Diagram with Plotly.
 
-        One has to pass dataframe from `FunnelDiscovery.get_navigation_paths` .
+        One has to pass dataframe from `FunnelDiscovery.get_navigation_paths`.
         In this function we convert this Bach dataframe to Pandas dataframe, and
         in order to plot sankey diagram we construct a new df_links pandas dataframe
         out of it, df_links:
-                source  target  value
-                step1   step2   val1
-                step2   step3   val2
-                ...
+        
+                - `'source', 'target', 'value'`
+                - `'step1', 'step2', 'val1'`
+                - `'step2', 'step3', 'val2'`
+                - `'...', '...', '...'`
+
         The navigation steps are our nodes (source and target), the value shows
         how many source -> target links we have.
 
