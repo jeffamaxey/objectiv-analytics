@@ -22,8 +22,8 @@ class FunnelDiscovery:
     """
     Class to discovery user journeys for funnel analysis.
 
-    The main method of this class is the `get_navigation_paths`, to get the navigation 
-    paths of the users. This method can also get 'filtered' navigation paths to the 
+    The main method of this class is the `get_navigation_paths`, to get the navigation
+    paths of the users. This method can also get 'filtered' navigation paths to the
     conversion locations.
 
     For the visualization of the user flow, use the `plot_sankey_diagram` method.
@@ -206,8 +206,8 @@ class FunnelDiscovery:
         n_examples: int = None
     ) -> bach.DataFrame:
         """
-        Get the navigation paths for each event's location stack. Each navigation path 
-        is represented as a row, where each step is defined by the nice name of the 
+        Get the navigation paths for each event's location stack. Each navigation path
+        is represented as a row, where each step is defined by the nice name of the
         considered location.
 
         For each location stack:
