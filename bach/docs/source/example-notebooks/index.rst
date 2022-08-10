@@ -23,6 +23,7 @@ and instantiate an Objectiv DataFrame:
     user-intent
     explore-data
     feature-engineering
+    funnel-discovery
     logistic-regression
     feature-importance
     modelhub-basics

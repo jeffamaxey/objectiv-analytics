@@ -1,7 +1,10 @@
 .. _modeling:
 
 .. frontmatterposition:: 1
+
 .. frontmattersidebartitle:: Introduction
+
+.. currentmodule:: modelhub
 
 ======================
 Modeling with Objectiv
@@ -48,8 +51,7 @@ See how you can get up-and-running with your own notebook and data store in minu
     :maxdepth: 7
     :hidden:
 
-    Example notebooks <example-notebooks/index>
-    Models <open-model-hub/models/index>
+    Get started in your notebook <./get-started-in-your-notebook>
     Open model hub <open-model-hub/index>
     Bach <bach/index>
-    Get started in your notebook <./get-started-in-your-notebook>
+    Example notebooks <example-notebooks/index>
