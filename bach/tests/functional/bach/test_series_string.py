@@ -2,6 +2,7 @@
 Copyright 2021 Objectiv B.V.
 """
 import pandas as pd
+import pytest
 
 from bach import Series, SeriesString, DataFrame
 from tests.functional.bach.test_data_and_utils import assert_equals_data, get_df_with_test_data
@@ -132,6 +133,30 @@ def test_string_replace(engine) -> None:
             expected_data[idx].append(m.replace(pat, '_'))
 
     assert_equals_data(result_df, expected_columns=expected_columns, expected_data=expected_data)
+
+
+@pytest.mark.athena_supported
+def test_string_lower_upper(engine) -> None:
+    df = get_df_with_test_data(engine, full_data_set=True)
+    df['municipality_lower'] = df['municipality'].str.lower()
+    df['municipality_upper'] = df['municipality'].str.upper()
+    assert_equals_data(
+        df[['municipality', 'municipality_lower', 'municipality_upper']],
+        expected_columns=['_index_skating_order', 'municipality', 'municipality_lower', 'municipality_upper'],
+        expected_data=[
+            [1, 'Leeuwarden', 'leeuwarden', 'LEEUWARDEN'],
+            [2, 'Súdwest-Fryslân', 'súdwest-fryslân', 'SÚDWEST-FRYSLÂN'],
+            [3, 'Súdwest-Fryslân', 'súdwest-fryslân', 'SÚDWEST-FRYSLÂN'],
+            [4, 'De Friese Meren', 'de friese meren', 'DE FRIESE MEREN'],
+            [5, 'Súdwest-Fryslân', 'súdwest-fryslân', 'SÚDWEST-FRYSLÂN'],
+            [6, 'Súdwest-Fryslân', 'súdwest-fryslân', 'SÚDWEST-FRYSLÂN'],
+            [7, 'Súdwest-Fryslân', 'súdwest-fryslân', 'SÚDWEST-FRYSLÂN'],
+            [8, 'Súdwest-Fryslân', 'súdwest-fryslân', 'SÚDWEST-FRYSLÂN'],
+            [9, 'Harlingen', 'harlingen', 'HARLINGEN'],
+            [10, 'Waadhoeke', 'waadhoeke', 'WAADHOEKE'],
+            [11, 'Noardeast-Fryslân', 'noardeast-fryslân', 'NOARDEAST-FRYSLÂN'],
+        ]
+    )
 
 
 def test_to_json_array(engine):
