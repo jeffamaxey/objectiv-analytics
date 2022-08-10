@@ -201,8 +201,9 @@ class FunnelDiscovery:
         steps: int,
         by: GroupByType = not_set,
         location_stack: 'SeriesLocationStack' = None,
-        add_conversion_step_column=False,
-        only_converted_paths=False,
+        add_conversion_step_column: bool = False,
+        only_converted_paths: bool = False,
+        start_from_end: bool = False,
         n_examples: int = None
     ) -> bach.DataFrame:
         """
@@ -238,12 +239,28 @@ class FunnelDiscovery:
             per each navigation path and adds it as a column to the returned dataframe.
         :param only_converted_paths: if True filters each navigation path to first
             conversion location.
+        :param start_from_end: if True starts the construction of navigation paths from the last
+                context from the stack, otherwise it starts from the first.
+                If there are too many steps, and we limit the amount with `n_examples` parameter
+                we can lose the last steps of the user, hence in order to 'prioritize' the last
+                steps one can use this parameter.
+
+                Having, `location_stack = ['a', 'b', 'c' , 'd']` and `steps` = 3
+                Will generate the following paths:
+                - `'b', 'c', 'd'`
+                - `'a', 'b', 'c'`
+                - `None, 'a', 'b'`
+
         :param n_examples: limit the amount of navigation paths.
                            if None - all the navigation paths are taken.
 
         :returns: bach DataFrame containing a new series for each step containing the nice name
             of the location.
         """
+
+        from modelhub.util import check_objectiv_dataframe
+        check_objectiv_dataframe(df=data,
+                                 columns_to_check=['location_stack', 'moment'])
 
         data = data.copy()
 
@@ -263,7 +280,12 @@ class FunnelDiscovery:
         # for getting the correct navigation paths based on event time
         sort_nice_names_by += [data['moment']]
 
-        nice_name = _location_stack.ls.nice_name.sort_by_series(by=sort_nice_names_by)
+        ascending = True
+        if start_from_end:
+            ascending = False
+        nice_name = _location_stack.ls.nice_name.sort_by_series(by=sort_nice_names_by,
+                                                                ascending=ascending)
+
         agg_steps = nice_name.to_json_array(partition=partition)
         flattened_lc, offset_lc = agg_steps.json.flatten_array()
 
@@ -292,8 +314,7 @@ class FunnelDiscovery:
 
         nav_df = nav_df.sort_values(
             by=nav_df.index_columns + [offset_lc.name],
-            # since we are using lag, we should reverse the step order
-            ascending=[True] * len(nav_df.index_columns) + [False],
+            ascending=[True if start_from_end else False] * len(nav_df.index_columns) + [False]
         )
 
         window = nav_df.groupby(by=nav_df.index_columns).window()
@@ -335,6 +356,30 @@ class FunnelDiscovery:
 
         # drop offset column
         result = result.drop(columns=[offset_lc.name])
+
+        if start_from_end:
+            # need to reverse column order
+            # if path is `a, b, c, d` and steps=3, the current format is:
+
+            # step_1 step_2 step_3
+            #   d     c      b
+            #   c     b      a
+            #   b     a      None
+
+            # but we expect this:
+
+            # step_1 step_2  step_3
+            #  b      c       d
+            #  a      b       c
+            #  None   b       a
+
+            column_old_order = result.data_columns
+            column_new_order = column_old_order[::-1]
+
+            new_columns_name = {}
+            for old, new in zip(column_old_order, column_new_order):
+                new_columns_name[old] = new
+            result = result.rename(columns=new_columns_name)[column_old_order]
 
         # conversion part
         if not (add_conversion_step_column or only_converted_paths):
