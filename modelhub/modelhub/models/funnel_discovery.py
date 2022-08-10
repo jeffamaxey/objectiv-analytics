@@ -211,7 +211,7 @@ class FunnelDiscovery:
         considered location.
 
         For each location stack:
-        
+
         - The number of navigation paths to be generated is less than or equal to
             `steps`.
         - The locations to be considered as starting steps are those that have
