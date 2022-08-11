@@ -30,7 +30,7 @@ Objectiv is built around an [open analytics taxonomy](https://www.objectiv.io/do
 
 [![taxonomy](https://user-images.githubusercontent.com/82152911/162000133-1eea0192-c882-4121-a866-8c1a3f8ffee3.svg)](https://www.objectiv.io/docs/taxonomy)
 
-Datasets that embrace the taxonomy ar highly consistent. As a result, models built on one dataset can be deployed and run on another.
+Datasets that embrace the taxonomy are highly consistent. As a result, models built on one dataset can be deployed and run on another.
 
 We're continuously expanding the coverage of the open analytics taxonomy. Support for marketing campaign analysis has been added recently, and areas like payments & CRM are on the roadmap.
 
