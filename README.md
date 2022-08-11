@@ -2,11 +2,13 @@
 <img src="https://user-images.githubusercontent.com/82152911/159266895-39f52604-83c1-438d-96bd-9a6d66e74b08.svg#gh-dark-mode-only" alt="objectiv_logo_dark" title="Objectiv Logo">
 
 
-[Objectiv](https://objectiv.io/) is open-source infrastructure for product analytics modeling. Collect data with an event structure designed for modeling and quickly build & run custom product analytics models that run on the full dataset and are reusable between platforms & projects.
+[Objectiv](https://objectiv.io/) is an integrated set of data collection and modeling tools to quickly build & run models for any product analytics use case.
+
+Self-hosted, free to use & open-source.
 
 ### Go to
 
-* [Demo notebooks](https://objectiv.io/docs/modeling/example-notebooks) - See Objectiv in action
+* [Demo notebooks](https://objectiv.io/docs/modeling/example-notebooks) - See Objectiv in action.
 * [Objectiv Docs](https://www.objectiv.io/docs) - Technical documentation.
 * [Objectiv on Slack](https://objectiv.io/join-slack) - Learn & share about Objectiv and product analytics modeling.
 
@@ -14,18 +16,23 @@
 
 ## What's in the box?
 
-Objectiv includes everything you need to build & run state-of-the-art product analytics models in minutes. Data collection & modeling were developed in close conjunction to ensure datasets carry the structure and information required for effective modeling. As a result, you can quickly build & run models straight on the full, raw dataset without any prepwork.
+* **A taxonomy** to give your datasets a generic & strict event structure designed for modeling.
+* **Tracking SDKs** for modern front-end frameworks to collect error-free user behavior data.
+* **An open model hub** with pre-built product analytics models & operations.
+* **A modeling library** to create reusable models that run on your full dataset.
 
 ![objectiv_stack](https://user-images.githubusercontent.com/920184/180789710-94e7bf9c-f081-4a0f-9637-3edf6fe5f501.svg#gh-light-mode-only "Objectiv Stack")
 ![objectiv_stack_dark](https://user-images.githubusercontent.com/920184/180790336-4143f099-dee3-4e83-8fb2-5a71d35169bb.svg#gh-dark-mode-only "Objectiv Stack")
 
 ### The open analytics taxonomy
 
-Objectiv is built around an [open analytics taxonomy](https://www.objectiv.io/docs/taxonomy): a universal structure for analytics data, so models built on one dataset can be deployed and run on another.
+Objectiv is built around an [open analytics taxonomy](https://www.objectiv.io/docs/taxonomy): a universal structure for analytics data that has been designed and tested with UIs and analytics use cases of over 50 companies. It ensures your dataset covers a wide range of common analytics use cases and is structured with modeling in mind. You can extend it to cover custom requirements as well.
 
 [![taxonomy](https://user-images.githubusercontent.com/82152911/162000133-1eea0192-c882-4121-a866-8c1a3f8ffee3.svg)](https://www.objectiv.io/docs/taxonomy)
 
-It's designed and tested with UIs and analytics use cases of over 50 companies. Areas like payments & CRM are on the roadmap, and it's extensible to cover custom use cases.
+Datasets that embrace the taxonomy ar highly consistent. As a result, models built on one dataset can be deployed and run on another.
+
+We're continuously expanding the coverage of the open analytics taxonomy. Support for marketing campaign analysis has been added recently, and areas like payments & CRM are on the roadmap.
 
 ### Tracking SDKs
 
@@ -36,7 +43,7 @@ Supports front-end engineers to [implement tracking instrumentation](https://www
  
 ### Open model hub
 
-A [growing collection of pre-built models and functions](https://objectiv.io/docs/modeling/open-model-hub/), so you can take and run what someone else made, or quickly build your own with pre-built models and functions.
+A [growing collection of pre-built product analytics models and functions](https://objectiv.io/docs/modeling/open-model-hub/). You can take and run them directly, or incorporate them into your own custom models.
 
 * Covers a wide range of use cases: from basic product analytics to predictive analysis with ML.
 * Works with any dataset that embraces the open analytics taxonomy.
@@ -44,7 +51,7 @@ A [growing collection of pre-built models and functions](https://objectiv.io/doc
 
 ### Bach modeling library
 
-Python-based [modeling library](https://www.objectiv.io/docs/modeling/bach/) that enables using pandas-like operations on the full SQL dataset.
+A pandas-like [modeling library](https://www.objectiv.io/docs/modeling/bach/) to build models that run on the full SQL dataset.
 
 * Includes specific operations to easily work with datasets that embrace the open analytics taxonomy.
 * Pandas-compatible: use popular pandas ML libraries in your models.
@@ -54,7 +61,7 @@ Python-based [modeling library](https://www.objectiv.io/docs/modeling/bach/) tha
 
 ## Compatible data stores
 
-Objectiv currently supports PostgreSQL and Google BigQuery (through Snowplow), with Amazon Athena next, and more data stores coming.
+Objectiv currently supports PostgreSQL and Google BigQuery (through Snowplow).  Amazon Athena is next, and more data stores coming.
 
 ## Get started
 
