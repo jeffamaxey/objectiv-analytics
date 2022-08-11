@@ -27,9 +27,9 @@ def check_set_const(
     Checks:
     1. Assert that data is correct
     2. Assert that Series have the expected type
-    3. Assert that the data type in the database is the expected type, for supported database.
+    3. Assert that the data type in the database is the expected type, for supported databases.
         The expected type is based on Series.supported_db_dtype, or the parameter expected_db_type_override
-        if set.
+        if that is set.
     """
     bt = get_df_with_test_data(engine)
     column_names = []
@@ -60,12 +60,11 @@ def check_set_const(
         # For BigQuery we cannot check the data type of an expression, as it doesn't offer a function for
         # that. For all other databases, we check that the actual type in the database matches the type
         # we expect
-        dialect = engine.dialect
         db_dialect = DBDialect.from_engine(engine)
         if expected_db_type_override and db_dialect in expected_db_type_override:
             expected_db_type = expected_db_type_override[db_dialect]
         else:
-            expected_db_type = expected_series.get_db_dtype(dialect)
+            expected_db_type = expected_series.get_db_dtype(engine.dialect)
         db_types = {column_name: expected_db_type for column_name in column_names}
         assert_db_types(bt, db_types)
 
