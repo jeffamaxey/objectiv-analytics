@@ -14,7 +14,7 @@
 
 ## What's in the box?
 
-Objectiv integrates data collection & modeling to give teams everything they need to build and run custom product analytics models in minutes.
+Objectiv includes everything you need to build & run state-of-the-art product analytics models in minutes. Data collection & modeling were developed in close conjunction to ensure datasets carry the structure and information required for effective modeling. As a result, you can quickly build & run models straight on the full, raw dataset without any prepwork.
 
 ![objectiv_stack](https://user-images.githubusercontent.com/920184/180789710-94e7bf9c-f081-4a0f-9637-3edf6fe5f501.svg#gh-light-mode-only "Objectiv Stack")
 ![objectiv_stack_dark](https://user-images.githubusercontent.com/920184/180790336-4143f099-dee3-4e83-8fb2-5a71d35169bb.svg#gh-dark-mode-only "Objectiv Stack")
