@@ -77,8 +77,4 @@ Objectiv currently supports PostgreSQL and Google BigQuery (through Snowplow).  
 
 ---
 
-For more information, visit [objectiv.io](https://www.objectiv.io) or [Objectiv Docs](https://www.objectiv.io/docs) - Objectiv's official documentation..
-
----
-
 This repository is part of the source code for Objectiv, which is released under the Apache 2.0 License. Please refer to [LICENSE.md](LICENSE.md) for details.
