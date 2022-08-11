@@ -6,7 +6,19 @@
 
 Self-hosted, free to use & open-source.
 
-### Go to
+---
+
+## Getting started
+
+1. Install the open model hub from PyPI:
+
+```sh
+pip install objectiv-modelhub
+```
+
+2. [Read how to get started in your notebook](https://objectiv.io/docs/modeling/get-started-in-your-notebook/) in the docs.
+
+### See also:
 
 * [Demo notebooks](https://objectiv.io/docs/modeling/example-notebooks) - See Objectiv in action.
 * [Objectiv Docs](https://www.objectiv.io/docs) - Technical documentation.
@@ -62,16 +74,6 @@ A pandas-like [modeling library](https://www.objectiv.io/docs/modeling/bach/) to
 ## Compatible data stores
 
 Objectiv currently supports PostgreSQL and Google BigQuery (through Snowplow).  Amazon Athena is next, and more data stores coming.
-
-## Get started
-
-1. Install the open model hub from PyPI:
-
-```sh
-pip install objectiv-modelhub
-```
-
-2. [Read how to get started in your notebook](https://objectiv.io/docs/modeling/get-started-in-your-notebook/) in the docs.
 
 ---
 
