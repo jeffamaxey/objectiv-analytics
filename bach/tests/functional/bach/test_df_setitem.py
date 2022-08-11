@@ -2,7 +2,7 @@
 Copyright 2021 Objectiv B.V.
 """
 import datetime
-from typing import Type, Any, List
+from typing import Type, Any, List, Dict
 
 import pandas
 import pytest
@@ -11,22 +11,32 @@ from pandas.core.indexes.numeric import Int64Index
 
 from bach import SeriesInt64, SeriesString, SeriesFloat64, SeriesDate, SeriesTimestamp, \
     SeriesTime, SeriesTimedelta, Series, SeriesJson, SeriesBoolean
+from sql_models.constants import DBDialect
 from sql_models.util import is_bigquery
 from tests.functional.bach.test_data_and_utils import assert_postgres_type, assert_equals_data, \
-    CITIES_INDEX_AND_COLUMNS,  get_df_with_test_data, get_df_with_railway_data
+    CITIES_INDEX_AND_COLUMNS, get_df_with_test_data, get_df_with_railway_data, assert_db_types
 
 
-def check_set_const(engine, constants: List[Any], expected_series: Type[Series], expected_pg_db_type: str):
+def check_set_const(
+        engine,
+        constants: List[Any],
+        expected_series: Type[Series],
+        expected_db_type_override: Dict[DBDialect, str] = None
+):
+    """
+    Checks:
+    1. Assert that data is correct
+    2. Assert that Series have the expected type
+    3. Assert that the data type in the database is the expected type, for supported databases.
+        The expected type is based on Series.supported_db_dtype, or the parameter expected_db_type_override
+        if that is set.
+    """
     bt = get_df_with_test_data(engine)
     column_names = []
     for i, constant in enumerate(constants):
         column_name = f'new_columns_{i}'
         column_names.append(column_name)
         bt[column_name] = constant
-
-    for column_name in column_names:
-        # we don't have an easy way to get the database type in BigQuery, so only support that check for PG
-        assert_postgres_type(bt[column_name], expected_pg_db_type, expected_series)
 
     assert_equals_data(
         bt,
@@ -42,7 +52,24 @@ def check_set_const(engine, constants: List[Any], expected_series: Type[Series],
         ]
     )
 
+    for column_name in column_names:
+        assert isinstance(bt[column_name], expected_series)
 
+    db_types = {}
+    if not is_bigquery(engine):
+        # For BigQuery we cannot check the data type of an expression, as it doesn't offer a function for
+        # that. For all other databases, we check that the actual type in the database matches the type
+        # we expect
+        db_dialect = DBDialect.from_engine(engine)
+        if expected_db_type_override and db_dialect in expected_db_type_override:
+            expected_db_type = expected_db_type_override[db_dialect]
+        else:
+            expected_db_type = expected_series.get_db_dtype(engine.dialect)
+        db_types = {column_name: expected_db_type for column_name in column_names}
+        assert_db_types(bt, db_types)
+
+
+@pytest.mark.athena_supported()
 def test_set_const_int(engine):
     constants = [
         np.int64(4),
@@ -50,39 +77,43 @@ def test_set_const_int(engine):
         2147483647,
         2147483648
     ]
-    check_set_const(engine, constants, SeriesInt64, 'bigint')
+    check_set_const(engine, constants, SeriesInt64)
 
 
+@pytest.mark.athena_supported()
 def test_set_const_float(engine):
     constants = [
         5.1,
         -5.1
     ]
-    check_set_const(engine, constants, SeriesFloat64, 'double precision')
+    check_set_const(engine, constants, SeriesFloat64)
     # See also tests.functional.bach.test_series_float.test_from_value(), which tests some interesting
     # special cases.
 
 
+@pytest.mark.athena_supported()
 def test_set_const_bool(engine):
     constants = [
         True,
         False
     ]
-    check_set_const(engine, constants, SeriesBoolean, 'boolean')
+    check_set_const(engine, constants, SeriesBoolean)
 
 
+@pytest.mark.athena_supported()
 def test_set_const_str(engine):
     constants = [
         'keatsen'
     ]
-    check_set_const(engine, constants, SeriesString, 'text')
+    expected_db_type_override = {DBDialect.ATHENA: 'varchar(7)'}
+    check_set_const(engine, constants, SeriesString, expected_db_type_override=expected_db_type_override)
 
 
 def test_set_const_date(engine):
     constants = [
         datetime.date(2019, 1, 5)
     ]
-    check_set_const(engine, constants, SeriesDate, 'date')
+    check_set_const(engine, constants, SeriesDate)
 
 
 def test_set_const_datetime(engine):
@@ -91,14 +122,14 @@ def test_set_const_datetime(engine):
         datetime.datetime(1999, 1, 15, 13, 37, 1, 23),
         np.datetime64('2022-01-01 12:34:56.7800'),
     ]
-    check_set_const(engine, constants, SeriesTimestamp, 'timestamp without time zone')
+    check_set_const(engine, constants, SeriesTimestamp)
 
 
 def test_set_const_time(engine):
     constants = [
         datetime.time.fromisoformat('00:05:23.283')
     ]
-    check_set_const(engine, constants, SeriesTime, 'time without time zone')
+    check_set_const(engine, constants, SeriesTime)
 
 
 def test_set_const_timedelta(engine):
@@ -106,7 +137,7 @@ def test_set_const_timedelta(engine):
         np.datetime64('2005-02-25T03:30') - np.datetime64('2005-01-25T03:30'),
         datetime.datetime.now() - datetime.datetime(2015, 4, 6),
     ]
-    check_set_const(engine, constants, SeriesTimedelta, 'interval')
+    check_set_const(engine, constants, SeriesTimedelta)
 
 
 def test_set_const_json(engine):
@@ -114,7 +145,7 @@ def test_set_const_json(engine):
         ['a', 'b', 'c'],
         {'a': 'b', 'c': 'd'},
     ]
-    check_set_const(engine, constants, SeriesJson, expected_pg_db_type='jsonb')
+    check_set_const(engine, constants, SeriesJson)
 
 
 def test_set_const_int_from_series(engine):
@@ -170,6 +201,7 @@ def test_set_series_column(engine):
         ]
     )
     assert filtered_bt.town == filtered_bt['town']
+
 
 @pytest.mark.skip_bigquery("Bigquery doesn't support spaces in column names")
 def test_set_series_column_name_with_spaces(engine):
