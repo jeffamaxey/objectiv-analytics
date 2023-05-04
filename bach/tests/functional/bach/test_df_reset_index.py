@@ -13,12 +13,12 @@ def test_reset_index_to_empty(engine):
 
     # regular
     rbt = bt.reset_index()
-    assert list(rbt.index.keys()) == []
+    assert not list(rbt.index.keys())
     assert '_index_skating_order' in rbt.data
 
     # drop
     dbt = bt.reset_index(drop=True)
-    assert list(dbt.index.keys()) == []
+    assert not list(dbt.index.keys())
     assert '_index_skating_order' not in dbt.data
 
     for r in [bt, rbt, dbt]:
@@ -57,7 +57,7 @@ def test_reset_index_materialize(engine):
     # regular, materializes automatically
     rbt = bt.reset_index()
     assert list(bt.index.keys()) == ['municipality']
-    assert list(rbt.index.keys()) == []
+    assert not list(rbt.index.keys())
 
     for r in [bt, rbt]:
         for s in r.index.values():

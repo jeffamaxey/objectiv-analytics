@@ -116,9 +116,7 @@ class SqlModelSpec:
     """
 
     def __init__(self):
-        # Basic check on the child-classes implementation of spec_references and spec_placeholders
-        overlap = self.spec_references.intersection(self.spec_placeholders)
-        if overlap:
+        if overlap := self.spec_references.intersection(self.spec_placeholders):
             raise Exception(f'Specified reference names and specified placeholder names of class overlap.'
                             f'This indicates an error in the implementation of the'
                             f'{self.__class__.__name__} class. Overlap: {overlap}')
@@ -233,7 +231,7 @@ class SqlModelBuilder(SqlModelSpec, metaclass=ABCMeta):
     def references(self):
         # return shallow-copy of the dictionary.
         # keys are strings and thus immutable, values are included uncopied.
-        return {key: value for key, value in self._references.items()}
+        return dict(self._references.items())
 
     @property
     def placeholders(self):
@@ -458,7 +456,7 @@ class SqlModel(Generic[T]):
     def references(self) -> MutableMapping[str, 'SqlModel']:
         # return shallow-copy of the dictionary.
         # keys are strings and thus immutable, values are included uncopied.
-        return {key: value for key, value in self._references.items()}
+        return dict(self._references.items())
 
     @property
     def placeholders(self) -> MutableMapping[str, Hashable]:
@@ -608,8 +606,7 @@ class SqlModel(Generic[T]):
         if reference_path == tuple():
             return self.copy_link(new_references=references)
         replacement_model = get_node(self, reference_path).copy_link(references)
-        result = replace_non_start_node_in_graph(self, reference_path, replacement_model)
-        return result
+        return replace_non_start_node_in_graph(self, reference_path, replacement_model)
 
     def set_materialization(self: TSqlModel,
                             reference_path: RefPath,
@@ -667,17 +664,12 @@ class SqlModel(Generic[T]):
         type, or whether the model_spec is the same type. As that ultimately won't affect the generated
         sql.
         """
-        if not isinstance(other, SqlModel):
-            return False
-        # There is one edge-case (other than incredible unlikely md5 hash-collisions) where comparing the
-        # hash to determine equality is not satisfactory. If a model has a non-standard
-        # self._placeholder_formatter. Then the following scenario is possible:
-        #   a.hash == b.hash
-        #   c, d = a.set(tuple(), placeholder='new value'), b.set(tuple(), placeholder='new value')
-        #   c.hash != d.hash
-        # The same operation on two equal objects should render two equal objects again. By also including
-        # the _placeholder_formatter in the comparison we can guarantee that.
-        return self.hash == other.hash and self._placeholder_formatter == other._placeholder_formatter
+        return (
+            self.hash == other.hash
+            and self._placeholder_formatter == other._placeholder_formatter
+            if isinstance(other, SqlModel)
+            else False
+        )
 
     def __hash__(self) -> int:
         """ python hash. Must not be confused with the unique hash that is self.hash """
@@ -695,10 +687,7 @@ class CustomSqlModelBuilder(SqlModelBuilder):
         :param name: optional override of the generic name (default: 'CustomSqlModel')
         """
         self._sql = sql
-        if name:
-            self._generic_name = name
-        else:
-            self._generic_name = 'CustomSqlModel'
+        self._generic_name = name if name else 'CustomSqlModel'
         super().__init__()
 
     @property

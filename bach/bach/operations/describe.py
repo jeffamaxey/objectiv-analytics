@@ -143,12 +143,10 @@ class DescribeOperation(Generic[TDataFrameOrSeries]):
         """
         all_stats_df = []
         for pos, stat in enumerate(SupportedStats):
-            stat_df = self._calculate_stat(stat=stat, stat_position=pos)
-            if stat_df:
+            if stat_df := self._calculate_stat(stat=stat, stat_position=pos):
                 all_stats_df.append(stat_df)
 
-        percentiles_df = self._calculate_percentiles()
-        if percentiles_df:
+        if percentiles_df := self._calculate_percentiles():
             all_stats_df.append(percentiles_df)
 
         describe_df = DataFrameConcatOperation(objects=all_stats_df)()

@@ -19,10 +19,9 @@ def helper_test_simple_arithmetic(engine: Engine, a: Union[int, float], b: Union
     matches the outcome of doing the same operation in python.
     """
     bt = get_df_with_test_data(engine)[['inhabitants']]
-    expected = []
     bt['a'] = a
     bt['b'] = b
-    expected.extend([a, b])
+    expected = [a, b]
     bt['plus'] = bt.a + bt.b
     bt['min'] = bt.a - bt.b
     bt['mul'] = bt.a * bt.b

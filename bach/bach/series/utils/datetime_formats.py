@@ -183,7 +183,7 @@ def parse_c_code_to_bigquery_code(date_format: str) -> str:
 
     if '%f' in date_format:
         warnings.warn(
-            message=f'There are no equivalent codes for %f.',
+            message='There are no equivalent codes for %f.',
             category=UserWarning,
         )
     return date_format

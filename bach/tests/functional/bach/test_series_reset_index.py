@@ -15,13 +15,13 @@ def test_reset_index_to_empty(engine):
 
     # regular
     rbt = sbt.reset_index()
-    assert list(rbt.index.keys()) == []
+    assert not list(rbt.index.keys())
     assert '_index_skating_order' in rbt.data
 
     # drop
     dbt = sbt.reset_index(drop=True)
     assert isinstance(dbt, Series)
-    assert list(dbt.index.keys()) == []
+    assert not list(dbt.index.keys())
 
     for r in [sbt, rbt, dbt]:
         for s in r.index.values():

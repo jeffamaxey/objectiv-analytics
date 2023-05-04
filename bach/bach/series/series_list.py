@@ -99,7 +99,9 @@ class SeriesList(Series):
         if not isinstance(dtype, list):
             raise ValueError(f'Dtype should be type list. Type(dtype): {type(dtype)}')
         if value is None:
-            raise ValueError(f'None values are not supported in from_value() by this class.')
+            raise ValueError(
+                'None values are not supported in from_value() by this class.'
+            )
         validate_dtype_value(static_dtype=cls.dtype, instance_dtype=dtype, value=value)
 
         sub_dtype = dtype[0]
@@ -126,7 +128,7 @@ class SeriesList(Series):
             sub_dtype=sub_dtype,
             sub_expressions=sub_exprs
         )
-        result = cls.get_class_instance(
+        return cls.get_class_instance(
             engine=base.engine,
             base_node=base.base_node,
             index=base.index,
@@ -134,9 +136,8 @@ class SeriesList(Series):
             expression=expression,
             group_by=None,
             order_by=[],
-            instance_dtype=dtype
+            instance_dtype=dtype,
         )
-        return result
 
     @staticmethod
     def _sub_expressions_to_expression(
@@ -179,8 +180,8 @@ class ListAccessor:
         Get an item from the list.
         :param key: integer indicating position in the list, 0-based. Slice is not yet supported
         """
-        engine = self._series.engine
         if isinstance(key, int):
+            engine = self._series.engine
             if is_bigquery(engine):
                 expr_str = f'{{}}[OFFSET({key})]'
             else:
@@ -194,16 +195,16 @@ class ListAccessor:
             if isinstance(sub_dtype, Dtype):
                 new_dtype = sub_dtype
                 return self._series \
-                    .copy_override_dtype(dtype=new_dtype) \
-                    .copy_override(expression=expression)
+                        .copy_override_dtype(dtype=new_dtype) \
+                        .copy_override(expression=expression)
             elif isinstance(sub_dtype, list):
                 return self._series \
-                    .copy_override(instance_dtype=sub_dtype, expression=expression)
+                        .copy_override(instance_dtype=sub_dtype, expression=expression)
             elif isinstance(sub_dtype, dict):
                 from bach import SeriesDict
                 return self._series \
-                    .copy_override_type(SeriesDict, instance_dtype=sub_dtype) \
-                    .copy_override(expression=expression)
+                        .copy_override_type(SeriesDict, instance_dtype=sub_dtype) \
+                        .copy_override(expression=expression)
             else:
                 raise Exception(f'Unexpected type of sub_dtype. sub_dtype: {sub_dtype}')
 

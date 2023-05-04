@@ -21,9 +21,7 @@ def get_type(property_description: Dict[str, Any]) -> str:
         return 'Dict[str, Any]'
     if type_name == 'string':
         return 'str'
-    if type_name == 'integer':
-        return 'int'
-    return 'str'
+    return 'int' if type_name == 'integer' else 'str'
 
 
 def get_parents(class_name: str, parent_mapping: Dict[str, List[str]]) -> List[str]:
@@ -35,7 +33,7 @@ def get_parents(class_name: str, parent_mapping: Dict[str, List[str]]) -> List[s
     """
     parents: List[str] = parent_mapping[class_name]
 
-    for parent in parent_mapping[class_name]:
+    for parent in parents:
         parents = [*parents, *get_parents(parent, parent_mapping)]
 
     return parents
@@ -47,16 +45,13 @@ def get_parent_list(objects: Dict[str, Dict[str, Any]]) -> Dict[str, List[str]]:
     :param objects:
     :return: dictionary with a list of ancestors per object
     """
-    # first create a list of parent per obj
-    parent_mapping: Dict[str, List[str]] = {}
-    for obj_name, obj in objects.items():
-        parent_mapping[obj_name] = obj['parents']
-
-    parent_list: Dict[str, List[str]] = {}
-    for klass in parent_mapping.keys():
-        parent_list[klass] = get_parents(
-            class_name=klass, parent_mapping=parent_mapping)
-
+    parent_mapping: Dict[str, List[str]] = {
+        obj_name: obj['parents'] for obj_name, obj in objects.items()
+    }
+    parent_list: Dict[str, List[str]] = {
+        klass: get_parents(class_name=klass, parent_mapping=parent_mapping)
+        for klass in parent_mapping
+    }
     return parent_list
 
 
@@ -71,7 +66,7 @@ def get_all_properties(object_list: List[str], objects: Dict[str, Dict[str, Any]
     properties: Dict[str, Dict[str, Any]] = {}
     for obj in object_list:
         if 'properties' in objects[obj]:
-            properties.update(objects[obj]['properties'])
+            properties |= objects[obj]['properties']
 
     return properties
 
@@ -84,10 +79,11 @@ def get_event_factory(objects: Dict[str, dict]) -> List[str]:
     """
     factory: List[str] = [
         'def make_event(_type: str, **kwargs) -> AbstractEvent:']
-    for obj_name, obj in objects.items():
-        factory.append(f'    if _type == "{obj_name}":\n'
-                       f'        return {obj_name}(**kwargs)')
-    factory.append(f'    return AbstractEvent(**kwargs)')
+    factory.extend(
+        f'    if _type == "{obj_name}":\n        return {obj_name}(**kwargs)'
+        for obj_name in objects
+    )
+    factory.append('    return AbstractEvent(**kwargs)')
     return factory
 
 
@@ -99,10 +95,11 @@ def get_context_factory(objects: Dict[str, dict]) -> List[str]:
     """
     factory: List[str] = [
         'def make_context(_type: str, **kwargs) -> AbstractContext:']
-    for obj_name, obj in objects.items():
-        factory.append(f'    if _type == "{obj_name}":\n'
-                       f'        return {obj_name}(**kwargs)')
-    factory.append(f'    return AbstractContext(**kwargs)')
+    factory.extend(
+        f'    if _type == "{obj_name}":\n        return {obj_name}(**kwargs)'
+        for obj_name in objects
+    )
+    factory.append('    return AbstractContext(**kwargs)')
     return factory
 
 
@@ -162,20 +159,16 @@ def get_args_string(property_meta: Dict[str, dict]) -> str:
         param = f"{property_name}: {meta['type']}"
         # optionals get a default of None, this translates to null in json
         if 'optional' in meta and meta['optional'] is True:
-            param += f' = None'
+            param += ' = None'
         params.append(param)
     # at the end we add a catch-all to propagate additional args to the parent constructor
     params.append('**kwargs: Optional[Any]')
 
-    if len(params) > 3:
-        # if the args don't fit on 1 line, we break them over multiple lines with 17 spaces of indentation
-        # so the line up nicely in the constructor
-        args_string = ',\n' + \
-            indent_lines(',\n'.join(params), level=17, spaces=1)
-    else:
-        args_string = ', ' + ', '.join(params)
-
-    return args_string
+    return (
+        ',\n' + indent_lines(',\n'.join(params), level=17, spaces=1)
+        if len(params) > 3
+        else ', ' + ', '.join(params)
+    )
 
 
 def get_super_args_string(property_meta: Dict[str, dict]) -> str:
@@ -185,10 +178,10 @@ def get_super_args_string(property_meta: Dict[str, dict]) -> str:
     :return: str - formatted python code
     """
     super_args_string = ''
-    params = [f'{p}={p}' for p in property_meta.keys()]
+    params = [f'{p}={p}' for p in property_meta]
     # make sure all arguments bubble up
     params.append('**kwargs')
-    if len(property_meta) > 0:
+    if property_meta:
         if len(property_meta) > 3:
             # hard to properly indent, as it depends on the strlen of the super class
             # we indent a bit to make it work, and have auto indent fix it properly
@@ -222,12 +215,14 @@ def get_class_attributes_description(property_meta: Dict[str, dict]) -> List[str
     :return:
     """
     class_descriptions: List[str] = []
-    if len(property_meta) > 0:
+    if property_meta:
         class_descriptions.append('\n    Attributes:')
-    for property_name, meta in property_meta.items():
-        class_descriptions.append(indent_lines(f'{property_name} ({meta["type"]}):', level=1)
-                                  + '\n'
-                                  + indent_lines(f'{meta["description"]}', level=3))
+    class_descriptions.extend(
+        indent_lines(f'{property_name} ({meta["type"]}):', level=1)
+        + '\n'
+        + indent_lines(f'{meta["description"]}', level=3)
+        for property_name, meta in property_meta.items()
+    )
     return class_descriptions
 
 
@@ -239,13 +234,13 @@ def get_class(obj_name: str, obj: Dict[str, Any], all_properties: Dict[str, Any]
     :param all_properties: List of all properties (through class hierarchy)
     :return:
     """
-    parents = [p for p in obj['parents']]
+    parents = list(obj['parents'])
     # add internal super class to "root" class (no parents)
-    if len(parents) == 0:
+    if not parents:
         parents.append('SchemaEntity')
 
     # keep track of super classes to call
-    super_classes: List[str] = [p for p in parents]
+    super_classes: List[str] = list(parents)
 
     # make sure all Abstract classes are actually abstract
     if re.match('^Abstract', obj_name):
@@ -283,9 +278,7 @@ def get_class(obj_name: str, obj: Dict[str, Any], all_properties: Dict[str, Any]
         f'{call_super_classes}'
     )
 
-    parent_string = ''
-    if len(parents) > 0:
-        parent_string = f'({", ".join(parents)})'
+    parent_string = f'({", ".join(parents)})' if parents else ''
     class_description = indent_lines('\n'.join(class_descriptions), level=1)
 
     return(

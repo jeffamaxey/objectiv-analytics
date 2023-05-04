@@ -70,13 +70,13 @@ def test_series_numeric_interval_from_value(dialect) -> None:
         name='num_interval',
     )
 
-    assert result.lower.name == f'_num_interval_lower'
+    assert result.lower.name == '_num_interval_lower'
     assert '0' in result.lower.expression.to_sql(dialect)
 
-    assert result.upper.name == f'_num_interval_upper'
+    assert result.upper.name == '_num_interval_upper'
     assert '1' in result.upper.expression.to_sql(dialect)
 
-    assert result.bounds.name == f'_num_interval_bounds'
+    assert result.bounds.name == '_num_interval_bounds'
     assert '(]' in result.bounds.expression.to_sql(dialect)
 
 

@@ -25,7 +25,7 @@ def test__eq__(dialect):
     result = get_df(['a'], ['b', 'c']) == get_df(['a'], ['b', 'c'])
     # Assert that we get a boolean (e.g. for Series this is not the case since we overloaded __eq__ in a
     # different way)
-    assert result is True
+    assert result
 
     assert get_df(['a'], ['b', 'c']) == get_df(['a'], ['b', 'c'])
     assert get_df(['a', 'b'], ['c']) == get_df(['a', 'b'], ['c'])
@@ -103,10 +103,10 @@ def test_init_conditions(dialect):
             engine=df.engine,
             base_node=df.base_node,
             index=df.index,
-            series={k + 'suffix': v for k, v in df.data.items()},
+            series={f'{k}suffix': v for k, v in df.data.items()},
             group_by=None,
             order_by=[],
-            savepoints=Savepoints()
+            savepoints=Savepoints(),
         )
 
     with pytest.raises(ValueError, match="Group_by in `series` should match dataframe"):

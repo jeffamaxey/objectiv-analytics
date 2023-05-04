@@ -167,13 +167,11 @@ def run_query(engine: sqlalchemy.engine, sql: str) -> ResultProxy:
     # escape sql, as conn.execute will think that '%' indicates a parameter
     sql = sql.replace('%', '%%')
     with engine.connect() as conn:
-        res = conn.execute(sql)
-        return res
+        return conn.execute(sql)
 
 
 def df_to_list(df):
-    data_list = df.reset_index().to_numpy().tolist()
-    return(data_list)
+    return df.reset_index().to_numpy().tolist()
 
 
 def _convert_uuid_expected_data(engine: Engine, data: List[List[Any]]) -> List[List[Any]]:
@@ -183,11 +181,13 @@ def _convert_uuid_expected_data(engine: Engine, data: List[List[Any]]) -> List[L
     if is_postgres(engine):
         return data
     if is_athena(engine) or is_bigquery(engine):
-        result = [
-            [str(cell) if isinstance(cell, uuid.UUID) else cell for cell in row]
+        return [
+            [
+                str(cell) if isinstance(cell, uuid.UUID) else cell
+                for cell in row
+            ]
             for row in data
         ]
-        return result
     raise Exception(f'engine not supported {engine}')
 
 
@@ -209,7 +209,7 @@ def assert_equals_data(
     but directly executes the result from `view_sql()`. To test `to_pandas()` set use_to_pandas=True.
     :return: the values queried from the database
     """
-    if len(expected_data) == 0:
+    if not expected_data:
         raise ValueError("Cannot check data if 0 rows are expected.")
 
     if isinstance(bt, Series):
@@ -224,11 +224,9 @@ def assert_equals_data(
     elif not bt.order_by:
         bt = bt.sort_index()
 
-    if not use_to_pandas:
-        column_names, db_values = _get_view_sql_data(bt)
-    else:
-        column_names, db_values = _get_to_pandas_data(bt)
-
+    column_names, db_values = (
+        _get_to_pandas_data(bt) if use_to_pandas else _get_view_sql_data(bt)
+    )
     assert len(db_values) == len(expected_data)
     assert column_names == expected_columns
     for i, df_row in enumerate(db_values):
@@ -259,9 +257,10 @@ def _get_to_pandas_data(df: DataFrame):
     # Convert pdf to the same format as _get_view_sql_data gives
     column_names = (list(pdf.index.names) if df.index else []) + list(pdf.columns)
     pdf = pdf.reset_index()
-    db_values = []
-    for value_row in pdf.to_numpy().tolist():
-        db_values.append(value_row if df.index else value_row[1:])  # don't include default index value
+    db_values = [
+        value_row if df.index else value_row[1:]
+        for value_row in pdf.to_numpy().tolist()
+    ]
     print(db_values)
     return column_names, db_values
 
@@ -319,7 +318,8 @@ def assert_db_types(
 
     df_sql = df.view_sql()
     types_sql = ', '.join(
-        f'{typeof_function_name}("{series_name}")'for series_name in series_expected_db_type.keys()
+        f'{typeof_function_name}("{series_name}")'
+        for series_name in series_expected_db_type
     )
     sql = f'with check_type as ({df_sql}) select {types_sql} from check_type limit 1'
     db_rows = run_query(engine=engine, sql=sql)

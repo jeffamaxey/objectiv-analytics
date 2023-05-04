@@ -36,9 +36,7 @@ def test_format_injection_single_model(dialect):
 def test_format_injection_composed_models(dialect):
     def dialect_expected(expected_sql: str) -> str:
         # replace the expected identifier quoatations if we are dealing with BigQuery dialect
-        if is_bigquery(dialect):
-            return expected_sql.replace('"', '`')
-        return expected_sql
+        return expected_sql.replace('"', '`') if is_bigquery(dialect) else expected_sql
 
     # Make sure that (parts of) format strings in the properties of a model don't mess up the sql generation.
     mb = CustomSqlModelBuilder('select {a} from x')

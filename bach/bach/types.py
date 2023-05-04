@@ -104,16 +104,15 @@ def validate_instance_dtype(static_dtype: Dtype, instance_dtype: StructuredDtype
         'dict': dict
     }
     expected_type = structural_type_mapping.get(static_dtype)
-    if expected_type is not None:
-        if not isinstance(instance_dtype, expected_type):
-            raise ValueError(f'Expected instance dtype of type "{expected_type}". '
-                             f'instance_dtype type: {type(instance_dtype)}, '
-                             f'instance_dtype: {instance_dtype}')
-    else:
+    if expected_type is None:
         if static_dtype != instance_dtype:
             raise ValueError(f'Expected instance dtype "{static_dtype}". '
                              f'instance_dtype: "{instance_dtype}"')
 
+    elif not isinstance(instance_dtype, expected_type):
+        raise ValueError(f'Expected instance dtype of type "{expected_type}". '
+                         f'instance_dtype type: {type(instance_dtype)}, '
+                         f'instance_dtype: {instance_dtype}')
     return validate_is_dtype(instance_dtype)
 
 
@@ -339,7 +338,7 @@ class TypeRegistry:
         :raises ValueError: if dtype is not a valid Dtype
         """
         self._real_init()
-        base_dtypes = set(series.dtype for series in self.dtype_to_series.values())
+        base_dtypes = {series.dtype for series in self.dtype_to_series.values()}
         _assert_is_valid_dtype(base_dtypes=base_dtypes, dtype=dtype)
 
 
@@ -402,8 +401,9 @@ def _assert_is_valid_dtype(base_dtypes: Set[Dtype], dtype: StructuredDtype):
         sub_dtype = dtype[0]
         _assert_is_valid_dtype(base_dtypes=base_dtypes, dtype=sub_dtype)
     elif isinstance(dtype, dict):
-        non_string_keys = sorted(key for key in dtype.keys() if not isinstance(key, str))
-        if non_string_keys:
+        if non_string_keys := sorted(
+            key for key in dtype.keys() if not isinstance(key, str)
+        ):
             raise ValueError(f'Expected all keys to be strings. '
                              f'Found non string keys: {non_string_keys}')
         for sub_dtype in dtype.values():

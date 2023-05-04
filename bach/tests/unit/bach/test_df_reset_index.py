@@ -20,8 +20,8 @@ def test_set_index(dialect):
     # regular reset in different ways
     sbt = bt.set_index(keys=[], drop=False)
     rbt = bt.reset_index(drop=True)
-    assert list(rbt.index.keys()) == []
-    assert list(sbt.index.keys()) == []
+    assert not list(rbt.index.keys())
+    assert not list(sbt.index.keys())
     assert '_index_skating_order' not in sbt.data
     assert '_index_skating_order' not in rbt.data
 

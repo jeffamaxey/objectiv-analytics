@@ -181,9 +181,9 @@ class Series(ABC):
         # End of Abstract-class check
 
         self.assert_engine_dialect_supported(engine)
-        if index == {} and group_by and group_by.index != {}:
+        if not index and group_by and group_by.index != {}:
             # not a completely watertight check, because a group_by on {} is valid.
-            raise ValueError(f'Index Series should be free of pending aggregation.')
+            raise ValueError('Index Series should be free of pending aggregation.')
         if group_by and not dict_name_series_equals(group_by.index, index):
             raise ValueError(f'Series and aggregation index do not match: {group_by.index} != {index}')
         if not group_by and expression.has_aggregate_function:
@@ -461,7 +461,7 @@ class Series(ABC):
         if dtype is None:
             dtype = cls.dtype
         expression = cls.value_to_expression(dialect=base.engine.dialect, value=value, dtype=dtype)
-        result = cls.get_class_instance(
+        return cls.get_class_instance(
             engine=base.engine,
             base_node=base.base_node,
             index=base.index,
@@ -469,9 +469,8 @@ class Series(ABC):
             expression=expression,
             group_by=None,
             order_by=[],
-            instance_dtype=dtype
+            instance_dtype=dtype,
         )
-        return result
 
     @classmethod
     def assert_engine_dialect_supported(cls, dialect_engine: Union[Dialect, Engine]) -> None:
@@ -625,13 +624,18 @@ class Series(ABC):
 
         :returns: the (modified) series and (modified) other.
         """
-        if not (other.expression.is_constant or other.expression.is_independent_subquery):
-            # we should maybe create a subquery
-            if self.base_node != other.base_node or self.group_by != other.group_by:
-                if other.expression.is_single_value:
-                    other = self.as_independent_subquery(other)
-                else:
-                    return self.__set_item_with_merge(other)
+        if (
+            not other.expression.is_constant
+            and not other.expression.is_independent_subquery
+            and (
+                self.base_node != other.base_node
+                or self.group_by != other.group_by
+            )
+        ):
+            if other.expression.is_single_value:
+                other = self.as_independent_subquery(other)
+            else:
+                return self.__set_item_with_merge(other)
 
         if other.dtype.lower() not in supported_dtypes:
             raise TypeError(f'{operation_name} not supported between {self.dtype} and {other.dtype}.')
@@ -843,10 +847,7 @@ class Series(ABC):
 
         result = self.to_frame().reset_index(level, drop)
 
-        if drop:
-            return result.all_series[self.name]
-
-        return result
+        return result.all_series[self.name] if drop else result
 
     def sort_values(self: SeriesSubType, *, ascending: bool = True) -> SeriesSubType:
         """
@@ -957,10 +958,9 @@ class Series(ABC):
             # The expression is lost when materializing
             expr = SingleValueExpression(expr)
 
-        s = series\
-            .copy_override_dtype(dtype=dtype)\
-            .copy_override(expression=expr, index={}, group_by=None)
-        return s
+        return series.copy_override_dtype(dtype=dtype).copy_override(
+            expression=expr, index={}, group_by=None
+        )
 
     def exists(self) -> 'SeriesBoolean':
         """
@@ -1122,8 +1122,8 @@ class Series(ABC):
                 other=other,
                 operation='fillna',
                 fmt_str='COALESCE({}, {})',
-                other_dtypes=tuple([self.dtype]),
-            )
+                other_dtypes=(self.dtype,),
+            ),
         )
 
     def _binary_operation(
@@ -1148,7 +1148,7 @@ class Series(ABC):
             resulting dtype. If the dict does not contain the rhs.dtype, None is assumed, using the lhs
             dtype.
         """
-        if len(other_dtypes) == 0:
+        if not other_dtypes:
             raise NotImplementedError(f'binary operation {operation} not supported '
                                       f'for {self.__class__} and {other.__class__}')
 
@@ -1160,11 +1160,7 @@ class Series(ABC):
         if dtype is None or isinstance(dtype, str):
             new_dtype = dtype
         else:  # dtype is Mapping[str, Optional[str]]
-            if other.dtype not in dtype:
-                new_dtype = None
-            else:
-                new_dtype = dtype[other.dtype]
-
+            new_dtype = None if other.dtype not in dtype else dtype[other.dtype]
         return self_modified.copy_override_dtype(dtype=new_dtype).copy_override(expression=expression)
 
     def _arithmetic_operation(
@@ -1182,7 +1178,7 @@ class Series(ABC):
 
         :see: _binary_operation() for parameters
         """
-        if len(other_dtypes) == 0:
+        if not other_dtypes:
             raise TypeError(f'arithmetic operation {operation} not supported for '
                             f'{self.__class__} and {other.__class__}')
         return self._binary_operation(other, operation, fmt_str, other_dtypes, dtype)
@@ -1243,7 +1239,7 @@ class Series(ABC):
         comparator: str,
         other_dtypes: Tuple[str, ...] = ()
     ) -> 'SeriesBoolean':
-        if len(other_dtypes) == 0:
+        if not other_dtypes:
             raise TypeError(f'comparator {comparator} not supported for '
                             f'{self.__class__} and {other.__class__}')
         return cast('SeriesBoolean', self._binary_operation(
@@ -1379,11 +1375,7 @@ class Series(ABC):
         notin = () if notin is None else notin
 
         if wrapped is None:
-            if self._group_by:
-                group_by = self._group_by
-            else:
-                # create an aggregation over the entire input
-                group_by = GroupBy([])
+            group_by = self._group_by if self._group_by else GroupBy([])
         else:
             if isinstance(wrapped, DataFrame):
                 unwrapped = wrapped.group_by
@@ -1463,37 +1455,36 @@ class Series(ABC):
                 )
         derived_dtype = self.dtype if dtype is None else dtype
 
-        if not isinstance(partition, Window):
-            if self._group_by and self._group_by != partition:
-                raise ValueError('passed partition does not match series partition. I\'m confused')
-
-            # if the passed expression was not a str, make sure it's tagged correctly
-            # we can't check the outer expression, because min_values logic above could have already wrapped
-            # it.
-            if not expression.has_aggregate_function:
-                raise ValueError('Passed expression should contain an aggregation function')
-
-            if partition.index == {}:
-                # we're creating an aggregation on everything, this will yield one value
-                expression = SingleValueExpression(expression)
-
-            return self\
-                .copy_override_dtype(dtype=derived_dtype)\
-                .copy_override(
-                    index=partition.index,
-                    group_by=partition,
-                    expression=expression,
-                    order_by=[],
-                )
-        else:
+        if isinstance(partition, Window):
             # The window expression already contains the full partition and sorting, no need
             # to keep that with this series, the expression can be used without any of those.
             return self\
-                .copy_override_dtype(dtype=derived_dtype)\
-                .copy_override(
+                    .copy_override_dtype(dtype=derived_dtype)\
+                    .copy_override(
                     group_by=None,
                     expression=partition.get_window_expression(expression),
                 )
+        if self._group_by and self._group_by != partition:
+            raise ValueError('passed partition does not match series partition. I\'m confused')
+
+        # if the passed expression was not a str, make sure it's tagged correctly
+        # we can't check the outer expression, because min_values logic above could have already wrapped
+        # it.
+        if not expression.has_aggregate_function:
+            raise ValueError('Passed expression should contain an aggregation function')
+
+        if partition.index == {}:
+            # we're creating an aggregation on everything, this will yield one value
+            expression = SingleValueExpression(expression)
+
+        return self\
+                .copy_override_dtype(dtype=derived_dtype)\
+                .copy_override(
+                index=partition.index,
+                group_by=partition,
+                expression=expression,
+                order_by=[],
+            )
 
     def count(self, partition: WrappedPartition = None, skipna: bool = True) -> 'SeriesInt64':
         """
@@ -1632,11 +1623,15 @@ class Series(ABC):
         from bach.partitioning import Window
         checked_window = cast(Window, self._check_unwrap_groupby(window, isin=(Window, )))
 
-        if not agg_function.supports_window_frame_clause(dialect=self.engine.dialect):
-            # remove boundaries if the functions does not support window frame clause
-            return checked_window.set_frame_clause(start_boundary=None, end_boundary=None)
-
-        return checked_window
+        return (
+            checked_window
+            if agg_function.supports_window_frame_clause(
+                dialect=self.engine.dialect
+            )
+            else checked_window.set_frame_clause(
+                start_boundary=None, end_boundary=None
+            )
+        )
 
     def window_row_number(self, window: Optional[WrappedWindow] = None) -> 'SeriesInt64':
         """
@@ -1822,11 +1817,10 @@ class Series(ABC):
             return self
 
         other_series = other if isinstance(other, list) else [other]
-        concatenated_series = SeriesConcatOperation(
+        return SeriesConcatOperation(
             objects=[self] + other_series,
             ignore_index=ignore_index,
         )()
-        return concatenated_series
 
     def describe(
         self,
@@ -1909,7 +1903,7 @@ class Series(ABC):
             return self.to_frame().value_counts(normalize=normalize, sort=sort, ascending=ascending)
 
         from bach.operations.cut import CutOperation, CutMethod
-        if not any(method == valid_method.value for valid_method in CutMethod):
+        if all(method != valid_method.value for valid_method in CutMethod):
             raise ValueError(f'"{method}" is not a valid method.')
 
         assert isinstance(self, SeriesAbstractNumeric)
@@ -1930,10 +1924,7 @@ class Series(ABC):
         # append empty bins with count 0, final result must show those ranges
         result = value_counts_result.append(empty_bins_df.all_series['value_counts'])
         result = result.copy_override(name='value_counts')
-        if sort:
-            return result.sort_values(ascending=ascending)
-
-        return result
+        return result.sort_values(ascending=ascending) if sort else result
 
 
 def value_to_series(base: DataFrameOrSeries,
@@ -1981,7 +1972,7 @@ def variable_series(
         dialect=base.engine.dialect,
         literal=variable_placeholder
     )
-    result = series_type.get_class_instance(
+    return series_type.get_class_instance(
         engine=base.engine,
         base_node=base.base_node,
         index=base.index,
@@ -1989,6 +1980,5 @@ def variable_series(
         expression=ConstValueExpression(variable_expression),
         group_by=None,
         order_by=[],
-        instance_dtype=series_type.dtype  # TODO: make work for structural types too
+        instance_dtype=series_type.dtype,  # TODO: make work for structural types too
     )
-    return result

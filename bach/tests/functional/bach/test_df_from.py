@@ -198,7 +198,7 @@ def test_big_query_from_other_project(engine):
                         'fullVisitorId', 'userId', 'channelGrouping', 'socialEngagementType']
     df = df[column_selection]
     df = df.sort_index()
-    df = df[0:2]  # 2 rows is plenty
+    df = df[:2]
 
     expected_columns = ['visitId'] + column_selection
     expected_data = [

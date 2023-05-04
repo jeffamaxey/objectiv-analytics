@@ -75,8 +75,9 @@ class DateTimeOperation:
 
         expression = Expression.construct('to_char({}, {})',
                                           self._series, Expression.string_value(format_str))
-        str_series = self._series.copy_override_type(SeriesString).copy_override(expression=expression)
-        return str_series
+        return self._series.copy_override_type(SeriesString).copy_override(
+            expression=expression
+        )
 
     def strftime(self, format_str: str) -> SeriesString:
         """
@@ -112,8 +113,9 @@ class DateTimeOperation:
         else:
             raise DatabaseNotSupportedException(engine)
 
-        str_series = self._series.copy_override_type(SeriesString).copy_override(expression=expression)
-        return str_series
+        return self._series.copy_override_type(SeriesString).copy_override(
+            expression=expression
+        )
 
     def date_trunc(self, date_part: str) -> Series:
         """
@@ -141,8 +143,7 @@ class DateTimeOperation:
         if date_part not in available_formats:
             raise ValueError(f'{date_part} format is not available.')
 
-        if not (isinstance(self._series, SeriesDate) or
-                isinstance(self._series, SeriesTimestamp)):
+        if not (isinstance(self._series, (SeriesDate, SeriesTimestamp))):
             raise ValueError(f'{type(self._series)} type is not supported.')
 
         engine = self._series.engine
@@ -219,11 +220,11 @@ class TimedeltaOperation(DateTimeOperation):
             component_name = f'{date_part}'
             current_ts = f'ts_{date_part}'
 
-            if not prev_ts:
-                df[component_name] = df[current_ts] / df[converted_series_name]
-            else:
-                df[component_name] = (df[current_ts] - df[prev_ts]) / df[converted_series_name]
-
+            df[component_name] = (
+                (df[current_ts] - df[prev_ts]) / df[converted_series_name]
+                if prev_ts
+                else df[current_ts] / df[converted_series_name]
+            )
             df[component_name] = cast(SeriesFloat64, df[component_name]).round(decimals=0)
 
             components_series_names.append(component_name)
@@ -282,19 +283,17 @@ class TimedeltaOperation(DateTimeOperation):
         returns the total amount of seconds in the interval
         """
 
-        if not is_bigquery(self._series.engine):
-            # extract(epoch from source) returns the total number of seconds in the interval
-            expression = Expression.construct(f'extract(epoch from {{}})', self._series)
-        else:
-            # bq cannot extract epoch from interval
-            expression = Expression.construct(
+        expression = (
+            Expression.construct(
                 (
                     f"UNIX_MICROS(CAST('1970-01-01' AS TIMESTAMP) + {{}}) "
                     f"* {_TOTAL_SECONDS_PER_DATE_PART[DatePart.MICROSECOND]}"
                 ),
                 self._series,
             )
-
+            if is_bigquery(self._series.engine)
+            else Expression.construct(f'extract(epoch from {{}})', self._series)
+        )
         return (
             self._series
             .copy_override_type(SeriesFloat64)
@@ -328,24 +327,19 @@ class SeriesAbstractDateTime(Series, ABC):
 
     @classmethod
     def _cast_to_date_if_dtype_date(cls, series: 'Series') -> 'Series':
-        # PG returns timestamp in all cases were we expect date
-        # Make sure we cast properly, and round similar to python datetime: add 12 hours and cast to date
-        if series.dtype == 'date':
-            td_12_hours = datetime.timedelta(seconds=3600 * 12)
-            series_12_hours = SeriesTimedelta.from_value(base=series, value=td_12_hours, name='tmp')
-            expr_12_hours = series_12_hours.expression
-
-            return series.copy_override(
-                expression=Expression.construct("cast({} + {} as date)", series, expr_12_hours)
-            )
-        else:
+        if series.dtype != 'date':
             return series
+        td_12_hours = datetime.timedelta(seconds=3600 * 12)
+        series_12_hours = SeriesTimedelta.from_value(base=series, value=td_12_hours, name='tmp')
+        expr_12_hours = series_12_hours.expression
+
+        return series.copy_override(
+            expression=Expression.construct("cast({} + {} as date)", series, expr_12_hours)
+        )
 
 
 def dt_strip_timezone(value: Optional[datetime.datetime]) -> Optional[datetime.datetime]:
-    if value is None:
-        return None
-    return value.replace(tzinfo=None)
+    return None if value is None else value.replace(tzinfo=None)
 
 
 class SeriesTimestamp(SeriesAbstractDateTime):
@@ -412,10 +406,10 @@ class SeriesTimestamp(SeriesAbstractDateTime):
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
         if source_dtype == 'timestamp':
             return expression
-        else:
-            if source_dtype not in ['string', 'date']:
-                raise ValueError(f'cannot convert {source_dtype} to timestamp')
+        if source_dtype in {'string', 'date'}:
             return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
+        else:
+            raise ValueError(f'cannot convert {source_dtype} to timestamp')
 
     def to_pandas_info(self) -> Optional['ToPandasInfo']:
         if is_postgres(self.engine):
@@ -425,7 +419,9 @@ class SeriesTimestamp(SeriesAbstractDateTime):
         return None
 
     def __add__(self, other) -> 'Series':
-        return self._arithmetic_operation(other, 'add', '({}) + ({})', other_dtypes=tuple(['timedelta']))
+        return self._arithmetic_operation(
+            other, 'add', '({}) + ({})', other_dtypes=('timedelta',)
+        )
 
     def __sub__(self, other) -> 'Series':
         type_mapping = {
@@ -470,10 +466,10 @@ class SeriesDate(SeriesAbstractDateTime):
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
         if source_dtype == 'date':
             return expression
-        else:
-            if source_dtype not in ['string', 'timestamp']:
-                raise ValueError(f'cannot convert {source_dtype} to date')
+        if source_dtype in {'string', 'timestamp'}:
             return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
+        else:
+            raise ValueError(f'cannot convert {source_dtype} to date')
 
     def __add__(self, other) -> 'Series':
         type_mapping = {
@@ -536,10 +532,10 @@ class SeriesTime(SeriesAbstractDateTime):
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
         if source_dtype == 'time':
             return expression
-        else:
-            if source_dtype not in ['string', 'timestamp']:
-                raise ValueError(f'cannot convert {source_dtype} to time')
+        if source_dtype in {'string', 'timestamp'}:
             return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
+        else:
+            raise ValueError(f'cannot convert {source_dtype} to time')
 
     # python supports no arithmetic on Time
 
@@ -599,12 +595,12 @@ class SeriesTimedelta(SeriesAbstractDateTime):
 
     @classmethod
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
-        if source_dtype == 'timedelta':
+        if source_dtype == 'string':
+            return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
+        elif source_dtype == 'timedelta':
             return expression
         else:
-            if not source_dtype == 'string':
-                raise ValueError(f'cannot convert {source_dtype} to timedelta')
-            return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
+            raise ValueError(f'cannot convert {source_dtype} to timedelta')
 
     def _comparator_operation(self, other, comparator,
                               other_dtypes=('timedelta', 'string')) -> SeriesBoolean:

@@ -71,15 +71,11 @@ class WindowFrameBoundary(Enum):
         """
         Generate the frame boundary sub-string
         """
-        if self == self.CURRENT_ROW:
-            if value is not None:
-                raise ValueError('Value not supported with CURRENT ROW')
-            return 'CURRENT ROW'
-        else:
-            if value is None:
-                return f'UNBOUNDED {self.name}'
-            else:
-                return f'{value} {self.name}'
+        if self != self.CURRENT_ROW:
+            return f'UNBOUNDED {self.name}' if value is None else f'{value} {self.name}'
+        if value is not None:
+            raise ValueError('Value not supported with CURRENT ROW')
+        return 'CURRENT ROW'
 
 
 class GroupBy:
@@ -131,12 +127,16 @@ class GroupBy:
         return copy(self._index)
 
     def __eq__(self, other):
-        if not isinstance(other, GroupBy):
-            return False
         return (
-            list(self._index.keys()) == list(other.index.keys()) and
-            all(self._index[n].equals(other.index[n], recursion='GroupBy')
-                for n in self._index.keys())
+            (
+                list(self._index.keys()) == list(other.index.keys())
+                and all(
+                    self._index[n].equals(other.index[n], recursion='GroupBy')
+                    for n in self._index.keys()
+                )
+            )
+            if isinstance(other, GroupBy)
+            else False
         )
 
     def get_index_expressions(self) -> List[Expression]:
@@ -189,7 +189,7 @@ class Cube(GroupBy):
     Very simple abstraction to support cubes
     """
     def __init__(self, group_by_columns: List[Series]):
-        if len(group_by_columns) == 0:
+        if not group_by_columns:
             raise ValueError('Can not create a cube without group by columns')
         super().__init__(group_by_columns)
 
@@ -204,7 +204,7 @@ class Rollup(GroupBy):
     """
 
     def __init__(self, group_by_columns: List[Series]):
-        if len(group_by_columns) == 0:
+        if not group_by_columns:
             raise ValueError('Can not create a rollup without group by columns')
         super().__init__(group_by_columns)
 
@@ -356,30 +356,34 @@ class Window(GroupBy):
             raise ValueError("End of frame can not be unbounded preceding")
 
         if (start_value is not None and start_value < 0) or \
-                (end_value is not None and end_value < 0):
+                    (end_value is not None and end_value < 0):
             raise ValueError("start_value and end_value must be greater than or equal to zero.")
 
         if mode == WindowFrameMode.RANGE \
-                and (start_value is not None or end_value is not None):
+                    and (start_value is not None or end_value is not None):
             raise ValueError("start_value or end_value cases only supported in ROWS mode.")
 
         if start_boundary is not None and end_boundary is not None:
             if start_boundary.value > end_boundary.value:
                 raise ValueError("frame boundaries defined in wrong order.")
 
-            if start_boundary == end_boundary:
-                if start_boundary == WindowFrameBoundary.PRECEDING \
-                        and start_value is not None \
-                        and end_value is not None \
-                        and start_value < end_value:
-                    raise ValueError("frame boundaries defined in wrong order.")
+            if (
+                start_boundary == end_boundary
+                and start_boundary == WindowFrameBoundary.PRECEDING
+                and start_value is not None
+                and end_value is not None
+                and start_value < end_value
+            ):
+                raise ValueError("frame boundaries defined in wrong order.")
 
-            if start_boundary == end_boundary:
-                if start_boundary == WindowFrameBoundary.FOLLOWING \
-                        and start_value is not None \
-                        and end_value is not None \
-                        and start_value > end_value:
-                    raise ValueError("frame boundaries defined in wrong order.")
+            if (
+                start_boundary == end_boundary
+                and start_boundary == WindowFrameBoundary.FOLLOWING
+                and start_value is not None
+                and end_value is not None
+                and start_value > end_value
+            ):
+                raise ValueError("frame boundaries defined in wrong order.")
 
         self._mode = mode
         self._start_boundary = start_boundary
@@ -390,11 +394,12 @@ class Window(GroupBy):
 
         # TODO This should probably be an expression
         self._frame_clause: str = ''
-        if start_boundary and end_boundary is None:
-            self._frame_clause = f'{mode.name} {start_boundary.frame_clause(start_value)}'
-        elif start_boundary and end_boundary:
-            self._frame_clause = f'{mode.name} BETWEEN {start_boundary.frame_clause(start_value)}'\
-                                f' AND {end_boundary.frame_clause(end_value)}'
+        if start_boundary:
+            if end_boundary is None:
+                self._frame_clause = f'{mode.name} {start_boundary.frame_clause(start_value)}'
+            elif end_boundary:
+                self._frame_clause = f'{mode.name} BETWEEN {start_boundary.frame_clause(start_value)}'\
+                                        f' AND {end_boundary.frame_clause(end_value)}'
 
         self._order_by = order_by
         self._nulls_last = nulls_last
@@ -436,16 +441,15 @@ class Window(GroupBy):
         Get a properly formatted order by clause based on this df's order_by.
         Will return an empty string in case ordering in not requested.
         """
-        if self._order_by:
-            exprs = [sc.expression for sc in self._order_by]
-            nulls_last_stmt = 'nulls last' if self._nulls_last else ''
-            fmtstr = [
-                f"{{}} {'asc' if sc.asc else 'desc'} {nulls_last_stmt}".strip()
-                for sc in self._order_by
-            ]
-            return Expression.construct(f'order by {", ".join(fmtstr)}', *exprs)
-        else:
+        if not self._order_by:
             return Expression.construct('')
+        exprs = [sc.expression for sc in self._order_by]
+        nulls_last_stmt = 'nulls last' if self._nulls_last else ''
+        fmtstr = [
+            f"{{}} {'asc' if sc.asc else 'desc'} {nulls_last_stmt}".strip()
+            for sc in self._order_by
+        ]
+        return Expression.construct(f'order by {", ".join(fmtstr)}', *exprs)
 
     def get_index_expressions(self) -> List[Expression]:
         from bach.series import SeriesAbstractMultiLevel
@@ -467,11 +471,7 @@ class Window(GroupBy):
         # TODO implement NULLS FIRST / NULLS LAST, probably not here but in the sorting logic.
         order_by = self._get_order_by_expression()
 
-        if self.frame_clause is None:
-            frame_clause = ''
-        else:
-            frame_clause = self.frame_clause
-
+        frame_clause = '' if self.frame_clause is None else self.frame_clause
         index_exprs = []
         if len(self._index) == 0:
             partition_fmt = ''

@@ -12,10 +12,10 @@ class ValuePropagationMethod(Enum):
 
     @classmethod
     def get_method(cls, method: str) -> 'ValuePropagationMethod':
-        if method in ('ffill', 'pad'):
+        if method in {'ffill', 'pad'}:
             return cls.FORWARD_FILL
 
-        if method in ('bfill', 'backfill'):
+        if method in {'bfill', 'backfill'}:
             return cls.BACK_FILL
 
         raise ValueError(f'"{method}" is not a valid propagation method.')

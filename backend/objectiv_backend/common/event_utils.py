@@ -10,17 +10,15 @@ from objectiv_backend.schema.schema import AbstractGlobalContext
 def get_optional_context(event: EventData, context_type: ContextType) -> Optional[ContextData]:
     """ Get the first Context of the given type, or None if there is none. """
     result = get_contexts(event=event, context_type=context_type)
-    if not result:
-        return None
-    return result[0]
+    return result[0] if result else None
 
 
 def get_context(event: EventData, context_type: ContextType) -> ContextData:
     """ Get the first Context of the given type. """
-    result = get_contexts(event=event, context_type=context_type)
-    if not result:
+    if result := get_contexts(event=event, context_type=context_type):
+        return result[0]
+    else:
         raise ValueError(f'context-type {context_type} not present in event. data: {event}')
-    return result[0]
 
 
 def get_contexts(event: EventData, context_type: ContextType) -> List[ContextData]:

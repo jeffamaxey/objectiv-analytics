@@ -150,22 +150,19 @@ def snowplow_schema_violation_json(payload: CollectorPayload, config: SnowplowCo
     data_reports = []
 
     if event_error and event_error.error_info:
-        for ei in event_error.error_info:
-            data_reports.append({
+        data_reports.extend(
+            {
                 "message": ei.info,
                 "path": '$',
                 "keyword": "required",
-                "targets": ["_type"]
-            })
-
-    parameters = []
+                "targets": ["_type"],
+            }
+            for ei in event_error.error_info
+        )
     data = json.loads(payload.body)['data'][0]
-    for key, value in data.items():
-        parameters.append({
-            "name": key,
-            "value": value[:512]
-        })
-
+    parameters = [
+        {"name": key, "value": value[:512]} for key, value in data.items()
+    ]
     # look for our custom context, so we can fill the enrich section
     event = {}
     if 'cx' in data:
@@ -254,20 +251,17 @@ def prepare_event_for_snowplow_pipeline(event: EventData,
     """
     payload: CollectorPayload = objectiv_event_to_snowplow_payload(event=event, config=config)
     if good:
-        data = payload_to_thrift(payload=payload)
-    else:
-        event_error = None
-        # try to find errors for the current event_id
-        if event_errors:
-            for ee in event_errors:
-                if ee.event_id == event['id']:
-                    event_error = ee
-        failed_event = snowplow_schema_violation_json(payload=payload, config=config, event_error=event_error)
+        return payload_to_thrift(payload=payload)
+    event_error = None
+    # try to find errors for the current event_id
+    if event_errors:
+        for ee in event_errors:
+            if ee.event_id == event['id']:
+                event_error = ee
+    failed_event = snowplow_schema_violation_json(payload=payload, config=config, event_error=event_error)
 
         # serialize (json) and encode to bytestring for publishing
-        data = json.dumps(failed_event, separators=(',', ':')).encode('utf-8')
-
-    return data
+    return json.dumps(failed_event, separators=(',', ':')).encode('utf-8')
 
 
 def write_data_to_gcp_pubsub(events: EventDataList, config: SnowplowConfig, good: bool = True,
@@ -282,13 +276,7 @@ def write_data_to_gcp_pubsub(events: EventDataList, config: SnowplowConfig, good
     """
 
     project = config.gcp_project
-    if good:
-        # good events get sent to the raw topic, which means they get processed by snowplow's enrichment
-        topic = config.gcp_pubsub_topic_raw
-    else:
-        # not ok events get sent to the bad topic
-        topic = config.gcp_pubsub_topic_bad
-
+    topic = config.gcp_pubsub_topic_raw if good else config.gcp_pubsub_topic_bad
     publisher = pubsub_v1.PublisherClient()
     topic_path = f'projects/{project}/topics/{topic}'
 

@@ -32,12 +32,13 @@ def test_json_get_value(engine, dtype):
     bt['get_val_mixed_str'] = bt.mixed_column.json.get_value('a', as_str=True)
     bt = bt[['get_val_dict', 'get_val_dict_str', 'get_val_mixed', 'get_val_mixed_str']]
 
-    # When using `as_str=True`. The returned value is a string. But there is no canonical way to represent
-    # json as a string, so different databases might return different things.
-    # To work around that the JsonDictMagivStrValue compares equal to two strings.
+
+
     class JsonDictMagivStrValue:
         def __eq__(self, other):
-            return other == '{"a": "c"}' or other == '{"a":"c"}'
+            return other in ['{"a": "c"}', '{"a":"c"}']
+
+
     magic_value = JsonDictMagivStrValue()
 
     assert_equals_data(

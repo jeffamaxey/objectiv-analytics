@@ -84,7 +84,7 @@ def test_sample_operations(engine, unique_table_test_name):
                               seed=seed,
                               overwrite=True)
 
-    bt_sample['better_city'] = bt_sample.city + '_better'
+    bt_sample['better_city'] = f'{bt_sample.city}_better'
     bt_sample['a'] = bt_sample.city.str[:2] + bt_sample.municipality.str[:2]
     bt_sample['big_city'] = bt_sample.inhabitants + 10
     bt_sample['b'] = bt_sample.inhabitants + bt_sample.founding
@@ -110,7 +110,7 @@ def test_sample_operations_filter(engine, unique_table_test_name):
                               filter=bt.skating_order % 2 == 0,
                               overwrite=True)
 
-    bt_sample['better_city'] = bt_sample.city + '_better'
+    bt_sample['better_city'] = f'{bt_sample.city}_better'
     bt_sample['a'] = bt_sample.city.str[:2] + bt_sample.municipality.str[:2]
     bt_sample['big_city'] = bt_sample.inhabitants + 10
     bt_sample['b'] = bt_sample.inhabitants + bt_sample.founding
@@ -132,7 +132,7 @@ def test_combine_unsampled_with_before_data(engine, unique_table_test_name):
     dff_s = dff[['municipality', 'city']].get_sample(
         unique_table_test_name, overwrite=True, sample_percentage=50
     )
-    dff_s['e'] = dff_s.city + '_extended'
+    dff_s['e'] = f'{dff_s.city}_extended'
     new_dff = dff_s.get_unsampled()
     assert new_dff.all_series.keys() == dff_s.all_series.keys()
     dff['e'] = new_dff.e
@@ -278,7 +278,7 @@ def test_sample_operations_variable(engine, unique_table_test_name):
                               overwrite=True)
 
     bt_sample, var = bt_sample.create_variable('var', 10)
-    bt_sample['better_city'] = bt_sample.city + '_better'
+    bt_sample['better_city'] = f'{bt_sample.city}_better'
     bt_sample['a'] = bt_sample.city.str[:2] + bt_sample.municipality.str[:2]
     bt_sample['big_city'] = bt_sample.inhabitants + var
     bt_sample['b'] = bt_sample.inhabitants + bt_sample.founding

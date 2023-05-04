@@ -140,11 +140,7 @@ def linkcode_resolve(domain, info):
         lineno = None
 
     # create linespec so GH can highlight the correct lines
-    if lineno:
-        linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
-    else:
-        linespec = ""
-
+    linespec = f"#L{lineno}-L{lineno + len(source) - 1}" if lineno else ""
     # get root of repository
     # we take this file as base: bach/docs/source/conf.py
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -167,8 +163,7 @@ def repair_classmethod_docstring(app, what, name, obj, options, lines):
     # If a property is annotated as a classmethod, there is confusion. Resolve that here
     if isinstance(obj, property) and isinstance(obj.fget, classmethod):
         lines.clear()
-        obj_lines = obj.fget.__func__.__doc__
-        if obj_lines:
+        if obj_lines := obj.fget.__func__.__doc__:
             lines.extend(obj_lines.split("\n"))
 
 

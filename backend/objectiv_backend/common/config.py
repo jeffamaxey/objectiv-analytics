@@ -148,9 +148,9 @@ def get_config_output_aws() -> Optional[AwsOutputConfig]:
     if not _OUTPUT_ENABLE_AWS:
         return None
     if _AWS_REGION and _AWS_ACCESS_KEY_ID and _AWS_SECRET_ACCESS_KEY and _AWS_BUCKET and _AWS_S3_PREFIX:
-        raise ValueError(f'OUTPUT_ENABLE_AWS = true, but not all required values specified. '
-                         f'Must specify AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET, '
-                         f'and AWS_S3_PREFIX')
+        raise ValueError(
+            'OUTPUT_ENABLE_AWS = true, but not all required values specified. Must specify AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET, and AWS_S3_PREFIX'
+        )
     return AwsOutputConfig(
         access_key_id=_AWS_ACCESS_KEY_ID,
         secret_access_key=_AWS_SECRET_ACCESS_KEY,
@@ -172,8 +172,9 @@ def get_config_postgres() -> Optional[PostgresConfig]:
     if not _OUTPUT_ENABLE_PG:
         return None
     if not _PG_HOSTNAME or not _PG_PORT or not _PG_DATABASE_NAME or not _PG_USER:
-        raise ValueError(f'OUTPUT_ENABLE_PG = true, but not all required values specified. '
-                         f'Must specify PG_HOSTNAME, PG_PORT, PG_DATABASE_NAME, PG_USER, and PG_PASSWORD')
+        raise ValueError(
+            'OUTPUT_ENABLE_PG = true, but not all required values specified. Must specify PG_HOSTNAME, PG_PORT, PG_DATABASE_NAME, PG_USER, and PG_PASSWORD'
+        )
     return PostgresConfig(
         hostname=_PG_HOSTNAME,
         port=int(_PG_PORT),

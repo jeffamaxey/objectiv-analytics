@@ -186,7 +186,7 @@ class SeriesJson(Series):
     @classmethod
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
         if is_postgres(dialect):
-            if source_dtype in ('json', 'json_postgres'):
+            if source_dtype in {'json', 'json_postgres'}:
                 # SeriesJsonPostgres is a special case: SeriesJsonPostgres.expression already contains a cast
                 # to the database type 'jsonb', so we actually don't need to do any conversion
                 return expression
@@ -194,7 +194,7 @@ class SeriesJson(Series):
                 return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
             raise ValueError(f'cannot convert {source_dtype} to json')
         if is_bigquery(dialect):
-            if source_dtype in ('json', 'string'):
+            if source_dtype in {'json', 'string'}:
                 return expression
             raise ValueError(f'cannot convert {source_dtype} to json')
         raise DatabaseNotSupportedException(dialect)
@@ -488,10 +488,9 @@ class JsonBigQueryAccessorImpl(Generic[TSeriesJson]):
             if is_start:
                 # return index of first item in the array
                 return Expression.construct('0')
-            else:
-                # return index that is guaranteed to be beyond the last item in the array
-                max_int = 2 ** 63 - 1
-                return Expression.construct(f'{max_int}')
+            # return index that is guaranteed to be beyond the last item in the array
+            max_int = 2 ** 63 - 1
+            return Expression.construct(f'{max_int}')
         elif value >= 0:
             return Expression.construct(f'{value}')
         else:
@@ -627,14 +626,12 @@ class JsonPostgresAccessorImpl(Generic[TSeriesJson]):
         self._series_object = series_object
 
     def _find_in_json_list(self, key: Union[str, Dict[str, str]]):
-        if isinstance(key, (dict, str)):
-            key = json.dumps(key)
-            quoted_key = quote_string(self._series_object.engine, key)
-            expression_str = f"""(select min(case when ({quoted_key}::jsonb) <@ value
-            then ordinality end) -1 from jsonb_array_elements({{}}) with ordinality)"""
-            return expression_str
-        else:
+        if not isinstance(key, (dict, str)):
             raise TypeError(f'key should be int or slice, actual type: {type(key)}')
+        key = json.dumps(key)
+        quoted_key = quote_string(self._series_object.engine, key)
+        return f"""(select min(case when ({quoted_key}::jsonb) <@ value
+            then ordinality end) -1 from jsonb_array_elements({{}}) with ordinality)"""
 
     def get_array_slice(self, key: slice) -> 'TSeriesJson':
         """ See implementation in parent class :class:`JsonAccessor` """
@@ -665,23 +662,23 @@ class JsonPostgresAccessorImpl(Generic[TSeriesJson]):
                 expression_references += 1
             else:
                 raise TypeError('cant')
-            if key.stop is not None:
-                where = f'between {start} and {stop}'
-            else:
-                where = f'>= {start}'
+            where = (
+                f'between {start} and {stop}'
+                if key.stop is not None
+                else f'>= {start}'
+            )
+        elif key.stop is not None:
+            where = f'<= {stop}'
         else:
-            if key.stop is not None:
-                where = f'<= {stop}'
-            else:
-                # no start and no stop: we want to select all elements.
-                where = 'is not null'  # should be true for all ordinalities.
+            # no start and no stop: we want to select all elements.
+            where = 'is not null'  # should be true for all ordinalities.
         combined_expression = f"""(select jsonb_agg(x.value)
         from jsonb_array_elements({{}}) with ordinality x
         where ordinality - 1 {where})"""
         expression_references += 1
         non_null_expression = f"coalesce({combined_expression}, '[]'::jsonb)"
         return self._series_object \
-            .copy_override(
+                .copy_override(
                 expression=Expression.construct(
                     non_null_expression,
                     *([self._series_object] * expression_references)
@@ -708,9 +705,7 @@ class JsonPostgresAccessorImpl(Generic[TSeriesJson]):
         if '"' in key:
             raise ValueError(f'key values containing double quotes are not supported. key: {key}')
 
-        return_as_string_operator = ''
-        if as_str:
-            return_as_string_operator = '>'
+        return_as_string_operator = '>' if as_str else ''
         expression = Expression.construct(f"{{}}->{return_as_string_operator}{{}}",
                                           self._series_object,
                                           Expression.string_value(key))

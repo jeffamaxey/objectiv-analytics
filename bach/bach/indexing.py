@@ -48,10 +48,10 @@ class BaseLocIndex(object):
         index_start = self._get_label_index(label_slicing.start) if label_slicing.start else None
         index_stop = self._get_label_index(label_slicing.stop) + 1 if label_slicing.stop else None
 
-        if index_start is not None and index_stop is not None:
-            return data_columns[index_start:index_stop]
-
         if index_start is not None:
+            if index_stop is not None:
+                return data_columns[index_start:index_stop]
+
             return data_columns[index_start:]
 
         return data_columns[:index_stop]
@@ -195,11 +195,15 @@ class LocIndexer(BaseLocIndex):
             parsed_column_labels = self.obj.data_columns
         series_value = value if isinstance(value, Series) else value_to_series(self.obj, value)
 
-        if not isinstance(index_labels, slice):
-            df = self._set_item_by_labels(index_labels, parsed_column_labels, series_value)
-        else:
-            df = self._set_item_by_slicing(index_labels, parsed_column_labels, series_value)
-
+        df = (
+            self._set_item_by_slicing(
+                index_labels, parsed_column_labels, series_value
+            )
+            if isinstance(index_labels, slice)
+            else self._set_item_by_labels(
+                index_labels, parsed_column_labels, series_value
+            )
+        )
         # TODO: remove call to private method
         self.obj._update_self_from_df(df)
 

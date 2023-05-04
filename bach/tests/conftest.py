@@ -39,6 +39,7 @@ failed.
 The fixture `unique_table_test_name` gives out a unique table name to each test that use it. These tables are
 automatically deleted at the end of the test session.
 """
+
 import os
 from collections import defaultdict
 from enum import Enum
@@ -55,7 +56,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
 # Load settings from .test_env file, but allow overrides from Environment variables
-_DOT_ENV_FILE = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + '/.secrets/.test_env'
+_DOT_ENV_FILE = f'{os.path.dirname(os.path.dirname(os.path.realpath(__file__)))}/.secrets/.test_env'
 _ENV = {
     **dotenv_values(_DOT_ENV_FILE),
     **os.environ
@@ -65,7 +66,7 @@ _DB_PG_TEST_URL = _ENV.get('OBJ_DB_PG_TEST_URL', 'postgresql://objectiv:@localho
 _DB_BQ_TEST_URL = _ENV.get('OBJ_DB_BQ_TEST_URL', 'bigquery://objectiv-snowplow-test-2/bach_test')
 _DB_BQ_CREDENTIALS_PATH = _ENV.get(
     'OBJ_DB_BQ_CREDENTIALS_PATH',
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + '/.secrets/bach-big-query-testing.json'
+    f'{os.path.dirname(os.path.dirname(os.path.realpath(__file__)))}/.secrets/bach-big-query-testing.json',
 )
 _DB_ATHENA_TEST_URL = _ENV.get('OBJ_DB_ATHENA_TEST_URL')
 _DB_ATHENA_AWS_ACCESS_KEY_ID = _ENV.get('OBJ_DB_ATHENA_AWS_ACCESS_KEY_ID')

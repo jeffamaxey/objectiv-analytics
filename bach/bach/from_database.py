@@ -70,7 +70,7 @@ def _get_meta_data_table_from_table_name(table_name) -> Tuple[str, str]:
     """
     parts = table_name.rsplit('.', maxsplit=1)
     if len(parts) == 2:
-        project_id_dataset = parts[0] + '.'
+        project_id_dataset = f'{parts[0]}.'
         table_name = parts[1]
     else:
         project_id_dataset = ''

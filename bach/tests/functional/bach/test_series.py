@@ -177,7 +177,7 @@ def test_fillna(engine):
     tf(np.nan)
 
     # pandas allows this, but we can't
-    for val in [int(99), 'nope']:
+    for val in [99, 'nope']:
         with pytest.raises(TypeError):
             bt['num'].fillna(val)
 

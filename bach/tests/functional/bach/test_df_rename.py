@@ -40,9 +40,7 @@ def test_rename_complex(engine):
             return new_name
         if old == 'municipality':
             return 'founding'
-        if old == 'founding':
-            return 'municipality'
-        return old
+        return 'municipality' if old == 'founding' else old
 
     nbt = bt.rename(columns=rename_func)
     assert_equals_data(

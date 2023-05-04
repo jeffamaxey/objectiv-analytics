@@ -112,8 +112,7 @@ class StandardScaler(BaseScaler):
         if self.with_std:
             aggregations.append('std')
 
-        agg_df = self.training_df.agg(func=list(aggregations), numeric_only=True, ddof=0)
-        return agg_df
+        return self.training_df.agg(func=list(aggregations), numeric_only=True, ddof=0)
 
 
 class MinMaxScaler(BaseScaler):

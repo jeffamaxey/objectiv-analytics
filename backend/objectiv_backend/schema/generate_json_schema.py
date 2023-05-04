@@ -23,11 +23,10 @@ def generate_json_schema(event_schema: EventSchema) -> Dict[str, Any]:
     ]
 
     combined_definitions = _combine_definition(sub_schemas)
-    combined = {
+    return {
         "allOf": [sub_schema.schema for sub_schema in sub_schemas],
-        "definitions": combined_definitions
+        "definitions": combined_definitions,
     }
-    return combined
 
 
 def _combine_definition(schema_definitions: List[SchemaDefinitionTuple]) -> Dict[str, Any]:

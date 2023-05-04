@@ -273,9 +273,9 @@ def main():
 
     for filename in args.filenames:
         print(f'\nChecking {filename}')
-        errors_file = validate_events_in_file(event_schema=event_schema,
-                                              filename=filename)
-        if errors_file:
+        if errors_file := validate_events_in_file(
+            event_schema=event_schema, filename=filename
+        ):
             errors[filename] = errors_file
     if errors:
         print(f'\n\nCombined summary: Errors in {len(errors)} / {len(filenames)} file(s). '

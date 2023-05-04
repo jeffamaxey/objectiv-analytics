@@ -174,13 +174,12 @@ def run_queries(
                 # escape sql, as conn.execute will think that '%' indicates a parameter
                 sql = sql.replace('%', '%%')
                 res = conn.execute(sql)
-                column_names = list(res.keys())
-                if not column_names:
-                    result[name] = None
-                else:
+                if column_names := list(res.keys()):
                     db_values = [list(row) for row in res]
                     result[name] = (column_names, db_values)
 
+                else:
+                    result[name] = None
             # rollback. This will remove any tables or views that we might have created.
             transaction.rollback()
             return result

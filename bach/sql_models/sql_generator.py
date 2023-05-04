@@ -56,8 +56,7 @@ def to_sql(dialect: Dialect, model: SqlModel) -> str:
 
     models = [fn.model for fn in reversed(materialized_found_nodes)]
     statements = _to_sql_list_models(dialect=dialect, models=models)
-    sql = ';\n'.join(sql_stat.sql for sql_stat in statements)
-    return sql
+    return ';\n'.join(sql_stat.sql for sql_stat in statements)
 
 
 def to_sql_materialized_nodes(
@@ -265,9 +264,8 @@ def model_to_name(model: SqlModel):
     # max length of an identifier name in Postgres is normally 63 characters. We'll use that as a cutoff
     # here.
     if model.materialization_name is not None:
-        return model.materialization_name[0:63]
-    name = f'{model.generic_name[0:28]}___{model.hash}'
-    return name
+        return model.materialization_name[:63]
+    return f'{model.generic_name[:28]}___{model.hash}'
 
 
 def model_to_quoted_name(dialect: Dialect, model: SqlModel):

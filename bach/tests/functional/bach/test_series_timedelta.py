@@ -32,14 +32,11 @@ def test_timedelta_arithmetic2(engine):
     bt['td'] = np.timedelta64(td)
     bt['td2'] = td2
     expected = [td, td2]
-    expected_types = ['timedelta', 'timedelta']
-
     # special timedelta ops only, rest is tested elsewhere
     bt['mul'] = bt.td * 5
     bt['div'] = bt.td / 5
     expected.extend([td * 5, td / 5])
-    expected_types.extend(['timedelta', 'timedelta'])
-
+    expected_types = ['timedelta', 'timedelta', 'timedelta', 'timedelta']
     assert [s.dtype for s in list(bt.all_series.values())[2:]] == expected_types
 
     assert_equals_data(

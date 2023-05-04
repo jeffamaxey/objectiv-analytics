@@ -1385,7 +1385,11 @@ def make_event(_type: str, **kwargs) -> AbstractEvent:
 
 
 def make_event_from_dict(obj: Dict[str, Any]) -> AbstractEvent:
-    if not ('_type' in obj and 'location_stack' in obj and 'global_contexts' in obj):
+    if (
+        '_type' not in obj
+        or 'location_stack' not in obj
+        or 'global_contexts' not in obj
+    ):
         raise Exception('missing arguments')
     obj['location_stack'] = [make_context(**c) for c in obj['location_stack']]
     obj['global_contexts'] = [make_context(

@@ -71,10 +71,14 @@ class ConcatOperation(Generic[TDataFrameOrSeries]):
 
         # all objects should have the same indexes
         for obj in self.objects:
-            curr_obj_index = list(itertools.chain.from_iterable(
-                [idx] if not isinstance(idx, SeriesAbstractMultiLevel) else list(idx.levels.values())
-                for idx in obj.index.values()
-            ))
+            curr_obj_index = list(
+                itertools.chain.from_iterable(
+                    list(idx.levels.values())
+                    if isinstance(idx, SeriesAbstractMultiLevel)
+                    else [idx]
+                    for idx in obj.index.values()
+                )
+            )
             if set(merged_indexes.keys()) != {idx.name for idx in curr_obj_index}:
                 raise ValueError('concatenation with different index levels is not supported yet.')
 
@@ -182,7 +186,7 @@ class DataFrameConcatOperation(ConcatOperation[DataFrame]):
             if isinstance(obj, Series):
                 raise Exception('Cannot concat Series to DataFrame')
 
-            df = obj.copy() if not self.ignore_index else obj.reset_index(drop=True)
+            df = obj.reset_index(drop=True) if self.ignore_index else obj.copy()
             # need to materialize in order to avoid further problems
             if df.group_by:
                 df = df.materialize()
@@ -209,7 +213,11 @@ class DataFrameConcatOperation(ConcatOperation[DataFrame]):
                 continue
 
             has_diff_dtype = rc.dtype != obj.all_series[idx].dtype
-            curr_series = obj.all_series[idx] if not has_diff_dtype else obj.all_series[idx].astype(rc.dtype)
+            curr_series = (
+                obj.all_series[idx].astype(rc.dtype)
+                if has_diff_dtype
+                else obj.all_series[idx]
+            )
             expressions.append(
                 Expression.construct_expr_as_name(expr=curr_series.expression, name=rc.name)
             )
@@ -224,10 +232,11 @@ class DataFrameConcatOperation(ConcatOperation[DataFrame]):
             itertools.chain.from_iterable(df.data.values() for df in self.objects)
         )
         result_series = self._get_result_series(all_series)
-        if not self.sort:
-            return result_series
-
-        return {s: result_series[s] for s in sorted(result_series)}
+        return (
+            {s: result_series[s] for s in sorted(result_series)}
+            if self.sort
+            else result_series
+        )
 
     def _get_concatenated_object(self) -> DataFrame:
         """
@@ -247,7 +256,7 @@ class DataFrameConcatOperation(ConcatOperation[DataFrame]):
         # variables are overridden based on the order of concatenation. This means that the initial dataframe
         # will have higher priority over the following dataframes
         for df in reversed(objects):
-            variables.update(df.variables)
+            variables |= df.variables
             savepoints.merge(df.savepoints)
 
         return main_df.copy_override(
@@ -290,7 +299,7 @@ class SeriesConcatOperation(ConcatOperation[Series]):
         """
         gets the final data series result
         """
-        dtypes: Set[str] = set(series.dtype for series in self.objects)
+        dtypes: Set[str] = {series.dtype for series in self.objects}
 
         main_series = self.objects[0].copy_override_dtype(dtype=get_merged_series_dtype(dtypes))
         return self._get_result_series([main_series])

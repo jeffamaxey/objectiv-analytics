@@ -65,20 +65,21 @@ class SeriesBoolean(Series, ABC):
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
         if source_dtype == 'bool':
             return expression
-        if source_dtype not in ['int64', 'string']:
+        if source_dtype in {'int64', 'string'}:
+            return (
+                Expression.construct('{} != 0', expression)
+                if is_postgres(dialect) and source_dtype == 'int64'
+                else Expression.construct(
+                    f'cast({{}} as {cls.get_db_dtype(dialect)})', expression
+                )
+            )
+        else:
             raise ValueError(f'cannot convert {source_dtype} to bool')
-        if is_postgres(dialect):
-            # Postgres cannot directly cast a bigint to bool.
-            # So we do a comparison against 0 (==False) instead
-            if source_dtype == 'int64':
-                return Expression.construct('{} != 0', expression)
-        # Default case: do a regular cast
-        return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
 
-    def _comparator_operation(self, other, comparator, other_dtypes=tuple(['bool'])) -> 'SeriesBoolean':
+    def _comparator_operation(self, other, comparator, other_dtypes=('bool', )) -> 'SeriesBoolean':
         return super()._comparator_operation(other, comparator, other_dtypes)
 
-    def _boolean_operator(self, other, operator: str, other_dtypes=tuple(['bool'])) -> 'SeriesBoolean':
+    def _boolean_operator(self, other, operator: str, other_dtypes=('bool', )) -> 'SeriesBoolean':
         fmt_str = f'({{}}) {operator} ({{}})'
         if other.dtype != 'bool':
             # this is not currently used, as both bigint and float can not be cast to bool in PG

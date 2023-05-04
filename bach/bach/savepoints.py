@@ -183,13 +183,9 @@ class Savepoints:
 
         with engine.connect() as conn:
             with conn.begin() as transaction:
-                if overwrite:
-                    # This is a bit fragile. Drop statements might fail if other objects (which we might not
-                    # consider) depend on a view/table, or if the object type (view/table) is different than
-                    # we assume. For now that's just the way it is, the user will get an error.
-                    if drop_statements:
-                        drop_sql = '; '.join(drop_statements.values())
-                        conn.execute(drop_sql)
+                if overwrite and drop_statements:
+                    drop_sql = '; '.join(drop_statements.values())
+                    conn.execute(drop_sql)
 
                 for name, statement in create_statements.items():
                     info = self._entries[name]
@@ -236,8 +232,9 @@ class Savepoints:
         :return: List of GeneratedSqlStatement, each representing one savepoint
         """
         graph = self._get_combined_graph()
-        sqls = to_sql_materialized_nodes(dialect=dialect, start_node=graph, include_start_node=False)
-        return sqls
+        return to_sql_materialized_nodes(
+            dialect=dialect, start_node=graph, include_start_node=False
+        )
 
     def _get_combined_graph(self) -> SqlModel:
         """
@@ -265,28 +262,23 @@ class Savepoints:
         views = [entry for entry in self.all if entry.materialization == Materialization.VIEW]
         others = [entry for entry in self.all if entry.materialization
                   not in (Materialization.TABLE, Materialization.VIEW)]
-        result = [f'Savepoint, entries: {len(self.all)}']
+        result = [
+            f'Savepoint, entries: {len(self.all)}',
+            f'\tTables, entries: {len(tables)}',
+        ]
 
-        result.append(f'\tTables, entries: {len(tables)}')
-        for table in tables:
-            result.append(f'\t\t{table.name}')
-
+        result.extend(f'\t\t{table.name}' for table in tables)
         result.append(f'\tViews, entries: {len(views)}')
-        for view in views:
-            result.append(f'\t\t{view.name}')
-
+        result.extend(f'\t\t{view.name}' for view in views)
         result.append(f'\tOther, entries: {len(others)}')
-        for other in others:
-            result.append(f'\t\t{other.name}')
-
-        string = '\n'.join(result)
-        return string
+        result.extend(f'\t\t{other.name}' for other in others)
+        return '\n'.join(result)
 
 
 def _get_virtual_node(references: Dict[str, BachSqlModel]) -> SqlModel:
     # TODO: move this to sqlmodel?
     # reference_sql is of form "{{ref_0}}, {{1}}, ..., {{n}}"
-    reference_sql = ', '.join(f'{{{{{ref_name}}}}}' for ref_name in references.keys())
+    reference_sql = ', '.join(f'{{{{{ref_name}}}}}' for ref_name in references)
     sql = f'select * from {reference_sql}'
     return CustomSqlModelBuilder(name='virtual_node', sql=sql)\
         .set_materialization(Materialization.VIRTUAL_NODE)\

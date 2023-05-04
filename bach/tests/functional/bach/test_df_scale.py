@@ -120,9 +120,6 @@ def test_min_max_scale(pg_engine) -> None:
     all_cols = ['city'] + numerical_cols
     pdf = get_pandas_df(TEST_DATA_CITIES_FULL, CITIES_COLUMNS)
     bt = get_df_with_test_data(engine=pg_engine, full_data_set=True)[all_cols]
-    # bt = bt.sort_index()  # TODO: This breaks later on, it shouldn't.
-                            #  Required to make this test deterministicly pass/fail
-
     min_so = 1
     max_so = 11
     diff_so = max_so - min_so
@@ -164,10 +161,10 @@ def test_min_max_scale(pg_engine) -> None:
     result_w_fr = bt.minmax_scale(feature_range=(2, 4)).sort_index()
     np.testing.assert_almost_equal(expected_w_fr, result_w_fr[numerical_cols].to_numpy(), decimal=4)
 
-    expected_data_fr = []
-    for row in expected_data_default:
-        expected_data_fr.append([val if idx < 2 else val * 2 + 2 for idx, val in enumerate(row)])
-
+    expected_data_fr = [
+        [val if idx < 2 else val * 2 + 2 for idx, val in enumerate(row)]
+        for row in expected_data_default
+    ]
     assert_equals_data(
         result_w_fr,
         expected_columns=['_index_skating_order', 'city', 'skating_order', 'inhabitants', 'founding'],

@@ -67,9 +67,7 @@ class VariableToken(ExpressionToken):
         Will return None if the placeholder_name doesn't match the pattern
         """
         match = re.match('^___bach_variable___([a-zA-Z0-9)]+)___(.+)$', placeholder_name)
-        if not match:
-            return None
-        return cls(match.group(1), match.group(2))
+        return cls(match[1], match[2]) if match else None
 
 
 @dataclass(frozen=True)
@@ -184,11 +182,7 @@ class Expression:
         for i, sub_str in enumerate(sub_strs):
             if i > 0:
                 arg = args[i - 1]
-                if not isinstance(arg, Expression):  # arg is a Series
-                    arg_expr = arg.expression
-                else:
-                    arg_expr = arg
-
+                arg_expr = arg if isinstance(arg, Expression) else arg.expression
                 if isinstance(arg_expr, NonAtomicExpression):
                     data.extend([RawToken('('), arg_expr, RawToken(')')])
                 else:
@@ -366,7 +360,7 @@ class Expression:
         rv = {}
         for data_item in self.data:
             if isinstance(data_item, Expression):
-                rv.update(data_item.get_references())
+                rv |= data_item.get_references()
             elif isinstance(data_item, ModelReferenceToken):
                 rv[data_item.refname()] = data_item.model
         return rv

@@ -1,6 +1,7 @@
 """
 Copyright 2022 Objectiv B.V.
 """
+
 from os import path
 from codecs import open
 from setuptools import setup
@@ -13,10 +14,9 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 # required libraries (https://packaging.python.org/en/latest/discussions/install-requires-vs-requirements/)
-install_requires = list()
+install_requires = []
 with open(path.join(here, 'requirements.txt'), 'r', encoding='utf-8') as f:
-    for line in f.readlines():
-        install_requires.append(line)
+    install_requires.extend(iter(f))
 
 
 def setup(app):

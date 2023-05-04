@@ -55,9 +55,11 @@ class DocusaurusTranslator(Translator):
             if isinstance(node, nodes.row):
                 rows.append(node)
             else:
-                for subnode in node.children:
-                    if isinstance(subnode, nodes.row):
-                        rows.append(subnode)
+                rows.extend(
+                    subnode
+                    for subnode in node.children
+                    if isinstance(subnode, nodes.row)
+                )
         return rows
 
 
@@ -79,19 +81,18 @@ class DocusaurusTranslator(Translator):
 
         # Format API reference slugs
         for api_pattern, config in self.builder.api_frontmatter.items():
-            if docname.startswith(api_pattern):
-                if 'slug_tree_levels' in config:
-                    levels = config['slug_tree_levels']
-                    # format the part after the last slash
-                    index_last_part = docname.rfind('/') + 1
-                    last_part = docname[index_last_part:]
-                    parts = last_part.split('.')
-                    last_part_formatted = '.'.join(parts[-levels:])
-                    slug = docname[0:index_last_part] + last_part_formatted
+            if docname.startswith(api_pattern) and 'slug_tree_levels' in config:
+                levels = config['slug_tree_levels']
+                # format the part after the last slash
+                index_last_part = docname.rfind('/') + 1
+                last_part = docname[index_last_part:]
+                parts = last_part.split('.')
+                last_part_formatted = '.'.join(parts[-levels:])
+                slug = docname[:index_last_part] + last_part_formatted
 
         # add base path and trailing slash
         # TODO: make configurable instead of hardcoded
-        slug = '/modeling/' + slug + '/'
+        slug = f'/modeling/{slug}/'
         if docname == 'index' or docname[-6:] == "/index":
             # this is an index page, so should just end in '/'
             slug = slug[:-6]
@@ -114,12 +115,14 @@ class DocusaurusTranslator(Translator):
 
         title = self.title
         for api_pattern, config in self.builder.api_frontmatter.items():
-            if self.builder.current_docname.startswith(api_pattern):
-                if 'title_tree_levels' in config:
-                    levels = config['title_tree_levels']
-                    parts = self.title.split('.')
-                    title = '.'.join(parts[-levels:])
-        
+            if (
+                self.builder.current_docname.startswith(api_pattern)
+                and 'title_tree_levels' in config
+            ):
+                levels = config['title_tree_levels']
+                parts = self.title.split('.')
+                title = '.'.join(parts[-levels:])
+
         return title
 
 
@@ -155,15 +158,17 @@ class DocusaurusTranslator(Translator):
 
         # write the frontmatter after being done with the doc
         current_doc = self.builder.current_docname
-        
+
         # Format API reference titles
         title = self.title
         for api_pattern, config in self.builder.api_frontmatter.items():
-            if current_doc.startswith(api_pattern):
-                if 'title_tree_levels' in config:
-                    levels = config['title_tree_levels']
-                    parts = self.title.split('.')
-                    title = '.'.join(parts[-levels:])
+            if (
+                current_doc.startswith(api_pattern)
+                and 'title_tree_levels' in config
+            ):
+                levels = config['title_tree_levels']
+                parts = self.title.split('.')
+                title = '.'.join(parts[-levels:])
 
         ctx = self.builder.ctx
         doc_frontmatter = self.frontmatter[current_doc] if current_doc in self.frontmatter else None
@@ -185,7 +190,7 @@ class DocusaurusTranslator(Translator):
         if not self.visited_title:
             self.title = node.astext()
             self.visited_title = True
-        for x in range(0, self.section_depth):
+        for _ in range(0, self.section_depth):
             self.add('#')
         self.add(' ')
 
@@ -225,10 +230,9 @@ class DocusaurusTranslator(Translator):
 
     
     def visit_target(self, node):
-        if self.visited_title:
-            if node.get('refid'):
-                target_id = str(node.get('refid'))
-                self.add('<div id="' + target_id + '" className="hidden-anchor"></div>\n\n')
+        if self.visited_title and node.get('refid'):
+            target_id = str(node.get('refid'))
+            self.add(f'<div id="{target_id}' + '" className="hidden-anchor"></div>\n\n')
 
 
     def depart_target(self, node):
@@ -250,8 +254,11 @@ class DocusaurusTranslator(Translator):
 
     def visit_versionmodified(self, node):
         """Deprecation and compatibility messages. Type will hold something like 'deprecated'"""
-        print("Unchecked 'version' directive found in document " + self.builder.current_docname + ":", node) 
-        self.add('**%s:** ' % node.attributes['type'].capitalize())
+        print(
+            f"Unchecked 'version' directive found in document {self.builder.current_docname}:",
+            node,
+        )
+        self.add(f"**{node.attributes['type'].capitalize()}:** ")
 
 
     def depart_versionmodified(self, node):
@@ -314,7 +321,7 @@ class DocusaurusTranslator(Translator):
         self.add('[')
         for child in node.children:
             child.walkabout(self)
-        self.add(']({})'.format(url))
+        self.add(f']({url})')
 
         if('viewcode-link' in node.attributes['classes']):
             self.add("</span>\n")
@@ -326,7 +333,6 @@ class DocusaurusTranslator(Translator):
         """Any reference (aka link), whether external or internal:
         https://docutils.sourceforge.io/docs/ref/doctree.html#reference"""
         self.in_reference = False
-        pass
 
 
     def visit_title_reference(self, node):
@@ -380,14 +386,14 @@ class DocusaurusTranslator(Translator):
         https://docutils.sourceforge.io/docs/ref/doctree.html#list-item"""
         self.depth.descend('list_item')
         depth = self.depth.get('list')
-        depth_padding = ''.join(['  ' for i in range(depth - 1)])
+        depth_padding = ''.join(['  ' for _ in range(depth - 1)])
         marker = '*'
         if node.parent.tagname == 'enumerated_list':
             if depth not in self.enumerated_count:
                 self.enumerated_count[depth] = 1
             else:
                 self.enumerated_count[depth] = self.enumerated_count[depth] + 1
-            marker = str(self.enumerated_count[depth]) + '.'
+            marker = f'{str(self.enumerated_count[depth])}.'
         self.add(depth_padding + marker + ' ')
 
 
@@ -486,12 +492,14 @@ class DocusaurusTranslator(Translator):
         https://docutils.sourceforge.io/docs/ref/doctree.html#field-name
         """
         self.add('\n\n')
-        pass
 
 
     def visit_label(self, node):
         """Basic label: https://docutils.sourceforge.io/docs/ref/doctree.html#label"""
-        print("Unchecked 'label' directive found in document " + self.builder.current_docname + ":", node) 
+        print(
+            f"Unchecked 'label' directive found in document {self.builder.current_docname}:",
+            node,
+        )
         self.add('\n')
 
 
@@ -559,14 +567,13 @@ class DocusaurusTranslator(Translator):
             node_output = ""
             output_index = 0
             for i, line in enumerate(node_lines):
-                if(line[0:3] == ">>>"):
-                    if (i != 0): 
-                        node_input += "\n"
-                    node_input += line[3:]
-                    output_index = i+1
-                else:
+                if line[:3] != ">>>":
                     break
-            
+
+                if (i != 0): 
+                    node_input += "\n"
+                node_input += line[3:]
+                output_index = i+1
             # parse output
             known_output_languages = ['sql']
             for i, line in enumerate(node_lines[output_index:]):
@@ -580,7 +587,7 @@ class DocusaurusTranslator(Translator):
             self.add('\n<div className="jupyter-notebook-in-output">\n\n')
             self.add('\n<div className="jupyter-notebook-in">In:</div>\n\n')
             self.add('<div className="jupyter-notebook-input">\n\n')
-            if node['language'] == 'pycon3' or node['language'] == 'jupyter-notebook':
+            if node['language'] in ['pycon3', 'jupyter-notebook']:
                 self.add('```python\n')
             else:
                 self.add('```\n')
@@ -685,19 +692,18 @@ class DocusaurusTranslator(Translator):
         """Sphinx admonition directive."""
         # default type is 'note'; if `class` parameter specifies it's an 'api-reference' make it 'info'
         type = 'note'
-        if(node.hasattr('classes')):
-            if('api-reference' in node['classes']):
-                type = 'info'
-            
+        if (node.hasattr('classes')) and ('api-reference' in node['classes']):
+            type = 'info'
+
         for child in node.children:
             # if a title is specified, make it the adminition's title
             if ('title' in child.tagname):
-                self.add(':::' + type + ' ' + child.astext() + '\n\n')
+                self.add(f':::{type} {child.astext()}' + '\n\n')
                 node.remove(child)
                 break
             else:
-                self.add(':::' + type + ' ALSO SEE\n\n')
-            
+                self.add(f':::{type}' + ' ALSO SEE\n\n')
+
             child.walkabout(self)
 
 
@@ -719,12 +725,10 @@ class DocusaurusTranslator(Translator):
     def visit_image(self, node):
         """Images: https://docutils.sourceforge.io/docs/ref/doctree.html#image."""
         uri = node.attributes['uri']
-        alt = "image"
-        if 'alt' in node.attributes:
-            alt = node.attributes['alt']
+        alt = node.attributes['alt'] if 'alt' in node.attributes else "image"
         # Make img path absolute for Docusaurus
         if uri.startswith('img/'):
-            uri = '/' + uri
+            uri = f'/{uri}'
         # Below is old
         # doc_folder = os.path.dirname(self.builder.current_docname)
         # if uri.startswith(doc_folder):
@@ -750,7 +754,7 @@ class DocusaurusTranslator(Translator):
         desctype = node.attributes["desctype"] if "desctype" in node.attributes else None
         self.current_desc_type = desctype
         if desctype in ['class', 'method', 'property', 'attribute']:
-            self.add('<div className="' + desctype + '">\n')
+            self.add(f'<div className="{desctype}' + '">\n')
         else:
             self.add('<div>\n')
         self.parsed_desc_name = False # whether the name has already been parsed
@@ -848,7 +852,7 @@ class DocusaurusTranslator(Translator):
 
     def visit_desc_parameter(self, node):
         """Single method/class parameter."""
-        self.add('<span className="parameter" id="'+ node[0].astext() + '">')
+        self.add(f'<span className="parameter" id="{node[0].astext()}">')
 
 
     def depart_desc_parameter(self, node):
@@ -1052,7 +1056,7 @@ class DocusaurusTranslator(Translator):
         padding = ''.join(
             _.map(range(length - len(node.astext())), lambda: ' ')
         )
-        self.add(padding + ' ')
+        self.add(f'{padding} ')
 
 
     def descend(self, node_name):
@@ -1071,10 +1075,17 @@ class DocusaurusTranslator(Translator):
     def visit_vimeo_player(self, node):
         """Adds a VimeoPlayer component."""
         video_id = str(node.attributes['videoid'])
-        tracking_id = str(node.attributes['trackingid']) if 'trackingid' in node.attributes else 'video-'+video_id
+        tracking_id = (
+            str(node.attributes['trackingid'])
+            if 'trackingid' in node.attributes
+            else f'video-{video_id}'
+        )
         padding_bottom = str(node.attributes['paddingbottom'])
         self.add("\n\nimport VimeoPlayer from '@site/src/components/vimeo-player';\n\n")
-        self.add('<VimeoPlayer id="' + tracking_id + '" videoId="' + video_id + '" paddingBottom="' + padding_bottom + '" />\n\n')
+        self.add(
+            f'<VimeoPlayer id="{tracking_id}" videoId="{video_id}" paddingBottom="{padding_bottom}'
+            + '" />\n\n'
+        )
 
 
     def depart_vimeo_player(self, node):
@@ -1094,7 +1105,7 @@ class FrontMatterPositionDirective(SphinxDirective):
     def run(self):
         docname = self.env.docname
         reference = directives.uri(self.arguments[0])
-        frontmatter.setdefault(docname, dict())
+        frontmatter.setdefault(docname, {})
         frontmatter[docname]['position'] = reference
         empty_node = nodes.raw()
         return [empty_node]
@@ -1112,7 +1123,7 @@ class FrontMatterSidebarTitleDirective(SphinxDirective):
     def run(self):
         docname = self.env.docname
         title = directives.uri(self.arguments[0])
-        frontmatter.setdefault(docname, dict())
+        frontmatter.setdefault(docname, {})
         frontmatter[docname]['title'] = title
         empty_node = nodes.raw()
         return [empty_node]
@@ -1130,7 +1141,7 @@ class FrontMatterSlugDirective(SphinxDirective):
     def run(self):
         docname = self.env.docname
         reference = directives.uri(self.arguments[0])
-        frontmatter.setdefault(docname, dict())
+        frontmatter.setdefault(docname, {})
         frontmatter[docname]['slug'] = reference
         empty_node = nodes.raw()
         return [empty_node]

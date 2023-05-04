@@ -48,8 +48,9 @@ def main(argv: List[str]):
     for filename in filenames:
         with open(filename) as file:
             event_data = json.loads(file.read())
-        errors = validate_event_list(event_schema=event_schema, event_data=event_data['events'])
-        if errors:
+        if errors := validate_event_list(
+            event_schema=event_schema, event_data=event_data['events']
+        ):
             raise Exception(f'Error in file: {filename} - {errors}')
         events = event_data['events']
         print(

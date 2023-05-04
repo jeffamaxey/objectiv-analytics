@@ -57,7 +57,7 @@ def test_database_create_table(engine, unique_table_test_name: str):
     assert_equals_data(df_from_table, expected_columns=expected_columns, expected_data=expected_data)
 
     # Third test: write table again, with overwrite=True. We expect the table now to have the y column too
-    expected_columns = expected_columns + ['y']
+    expected_columns += ['y']
     expected_data = [row + [random_value] for row in expected_data]
     df_from_table = df.database_create_table(
         table_name=table_name,

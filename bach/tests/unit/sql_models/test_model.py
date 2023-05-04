@@ -135,7 +135,7 @@ def test_set():
     assert len(updated_sql) == len(sql)
     # Get a list with all characters that have changed in the updated_sql. But ignore all changes in the
     # range [0-9a-f] as we expect the md5 hashes to change.
-    sql_diff = list((a, b) for a, b in zip(sql, updated_sql) if a != b)
+    sql_diff = [(a, b) for a, b in zip(sql, updated_sql) if a != b]
     sql_diff_ignore_hash_changes = [(a, b) for a, b in sql_diff if not re.match('^[0-9a-f]$', a)]
     assert sql_diff_ignore_hash_changes == [('X', 'Y')]
 

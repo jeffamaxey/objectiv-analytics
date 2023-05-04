@@ -344,10 +344,10 @@ class DataFrame:
             return False
         if tuple(self.all_series.keys()) != self.base_node.columns:
             return False
-        for name, series in self.all_series.items():
-            if series.expression != Expression.column_reference(name):
-                return False
-        return True
+        return all(
+            series.expression == Expression.column_reference(name)
+            for name, series in self.all_series.items()
+        )
 
     @property
     def loc(self):
@@ -514,19 +514,17 @@ class DataFrame:
         Compares all fields that (potentially) influence the values of the data represented by the DataFrame,
         i.e. all fields except for self.savepoints
         """
-        if not isinstance(other, DataFrame):
-            return False
-        # We cannot just compare the data and index properties, because the Series objects have
-        # overridden the __eq__ function in a way that makes normal comparisons not useful. We have to use
-        # equals() instead
-        return \
-            dict_name_series_equals(self.index, other.index) and \
-            dict_name_series_equals(self.data, other.data) and \
-            self.engine == other.engine and \
-            self.base_node == other.base_node and \
-            self._group_by == other._group_by and \
-            self._order_by == other._order_by and \
-            self._variables == other._variables
+        return (
+            dict_name_series_equals(self.index, other.index)
+            and dict_name_series_equals(self.data, other.data)
+            and self.engine == other.engine
+            and self.base_node == other.base_node
+            and self._group_by == other._group_by
+            and self._order_by == other._order_by
+            and self._variables == other._variables
+            if isinstance(other, DataFrame)
+            else False
+        )
 
     @classmethod
     def from_table(
@@ -572,7 +570,7 @@ class DataFrame:
             f'col_{col_index}': quote_identifier(engine.dialect, col_name)
             for col_index, col_name in enumerate(dtypes.keys())
         }
-        sql_params.update(column_placeholders)
+        sql_params |= column_placeholders
 
         sql = f'SELECT {column_stmt} FROM {{table_name}}'
         model_builder = CustomSqlModelBuilder(sql=sql, name='from_table')
@@ -643,8 +641,7 @@ class DataFrame:
         :returns: A DataFrame based on an SqlModel
 
         """
-        missing_index_keys = {k for k in index if k not in all_dtypes}
-        if missing_index_keys:
+        if missing_index_keys := {k for k in index if k not in all_dtypes}:
             raise ValueError(f'Specified index keys ({missing_index_keys} not found in'
                              f' all_dtypes: {all_dtypes.keys()}')
 
@@ -872,14 +869,14 @@ class DataFrame:
                             f'cannot instantiate {series_type.__name__} class without level information.'
                         )
                     multi_level_series = cast(SeriesAbstractMultiLevel, self.all_series[name])
-                    extra_params.update(
-                        {
-                            lvl_name: lvl.copy_override(
-                                expression=expression_class.column_reference(f'_{name}_{lvl_name}')
+                    extra_params |= {
+                        lvl_name: lvl.copy_override(
+                            expression=expression_class.column_reference(
+                                f'_{name}_{lvl_name}'
                             )
-                            for lvl_name, lvl in multi_level_series.levels.items()
-                        }
-                    )
+                        )
+                        for lvl_name, lvl in multi_level_series.levels.items()
+                    }
 
                 new_series[name] = series_type.get_class_instance(
                     engine=args['engine'],
@@ -1014,9 +1011,7 @@ class DataFrame:
             variables=self.variables
         )
 
-        if not inplace:
-            return df
-        return self._update_self_from_df(df)
+        return self._update_self_from_df(df) if inplace else df
 
     def set_savepoint(self, name: str, materialization: Union[Materialization, str] = Materialization.CTE):
         """
@@ -1293,31 +1288,31 @@ class DataFrame:
             if not isinstance(value, Series):
                 series = value_to_series(base=self, value=value, name=key)
                 self._data[key] = series
+            elif value.base_node == self.base_node and self._group_by == value.group_by:
+                self._data[key] = value.copy_override(name=key, index=self._index)
+            elif value.expression.is_constant:
+                self._data[key] = value.copy_override(
+                    name=key, index=self._index, group_by=self._group_by,
+                )
+            elif value.expression.is_independent_subquery:
+                self._data[key] = value.copy_override(
+                    name=key, index=self._index, group_by=self._group_by,
+                )
+            elif value.expression.is_single_value:
+                self._data[key] = Series.as_independent_subquery(value).copy_override(
+                    name=key, index=self._index, group_by=self._group_by,
+                )
             else:
-                if value.base_node == self.base_node and self._group_by == value.group_by:
-                    self._data[key] = value.copy_override(name=key, index=self._index)
-                elif value.expression.is_constant:
-                    self._data[key] = value.copy_override(
-                        name=key, index=self._index, group_by=self._group_by,
-                    )
-                elif value.expression.is_independent_subquery:
-                    self._data[key] = value.copy_override(
-                        name=key, index=self._index, group_by=self._group_by,
-                    )
-                elif value.expression.is_single_value:
-                    self._data[key] = Series.as_independent_subquery(value).copy_override(
-                        name=key, index=self._index, group_by=self._group_by,
-                    )
-                else:
-                    if value.group_by and not value.expression.has_aggregate_function:
-                        raise ValueError('Setting a grouped Series to a DataFrame is only supported if '
-                                         'the Series is aggregated.')
-                    if (
+                if value.group_by and not value.expression.has_aggregate_function:
+                    raise ValueError('Setting a grouped Series to a DataFrame is only supported if '
+                                     'the Series is aggregated.')
+                if (
                         self.group_by
                         and not all(_s.expression.has_aggregate_function for _s in self.data.values())
                     ):
-                        raise ValueError('Setting new columns to grouped DataFrame is only supported if '
-                                         'the DataFrame has aggregated columns.')
+                    raise ValueError('Setting new columns to grouped DataFrame is only supported if '
+                                     'the DataFrame has aggregated columns.')
+                else:
                     self.__set_item_with_merge(key=key, value=value)
 
         elif isinstance(key, list):
@@ -1346,7 +1341,7 @@ class DataFrame:
         :param value: Series that is set.
         """
 
-        if not (len(value.index) == 1 and len(self.index) == 1):
+        if len(value.index) != 1 or len(self.index) != 1:
             raise ValueError(
                 'setting with different base nodes only supported for one level index'
             )
@@ -1377,8 +1372,8 @@ class DataFrame:
 
         # remove conflicts in case self already has a value for series key
         if key in self.data_columns:
-            df[key] = df[key + '__remove']
-            df = df.drop(columns=[key + '__remove'])
+            df[key] = df[f'{key}__remove']
+            df = df.drop(columns=[f'{key}__remove'])
         self._update_self_from_df(df)
 
     def rename(
@@ -1510,18 +1505,18 @@ class DataFrame:
             df = df.materialize(node_name='groupby_setindex')
 
         # build the new index, appending if necessary
-        new_index = {} if not append else copy(df._index)
+        new_index = copy(df._index) if append else {}
         for k in (keys if isinstance(keys, list) else [keys]):
             idx_series: Series
             if isinstance(k, Series):
                 if k.base_node != df.base_node or k.group_by != df.group_by:
                     raise ValueError('index series should have same base_node and group_by as df')
                 idx_series = k
-            else:
-                if k not in df.all_series:
-                    raise ValueError(f'series \'{k}\' not found')
+            elif k in df.all_series:
                 idx_series = df.all_series[k]
 
+            else:
+                raise ValueError(f'series \'{k}\' not found')
             new_index[idx_series.name] = idx_series.copy_override(index={}, order_by=[])
 
             if not drop and idx_series.name not in df._index and idx_series.name in df._data:
@@ -1541,11 +1536,10 @@ class DataFrame:
         """
         Deletes columns from the DataFrame.
         """
-        if isinstance(key, str):
-            del (self._data[key])
-            return
-        else:
+        if not isinstance(key, str):
             raise TypeError(f'Unsupported type {type(key)}')
+        del (self._data[key])
+        return
 
     def drop(
         self,
@@ -1604,15 +1598,13 @@ class DataFrame:
         # Check and/or convert parameters
         if not isinstance(dtype, dict):
             dtype = {column: dtype for column in self.data_columns}
-        not_existing_columns = set(dtype.keys()) - set(self.data_columns)
-        if not_existing_columns:
+        if not_existing_columns := set(dtype.keys()) - set(self.data_columns):
             raise ValueError(f'Specified columns do not exist: {not_existing_columns}')
 
         # Construct new dataframe with converted columns
         new_data = {}
         for column, series in self.data.items():
-            new_dtype = dtype.get(column)
-            if new_dtype:
+            if new_dtype := dtype.get(column):
                 new_data[column] = series.astype(dtype=new_dtype)
             else:
                 new_data[column] = series
@@ -1642,10 +1634,8 @@ class DataFrame:
                     group_by_columns.append(self.all_series[by_item])
                 if isinstance(by_item, Series):
                     group_by_columns.append(by_item)
-        elif by is None:
-            pass
-        else:
-            raise ValueError(f'Value of "by" should be either None, a string, or a Series.')
+        elif by is not None:
+            raise ValueError('Value of "by" should be either None, a string, or a Series.')
 
         return group_by_columns
 
@@ -1712,7 +1702,9 @@ class DataFrame:
             )
             return DataFrame._groupby_to_frame(df, group_by)
 
-        if isinstance(by, list) and len([b for b in by if isinstance(b, (tuple, list))]) > 0:
+        if isinstance(by, list) and [
+            b for b in by if isinstance(b, (tuple, list))
+        ]:
             if not is_postgres(self.engine):
                 raise DatabaseNotSupportedException(
                     self.engine,
@@ -1811,11 +1803,7 @@ class DataFrame:
 
         mode = WindowFrameMode.ROWS
         end_value: Optional[int]
-        if center:
-            end_value = (window - 1) // 2
-        else:
-            end_value = 0
-
+        end_value = (window - 1) // 2 if center else 0
         start_boundary = WindowFrameBoundary.PRECEDING
         start_value = (window - 1) - end_value
 
@@ -1924,8 +1912,7 @@ class DataFrame:
          otherwise it updates the original and returns None.
         """
         sort_by = self.index_columns if level is None else self._get_indexes_by_level(level)
-        df = self.sort_values(by=sort_by, ascending=ascending)
-        return df
+        return self.sort_values(by=sort_by, ascending=ascending)
 
     def _get_indexes_by_level(self, level: Level) -> List[str]:
         selected_indexes = []
@@ -2011,11 +1998,9 @@ class DataFrame:
 
         dialect = self.engine.dialect
         all_series_expr = {s.expression.to_sql(dialect): s.name for s in self.all_series.values()}
-        if (
-            self.group_by and
-            not all(
-                ob.expression.to_sql(dialect) in all_series_expr for ob in self._order_by
-            )
+        if self.group_by and any(
+            ob.expression.to_sql(dialect) not in all_series_expr
+            for ob in self._order_by
         ):
             raise Exception(
                 'Current order by clause is referencing expressions that are neither aggregated or grouped,'
@@ -2078,20 +2063,19 @@ class DataFrame:
             if limit.step is not None:
                 raise NotImplementedError("Step size not supported in slice")
             if (limit.start is not None and limit.start < 0) or \
-                    (limit.stop is not None and limit.stop < 0):
+                        (limit.stop is not None and limit.stop < 0):
                 raise NotImplementedError("Negative start or stop not supported in slice")
 
-            if limit.start is not None:
-                if limit.stop is not None:
-                    if limit.stop <= limit.start:
-                        raise ValueError('limit.stop <= limit.start')
-                    limit_str = f'limit {limit.stop - limit.start} offset {limit.start}'
-                else:
-                    limit_str = f'limit all offset {limit.start}'
-            else:
+            if limit.start is None:
                 if limit.stop is not None:
                     limit_str = f'limit {limit.stop}'
 
+            elif limit.stop is not None:
+                if limit.stop <= limit.start:
+                    raise ValueError('limit.stop <= limit.start')
+                limit_str = f'limit {limit.stop - limit.start} offset {limit.start}'
+            else:
+                limit_str = f'limit all offset {limit.start}'
         limit_clause = Expression.construct('' if limit_str is None else f'{limit_str}')
         where_clause = where_clause if where_clause else Expression.construct('')
         group_by_clause = None
@@ -2100,11 +2084,11 @@ class DataFrame:
         column_names: List[str] = []
 
         if self.group_by:
-            not_aggregated = [
-                s.name for s in self._data.values()
+            if not_aggregated := [
+                s.name
+                for s in self._data.values()
                 if not s.expression.has_aggregate_function
-            ]
-            if len(not_aggregated) > 0:
+            ]:
                 raise ValueError(
                     f'The df has groupby set, but contains Series that have no aggregation '
                     f'function yet. Please make sure to first: remove these from the frame, '
@@ -2114,9 +2098,9 @@ class DataFrame:
 
             group_by_clause = Expression.construct('')
             having_clause = having_clause if having_clause else Expression.construct('')
-            group_by_column_expr = self.group_by.get_group_by_column_expression()
-
-            if group_by_column_expr:
+            if (
+                group_by_column_expr := self.group_by.get_group_by_column_expression()
+            ):
                 group_by_clause = Expression.construct('group by {}', group_by_column_expr)
 
         for s in self.all_series.values():
@@ -2159,8 +2143,7 @@ class DataFrame:
         placeholder_values = get_variable_values_sql(dialect=dialect, variable_values=self.variables)
         model = update_placeholders_in_graph(start_node=model, placeholder_values=placeholder_values)
 
-        sql = to_sql(dialect=dialect, model=model)
-        return sql
+        return to_sql(dialect=dialect, model=model)
 
     def merge(
         self,
@@ -2521,11 +2504,11 @@ class DataFrame:
             quantile_df['quantile'] = qt
             all_quantile_dfs.append(quantile_df)
 
-        final_index = 'quantile'
-
         if len(quantiles) == 1:
             # if only one quantile was calculated, then we don't need to add the label on the index
             result = all_quantile_dfs[0]
+            final_index = 'quantile'
+
             result = result[[col for col in result.data_columns if col != final_index]]
         else:
             from bach.operations.concat import DataFrameConcatOperation
@@ -2821,12 +2804,11 @@ class DataFrame:
             raise ValueError('no dataframe or series to append.')
 
         other_dfs = other if isinstance(other, list) else [other]
-        concatenated_df = DataFrameConcatOperation(
+        return DataFrameConcatOperation(
             objects=[self] + other_dfs,
             ignore_index=ignore_index,
             sort=sort,
         )()
-        return concatenated_df
 
     def drop_duplicates(
         self,
@@ -2866,7 +2848,7 @@ class DataFrame:
         subset = self._get_parsed_subset_of_data_columns(subset)
         sort_by = self._get_parsed_subset_of_data_columns(sort_by)
 
-        df = self.copy() if not ignore_index else self.reset_index(drop=True)
+        df = self.reset_index(drop=True) if ignore_index else self.copy()
 
         dedup_on = list(subset or self.data_columns)
         dedup_data = [name for name in df.all_series if name not in dedup_on]
@@ -2910,7 +2892,7 @@ class DataFrame:
 
         # we need to just apply distinct for 'first' and 'last'.
         if keep:
-            node_name = f'drop_duplicates_' + '_'.join(dedup_on)
+            node_name = 'drop_duplicates_' + '_'.join(dedup_on)
             df = df.materialize(distinct=True, node_name=node_name)
             # respect initial order by
             df._order_by = self._order_by
@@ -3019,7 +3001,9 @@ class DataFrame:
             expression_fmt = f' {logical_operator} '.join([f'{{}}'] * len(dropna_series))
         else:
             # we need to add the amount of nullables in the row and compare it to the thresh
-            cases_fmt = f' + '.join([f'case when {{}} then 1 else 0 end'] * len(dropna_series))
+            cases_fmt = ' + '.join(
+                [f'case when {{}} then 1 else 0 end'] * len(dropna_series)
+            )
             expression_fmt = f'{len(self.data_columns)} - ({cases_fmt}) < {thresh}'
 
         drop_row_series = conditions[0].copy_override(
@@ -3399,21 +3383,23 @@ class DataFrame:
         if not columns_to_encode:
             return self.copy()
 
-        invalid_columns = [
-            col for col in columns_to_encode
+        if invalid_columns := [
+            col
+            for col in columns_to_encode
             if col not in self.data or self.data[col].dtype != 'string'
-        ]
-        if invalid_columns:
+        ]:
             raise ValueError(f'{invalid_columns} are not valid columns.')
 
         prefix_per_col = {}
         if isinstance(prefix, dict):
             prefix_per_col = prefix
         elif prefix is not None:
-            prefix_per_col = {
-                col: prefix
-                for col, prefix in zip(columns_to_encode, (prefix if isinstance(prefix, list) else [prefix]))
-            }
+            prefix_per_col = dict(
+                zip(
+                    columns_to_encode,
+                    (prefix if isinstance(prefix, list) else [prefix]),
+                )
+            )
 
         categorical_series = []
         from bach.series.series import value_to_series

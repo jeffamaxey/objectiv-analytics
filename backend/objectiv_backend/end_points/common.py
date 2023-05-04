@@ -15,8 +15,7 @@ def get_json_response(status: int, msg: str) -> Response:
     """
     response = Response(mimetype='application/json', status=status, response=msg)
 
-    cookie_config = get_collector_config().cookie
-    if cookie_config:
+    if cookie_config := get_collector_config().cookie:
         cookie_id = get_cookie_id()
         response.set_cookie(key=cookie_config.name, value=f'{cookie_id}',
                             max_age=cookie_config.duration, samesite=cookie_config.samesite,

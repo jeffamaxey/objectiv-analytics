@@ -114,14 +114,11 @@ class SeriesAbstractMultiLevel(Series, ABC):
         )
 
         if not levels_are_provided:
-            # if levels are not provided, search for them in base node
-            # this can only happen when instantiating a new DataFrame, if df is containing a multilevel series
-            # then levels MUST be in the base node.
-            missing_references = [
-                f'_{name}_{level_name}' for level_name in default_level_dtypes.keys()
+            if missing_references := [
+                f'_{name}_{level_name}'
+                for level_name in default_level_dtypes.keys()
                 if f'_{name}_{level_name}' not in base_node.columns
-            ]
-            if missing_references:
+            ]:
                 raise ValueError(
                     f'base node must include all referenced columns {missing_references} '
                     f'for the "{cls.__name__}" instance.'
@@ -204,11 +201,11 @@ class SeriesAbstractMultiLevel(Series, ABC):
         """
         if dtype is None:
             dtype = cls.dtype
-        if (
-            value is not None
-            and (
-                not isinstance(value, dict)
-                or not all(level in value for level in cls.get_supported_level_dtypes().keys())
+        if value is not None and (
+            not isinstance(value, dict)
+            or any(
+                level not in value
+                for level in cls.get_supported_level_dtypes().keys()
             )
         ):
             raise ValueError(f'value should contain mapping for each {cls.__name__} level')
@@ -226,7 +223,7 @@ class SeriesAbstractMultiLevel(Series, ABC):
                     base=base, value=None, name=level_name)
                 for level_name, dtypes in cls.get_supported_level_dtypes().items()
             }
-        result = cls.get_class_instance(
+        return cls.get_class_instance(
             engine=base.engine,
             base_node=base.base_node,
             index=base.index,
@@ -237,8 +234,6 @@ class SeriesAbstractMultiLevel(Series, ABC):
             instance_dtype=dtype,
             **levels
         )
-
-        return result
 
     @classmethod
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
@@ -296,9 +291,8 @@ class SeriesAbstractMultiLevel(Series, ABC):
         ..note:
             "other" should be a dict object containing at least one level to be filled.
         """
-        if (
-            not isinstance(other, dict)
-            or not all(level in self.levels for level in other.keys())
+        if not isinstance(other, dict) or any(
+            level not in self.levels for level in other.keys()
         ):
             raise ValueError(
                 f'"other" should contain mapping for at least one of {self.__class__.__name__} levels'
@@ -507,7 +501,9 @@ class SeriesNumericInterval(SeriesAbstractMultiLevel):
 
         # expects a dict with interval information
         expected_keys = ['lower', 'upper', 'bounds']
-        if not isinstance(value, dict) or not all(k in value for k in expected_keys):
+        if not isinstance(value, dict) or any(
+            k not in value for k in expected_keys
+        ):
             raise ValueError(f'{value} has not the expected structure.')
 
         if value['bounds'] == '[]':

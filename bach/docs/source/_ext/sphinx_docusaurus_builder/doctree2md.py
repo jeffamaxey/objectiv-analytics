@@ -219,7 +219,7 @@ class IndentLevel(object):
         """
         string = ''.join(self.content)
         lines = string.splitlines(True)
-        if len(lines) == 0:
+        if not lines:
             return
         texts = [self.first_prefix + lines[0]]
         for line in lines[1:]:
@@ -249,8 +249,8 @@ def add_pref_suff(pref_suff_map):
         # of the loop.  The defined method picks up this new variable in its
         # scope.
         for key, (prefix, suffix) in pref_suff_map.items():
-            setattr(cls, 'visit_' + key, _make_method(prefix))
-            setattr(cls, 'depart_' + key, _make_method(suffix))
+            setattr(cls, f'visit_{key}', _make_method(prefix))
+            setattr(cls, f'depart_{key}', _make_method(suffix))
         return cls
 
     return dec
@@ -452,7 +452,7 @@ class Translator(nodes.NodeVisitor):
             # strip off the end starting with '/#', e.g. 'ModelHub/modelhub.ModelHub/#modelhub.ModelHub'
             hash_index = url.rfind('/#')
             optional_anchor = url[hash_index+2:]
-            url = url[0:hash_index]
+            url = url[:hash_index]
             # strip off the first '../'
             url = url[3:]
             node['refuri'] = url
@@ -462,19 +462,17 @@ class Translator(nodes.NodeVisitor):
             return node.get("refuri")
         if url in (None, ''):  # Reference to this doc
             url = self.builder.get_target_uri(this_doc)
-        else:  # URL is relative to the current docname.
-            this_dir = posixpath.dirname(this_doc)
-            if this_dir:
-                url = posixpath.normpath('{}/{}'.format(this_dir, url))
+        elif this_dir := posixpath.dirname(this_doc):
+            url = posixpath.normpath(f'{this_dir}/{url}')
         # turn each link into a relative file link to the .mdx file
         # first strip any trailing slash, then add a '.mdx' extension
         if url[-1:] == '/':
             url = url[:-1]
-        url = url + '.mdx'
-        url = '{}/{}'.format(self.markdown_http_base, url)
+        url = f'{url}.mdx'
+        url = f'{self.markdown_http_base}/{url}'
         if 'refid' in node:
             url += '#' + node['refid']
-        elif not 'optional_anchor' == "":
+        else:
             # Sphinx references (by :ref: or :autosummary:) all generate anchors ('#myanchor') in the refuri.
             # No distinction is made between a useful anchor that points to a section and a redundant one.
             # One pattern exists: if the anchor is already part of the URL, it's nearly certainly redundant.
@@ -483,7 +481,7 @@ class Translator(nodes.NodeVisitor):
             # So here we only add the anchor if it seems useful (not yet part of the URL).
             anchor_is_redundant = optional_anchor.replace("-", "/") in url or optional_anchor.startswith('./')
             if not anchor_is_redundant:
-                url += '#' + optional_anchor
+                url += f'#{optional_anchor}'
 
         return url
 
@@ -517,7 +515,7 @@ class Translator(nodes.NodeVisitor):
         """Document bibliographic or meta data, e.g. the title & copyright page of a book.
         https://docutils.sourceforge.io/docs/ref/doctree.html#docinfo"""
         # called explicitly from methods in this class
-        self.add_section('% {}\n'.format(node.astext()), section='head')
+        self.add_section(f'% {node.astext()}\n', section='head')
         raise nodes.SkipNode
 
 
@@ -657,10 +655,8 @@ class Translator(nodes.NodeVisitor):
         filename = node.get('filename')
         if None in (self.markdown_http_base, filename):
             return
-        target_url = '{}/_downloads/{}'.format(
-            self.markdown_http_base, filename
-        )
-        self.add('[{}]({})'.format(node.astext(), target_url))
+        target_url = f'{self.markdown_http_base}/_downloads/{filename}'
+        self.add(f'[{node.astext()}]({target_url})')
         raise nodes.SkipNode
 
 
@@ -688,7 +684,7 @@ class Translator(nodes.NodeVisitor):
         code_type = node['classes'][1] if 'code' in node['classes'] else ''
         if 'language' in node:
             code_type = node['language']
-        self.add('```' + code_type + '\n')
+        self.add(f'```{code_type}' + '\n')
 
 
     def depart_literal_block(self, node):
@@ -749,7 +745,7 @@ class Translator(nodes.NodeVisitor):
 
     def visit_displaymath(self, node):
         """Sphinx math blocks become displaymath."""
-        self.add('$$\n{}\n$$\n\n'.format(node['latex']))
+        self.add(f"$$\n{node['latex']}\n$$\n\n")
         raise nodes.SkipNode
 
 
@@ -758,7 +754,7 @@ class Translator(nodes.NodeVisitor):
         https://docutils.sourceforge.io/docs/ref/doctree.html#math"""
         # sphinx math node has 'latex' attribute, docutils does not
         if 'latex' in node:  # sphinx math node
-            self.add('${}$'.format(node['latex']))
+            self.add(f"${node['latex']}$")
             raise nodes.SkipNode
         # docutils math node
         self._escape_text = False
@@ -799,7 +795,7 @@ class Translator(nodes.NodeVisitor):
 
     def visit_problematic(self, node):
         """Unknown: https://docutils.sourceforge.io/docs/ref/doctree.html#problematic."""
-        self.add('\n\n```\n{}\n```\n\n'.format(node.astext()))
+        self.add(f'\n\n```\n{node.astext()}\n```\n\n')
         raise nodes.SkipNode
 
 
@@ -808,11 +804,9 @@ class Translator(nodes.NodeVisitor):
         if node['level'] < self.document.reporter.report_level:
             # Level is too low to display
             raise nodes.SkipNode
-        line = ', line %s' % node['line'] if node.hasattr('line') else ''
+        line = f", line {node['line']}" if node.hasattr('line') else ''
         self.add(
-            '```\nSystem Message: {}:{}\n\n{}\n```\n\n'.format(
-                node['source'], line, node.astext()
-            )
+            f"```\nSystem Message: {node['source']}:{line}\n\n{node.astext()}\n```\n\n"
         )
         raise nodes.SkipNode
 
@@ -840,7 +834,7 @@ class Translator(nodes.NodeVisitor):
         node_type = node.__class__.__name__
         if node_type not in self._warned:
             self.document.reporter.warning(
-                'The ' + node_type + ' element not yet supported in Markdown.'
+                f'The {node_type} element not yet supported in Markdown.'
             )
             self._warned.add(node_type)
         raise nodes.SkipNode

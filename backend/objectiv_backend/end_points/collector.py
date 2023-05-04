@@ -77,7 +77,7 @@ def _get_event_data(request: Request) -> EventList:
     post_data = request.data
     if len(post_data) > DATA_MAX_SIZE_BYTES:
         # if it's more than a megabyte, we'll refuse to process
-        raise ValueError(f'Data size exceeds limit')
+        raise ValueError('Data size exceeds limit')
     event_data: EventList = json.loads(post_data)
     if not isinstance(event_data, dict):
         raise ValueError('Parsed post data is not a dict')
@@ -87,8 +87,7 @@ def _get_event_data(request: Request) -> EventList:
         raise ValueError('events is not a list')
     if len(event_data['events']) > DATA_MAX_EVENT_COUNT:
         raise ValueError('Events exceeds limit')
-    error_info = validate_structure_event_list(event_data=event_data)
-    if error_info:
+    if error_info := validate_structure_event_list(event_data=event_data):
         raise ValueError(f'List of Events not structured well: {error_info[0].info}')
 
     return event_data
@@ -103,9 +102,8 @@ def _get_collector_response(
     if not get_collector_config().error_reporting:
         event_errors = []
         data_error = ''
-    else:
-        if event_errors is None:
-            event_errors = []
+    elif event_errors is None:
+        event_errors = []
 
     status = 200 if error_count == 0 else 400
     msg = json.dumps({
@@ -209,10 +207,7 @@ def add_http_context_to_event(event: EventData, request: Request):
 
     remote_address = _get_remote_address(request)
 
-    # check if there is a pre-existing http_context
-    # if so, use that.
-    contexts = get_contexts(event, 'HttpContext')
-    if contexts:
+    if contexts := get_contexts(event, 'HttpContext'):
         tracker_http_context = contexts[0]
         tracker_http_context['remote_address'] = remote_address
     else:
@@ -234,14 +229,12 @@ def add_marketing_context_to_event(event: EventData) -> None:
     :param event: EventData
     :return:
     """
-    path_contexts = get_contexts(event, 'PathContext')
-
-    if not path_contexts:
-        # without a PathContext, we have no query_string
-        return
-    else:
+    if path_contexts := get_contexts(event, 'PathContext'):
         path_context = path_contexts[0]
 
+    else:
+        # without a PathContext, we have no query_string
+        return
     query_string = urlparse(str(path_context.get('id', ''))).query
     parsed_qs = parse_qs(query_string)
 
@@ -260,8 +253,7 @@ def add_marketing_context_to_event(event: EventData) -> None:
         }
     }
 
-    for mapping_type in mappings:
-        mapping = mappings[mapping_type]
+    for mapping_type, mapping in mappings.items():
         marketing_context_fields = {}
         for field, mapped_field in mapping.items():
 
@@ -341,10 +333,10 @@ def write_async_events(events: EventDataList):
 
     if not output_config.file_system and not output_config.aws:
         return
-    prefix = 'RAW'
     if events:
         data = events_to_json(events)
         moment = datetime.utcnow()
+        prefix = 'RAW'
         write_data_to_fs_if_configured(data=data, prefix=prefix, moment=moment)
         write_data_to_s3_if_configured(data=data, prefix=prefix, moment=moment)
 

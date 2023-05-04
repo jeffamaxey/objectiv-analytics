@@ -136,12 +136,16 @@ class SeriesAbstractNumeric(Series, ABC):
         :param ddof: Delta degrees of freedom. The divisor used in calculations is N - ddof,
             where N represents the number of elements
         """
-        if ddof is not None and ddof not in (0, 1):
+        if ddof is None or ddof in {0, 1}:
+            return (
+                self._derived_agg_func(partition, 'stddev_pop', skipna=skipna)
+                if ddof == 0
+                else self._derived_agg_func(
+                    partition, 'stddev_samp', skipna=skipna
+                )
+            )
+        else:
             raise NotImplementedError(f"ddof == {ddof} currently not implemented")
-
-        if ddof == 0:
-            return self._derived_agg_func(partition, 'stddev_pop', skipna=skipna)
-        return self._derived_agg_func(partition, 'stddev_samp', skipna=skipna)
 
     def sum(self, partition: WrappedPartition = None, skipna: bool = True, min_count: int = None, **kwargs):
         """
@@ -281,9 +285,10 @@ class SeriesInt64(SeriesAbstractNumeric):
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
         if source_dtype == 'int64':
             return expression
-        if source_dtype not in ['float64', 'bool', 'string']:
+        if source_dtype in {'float64', 'bool', 'string'}:
+            return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
+        else:
             raise ValueError(f'cannot convert {source_dtype} to int64')
-        return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
 
     def _arithmetic_operation(self, other, operation, fmt_str, other_dtypes=('int64', 'float64'), dtype=None):
         # Override this method, because we need to return a float if we interact with one.
@@ -299,28 +304,42 @@ class SeriesInt64(SeriesAbstractNumeric):
     def __rshift__(self, other):
         if is_postgres(self.engine):
             # Postgres expects the argument to a bitshift to be a regular int, not bigint.
-            return self._arithmetic_operation(other, 'rshift', '({}) >> cast({} as int)',
-                                              other_dtypes=tuple(['int64']))
+            return self._arithmetic_operation(
+                other, 'rshift', '({}) >> cast({} as int)', other_dtypes=('int64',)
+            )
         if is_athena(self.engine):
             # Latest version of prestodb supports bitwise_logical_shift_right() [1], but the version that
             # Athena uses, does not [2]. So we do some hackish thing here
             # [1] https://prestodb.io/docs/current/functions/bitwise.html
             # [2] https://prestodb.io/docs/0.217/functions/bitwise.html
-            return self._arithmetic_operation(other, 'rshift', 'cast(({}) / power(2, {}) as bigint)',
-                                              other_dtypes=tuple(['int64']))
-        return self._arithmetic_operation(other, 'rshift', '({}) >> ({})', other_dtypes=tuple(['int64']))
+            return self._arithmetic_operation(
+                other,
+                'rshift',
+                'cast(({}) / power(2, {}) as bigint)',
+                other_dtypes=('int64',),
+            )
+        return self._arithmetic_operation(
+            other, 'rshift', '({}) >> ({})', other_dtypes=('int64',)
+        )
 
     def __lshift__(self, other):
         if is_postgres(self.engine):
             # Postgres expects the argument to a bitshift to be a regular int, not bigint.
-            return self._arithmetic_operation(other, 'lshift', '({}) << cast({} as int)',
-                                              other_dtypes=tuple(['int64']))
+            return self._arithmetic_operation(
+                other, 'lshift', '({}) << cast({} as int)', other_dtypes=('int64',)
+            )
         if is_athena(self.engine):
             # hack around missing shift operator
-            return self._arithmetic_operation(other, 'lshift', 'cast(({}) * power(2, {}) as bigint)',
-                                              other_dtypes=tuple(['int64']))
+            return self._arithmetic_operation(
+                other,
+                'lshift',
+                'cast(({}) * power(2, {}) as bigint)',
+                other_dtypes=('int64',),
+            )
 
-        return self._arithmetic_operation(other, 'lshift', '({}) << ({})', other_dtypes=tuple(['int64']))
+        return self._arithmetic_operation(
+            other, 'lshift', '({}) << ({})', other_dtypes=('int64',)
+        )
 
     def sum(self, partition: WrappedPartition = None, skipna: bool = True, min_count: int = None, **kwargs):
         # sum() has the tendency to return float on bigint arguments. Cast it back.
@@ -404,9 +423,10 @@ class SeriesFloat64(SeriesAbstractNumeric):
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:
         if source_dtype == 'float64':
             return expression
-        if source_dtype not in ['int64', 'string']:
+        if source_dtype in {'int64', 'string'}:
+            return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
+        else:
             raise ValueError(f'cannot convert {source_dtype} to float64')
-        return Expression.construct(f'cast({{}} as {cls.get_db_dtype(dialect)})', expression)
 
     @classmethod
     def random(cls, base: DataFrameOrSeries) -> 'SeriesFloat64':

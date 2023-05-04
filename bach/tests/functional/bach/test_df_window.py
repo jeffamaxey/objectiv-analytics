@@ -438,12 +438,12 @@ def test_rolling_variations(engine, group_by):
     full_df_rolling_results = {}
     for window in windows_to_test:
         full_df_roll = bt.rolling(window=window).sum()
-        full_df_rolling_results.update(
-            {
-                f'{s.name}_w_{window}': s.copy_override(name=f'{s.name}_w_{window}')
-                for s in full_df_roll.data.values()
-            }
-        )
+        full_df_rolling_results |= {
+            f'{s.name}_w_{window}': s.copy_override(
+                name=f'{s.name}_w_{window}'
+            )
+            for s in full_df_roll.data.values()
+        }
 
     per_series_rolling_results = {}
     for s in bt.data_columns:
@@ -519,12 +519,12 @@ def test_expanding_variations(engine):
     full_df_expanding_results = {}
     for min_periods in min_periods_to_test:
         full_df_roll = bt.expanding(min_periods=min_periods).sum()
-        full_df_expanding_results.update(
-            {
-                f'{s.name}_mn_{min_periods}': s.copy_override(name=f'{s.name}_mn_{min_periods}')
-                for s in full_df_roll.data.values()
-            }
-        )
+        full_df_expanding_results |= {
+            f'{s.name}_mn_{min_periods}': s.copy_override(
+                name=f'{s.name}_mn_{min_periods}'
+            )
+            for s in full_df_roll.data.values()
+        }
 
     per_series_expanding_results = {}
     for s in bt.data_columns:

@@ -74,16 +74,14 @@ class CutOperation:
         bucket_properties_df = self._calculate_bucket_properties()
         range_df = self._calculate_bucket_ranges(bucket_properties_df)
 
-        final_index_keys = []
-        if not self.ignore_index:
-            final_index_keys = list(self.series.index.keys())
+        final_index_keys = [] if self.ignore_index else list(self.series.index.keys())
         final_index_keys += [self.series.name]
 
         df = self.series.to_frame().reset_index(drop=self.ignore_index)
 
-        left_df = df if not self.include_empty_bins else range_df
-        right_df = range_df if not self.include_empty_bins else df
-        how = 'inner' if not self.include_empty_bins else 'left'
+        left_df = range_df if self.include_empty_bins else df
+        right_df = df if self.include_empty_bins else range_df
+        how = 'left' if self.include_empty_bins else 'inner'
 
         fake_merge = left_df.merge(right_df, how='cross')
         if self.right:

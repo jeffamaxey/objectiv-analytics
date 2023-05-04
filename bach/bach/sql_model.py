@@ -234,11 +234,13 @@ class CurrentNodeSqlModel(BachSqlModel):
 
         return CurrentNodeSqlModel(
             model_spec=CustomSqlModelBuilder(sql=sql, name=name),
-            placeholders=BachSqlModel._get_placeholders(dialect, variables, all_expressions),
+            placeholders=BachSqlModel._get_placeholders(
+                dialect, variables, all_expressions
+            ),
             references=references,
             materialization=Materialization.CTE,
             materialization_name=None,
-            column_expressions={name: expr for name, expr in zip(column_names, column_exprs)},
+            column_expressions=dict(zip(column_names, column_exprs)),
         )
 
 
@@ -256,7 +258,7 @@ def construct_references(
     for expr in expressions:
         references = expr.get_references()
         _check_reference_conflicts(result, references)
-        result.update(references)
+        result |= references
     _check_reference_conflicts(base_references, result)
     result.update(base_references)
     return result

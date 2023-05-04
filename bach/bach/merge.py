@@ -92,12 +92,12 @@ def _verify_on_conflicts(
     if not on_conditions:
         return None
 
-    if on_conditions and left.base_node == right.base_node:
+    if left.base_node == right.base_node:
         raise ValueError('"on" based SeriesBooleans is valid only when left.base_node != right.base_node. ')
 
     for col in on_conditions:
         refs = col.base_node.references.values()
-        if not (left.base_node in refs and right.base_node in refs):
+        if left.base_node not in refs or right.base_node not in refs:
             raise ValueError('boolean series must have both base_nodes to be merged as references.')
 
 
@@ -172,10 +172,7 @@ def _get_data_columns(df_series: DataFrameOrSeries) -> Set[str]:
 
 def _get_index_names(df_series: DataFrameOrSeries) -> Set[str]:
     """ Get set the names of the index columns. Works for both dataframe and series. """
-    if df_series.index:
-        return set(df_series.index.keys())
-    else:
-        return set()
+    return set(df_series.index.keys()) if df_series.index else set()
 
 
 def _get_all_series_names(df_series: DataFrameOrSeries) -> Set[str]:

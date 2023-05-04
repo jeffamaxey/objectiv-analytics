@@ -27,11 +27,12 @@ def get_sample(df: DataFrame,
     """
     dialect = df.engine.dialect
 
-    if sample_percentage is None and filter is None:
-        raise ValueError('Either sample_percentage or filter must be set')
+    if sample_percentage is None:
+        if filter is None:
+            raise ValueError('Either sample_percentage or filter must be set')
 
-    if sample_percentage is None and seed is not None:
-        raise ValueError('`sample_percentage` must be set when using `seed`')
+        if seed is not None:
+            raise ValueError('`sample_percentage` must be set when using `seed`')
 
     if sample_percentage is not None and (sample_percentage < 0 or sample_percentage > 100):
         raise ValueError(f'sample_percentage must be in range 0-100. Actual value: {sample_percentage}')
@@ -76,8 +77,7 @@ def get_sample(df: DataFrame,
             # `tablesample bernoulli`, which is not supported on BigQuery[1]. Additionally, this is simpler
             # and doesn't require us to create a temporary table like `tablesample` does.
             from bach import SeriesFloat64
-            sample_cutoff = sample_percentage / 100
-            df = df[SeriesFloat64.random(base=df) < sample_cutoff]
+            df = df[SeriesFloat64.random(base=df) < sample_percentage / 100]
     if_exists = 'replace' if overwrite else 'fail'
     df.database_create_table(table_name=table_name, if_exists=if_exists)
 

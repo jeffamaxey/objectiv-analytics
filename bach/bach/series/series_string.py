@@ -42,13 +42,13 @@ class StringOperation:
         if item.start is not None and item.start < 0:
             expression = Expression.construct(f'right({{}}, {abs(item.start)})', expression)
             if item.stop is not None:
-                if item.stop <= 0 and item.stop > item.start:
-                    # we needed to check stop <= 0, because that would mean we're going the wrong direction
-                    # and that's not supported
-                    expression = Expression.construct(f'left({{}}, {item.stop - item.start})', expression)
-                else:
-                    expression = Expression.construct("''")
-
+                expression = (
+                    Expression.construct(
+                        f'left({{}}, {item.stop - item.start})', expression
+                    )
+                    if item.stop <= 0 and item.stop > item.start
+                    else Expression.construct("''")
+                )
         elif item.stop is not None and item.stop < 0:
             # we need to get the full string, minus abs(stop) chars with possibly item.start as an offset
             offset = 1 if item.start is None else item.start + 1
@@ -58,28 +58,21 @@ class StringOperation:
                 expression, expression
             )
 
+        elif item.stop is None:
+            if item.start is not None:
+                # full string starting at start
+                expression = Expression.construct(f'substr({{}}, {item.start + 1})', expression)
+        elif item.start is None:
+            expression = Expression.construct(f'left({{}}, {item.stop})', expression)
         else:
-            # positives only
-            if item.stop is None:
-                if item.start is None:
-                    # full string, what are we doing here?
-                    # current expression is okay.
-                    pass
-                else:
-                    # full string starting at start
-                    expression = Expression.construct(f'substr({{}}, {item.start + 1})', expression)
-            else:
-                if item.start is None:
-                    expression = Expression.construct(f'left({{}}, {item.stop})', expression)
-                else:
-                    if item.stop > item.start:
-                        expression = Expression.construct(
-                            f'substr({{}}, {item.start + 1}, {item.stop - item.start})',
-                            expression
-                        )
-                    else:
-                        expression = Expression.construct("''")
-
+            expression = (
+                Expression.construct(
+                    f'substr({{}}, {item.start + 1}, {item.stop - item.start})',
+                    expression,
+                )
+                if item.stop > item.start
+                else Expression.construct("''")
+            )
         return self._base.copy_override(expression=expression)
 
     def slice(self, start=None, stop=None) -> 'SeriesString':
@@ -257,7 +250,7 @@ class SeriesString(Series):
     def __add__(self, other) -> 'Series':
         return self._binary_operation(other, 'concat', '{} || {}', other_dtypes=('string',))
 
-    def _comparator_operation(self, other, comparator, other_dtypes=tuple(['string'])) -> 'SeriesBoolean':
+    def _comparator_operation(self, other, comparator, other_dtypes=('string', )) -> 'SeriesBoolean':
         return super()._comparator_operation(other, comparator, other_dtypes)
 
     def to_json_array(self, partition: Optional[WrappedPartition] = None) -> 'SeriesJson':

@@ -168,14 +168,16 @@ def _assert_column_names_valid(dialect: Dialect, df: pandas.DataFrame):
     Will raise a ValueError if any of the checks fails
     """
     names = list(df.columns)
-    not_strings = [name for name in names if not isinstance(name, str)]
-    if not_strings:
+    if not_strings := [name for name in names if not isinstance(name, str)]:
         raise ValueError(f'Not all columns names are strings. Non-string names: {not_strings}')
     if len(set(names)) != len(names):
         raise ValueError(f'Duplicate column names in: {names}')
 
-    invalid_column_names = [name for name in names if not is_valid_column_name(dialect=dialect, name=name)]
-    if invalid_column_names:
+    if invalid_column_names := [
+        name
+        for name in names
+        if not is_valid_column_name(dialect=dialect, name=name)
+    ]:
         raise ValueError(f'Invalid column names: {invalid_column_names} for SQL dialect {dialect} ')
 
 
@@ -209,11 +211,7 @@ def _from_pd_shared(
     index = []
 
     for idx, name in enumerate(df.index.names):
-        if name is None:
-            name = f'_index_{idx}'
-        else:
-            name = f'_index_{name}'
-
+        name = f'_index_{idx}' if name is None else f'_index_{name}'
         index.append(name)
 
     df_copy = df.copy()

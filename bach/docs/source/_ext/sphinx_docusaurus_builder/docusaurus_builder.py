@@ -106,10 +106,14 @@ class DocusaurusBuilder(Builder):
 
         """
 
-        ctx = munchify({
-            'date': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-        })
-        return ctx
+        return munchify(
+            {
+                'date': datetime.datetime.utcnow().strftime(
+                    '%Y-%m-%dT%H:%M:%S.%f'
+                )[:-3]
+                + 'Z'
+            }
+        )
 
 
     def write_doc(self, docname, doctree):

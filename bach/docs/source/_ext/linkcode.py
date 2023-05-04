@@ -59,7 +59,7 @@ def doctree_read(app: Sphinx, doctree: Node) -> None:
                 # no source
                 continue
 
-            if uri in uris or not uri:
+            if uri in uris:
                 # only one link per name, please
                 continue
             uris.add(uri)

@@ -26,8 +26,7 @@ def get_simple_test_graph():
     vm1 = ValueModel.build(key='a', val=1)
     vm2 = ValueModel.build(key='a', val=2)
     rm = RefModel.build(ref=vm1)
-    model = JoinModel.build(ref_left=rm, ref_right=vm2)
-    return model
+    return JoinModel.build(ref_left=rm, ref_right=vm2)
 
 
 def test_get_graph_nodes_info():
@@ -42,7 +41,10 @@ def test_get_graph_nodes_info():
     # Test that the graph structure is correctly represented
     assert len(last_node_info.in_edges) == 2
     # the two in-edges are referenced as ref_left and ref_right
-    assert set(n.reference_path for n in last_node_info.in_edges) == {('ref_left',), ('ref_right',)}
+    assert {n.reference_path for n in last_node_info.in_edges} == {
+        ('ref_left',),
+        ('ref_right',),
+    }
     # the two in-edges both have the last node as out-edge
     assert [n.out_edges for n in last_node_info.in_edges] == [[last_node_info], [last_node_info]]
 

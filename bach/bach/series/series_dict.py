@@ -99,7 +99,9 @@ class SeriesDict(Series):
         if not isinstance(dtype, dict):
             raise ValueError(f'Dtype should be type dict. Type(dtype): {type(dtype)}')
         if value is None:
-            raise ValueError(f'None values are not supported in from_value() by this class.')
+            raise ValueError(
+                'None values are not supported in from_value() by this class.'
+            )
         validate_dtype_value(static_dtype=cls.dtype, instance_dtype=dtype, value=value)
 
         sub_exprs = []
@@ -122,7 +124,7 @@ class SeriesDict(Series):
             sub_expr = Expression.construct('{} as {}', series.expression, Expression.identifier(key))
             sub_exprs.append(sub_expr)
         expr = Expression.construct('STRUCT({})', join_expressions(expressions=sub_exprs, join_str=', '))
-        result = cls.get_class_instance(
+        return cls.get_class_instance(
             engine=base.engine,
             base_node=base.base_node,
             index=base.index,
@@ -130,9 +132,8 @@ class SeriesDict(Series):
             expression=expr,
             group_by=None,
             order_by=[],
-            instance_dtype=dtype
+            instance_dtype=dtype,
         )
-        return result
 
     @classmethod
     def dtype_to_expression(cls, dialect: Dialect, source_dtype: str, expression: Expression) -> Expression:

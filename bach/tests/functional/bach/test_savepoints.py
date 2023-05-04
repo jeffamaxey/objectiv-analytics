@@ -88,7 +88,7 @@ def test_write_to_db_create_objects(pg_engine, testrun_uid: str):
 
     # No changes, add query
     df = df.materialize()
-    sps.add_savepoint(f'sp_final_point', df, Materialization.QUERY)
+    sps.add_savepoint('sp_final_point', df, Materialization.QUERY)
 
     expected_columns = ['_index_skating_order', 'skating_order', 'city', 'founding', 'x']
     expected_data = [[1, 1, 'Ljouwert', 1285, 12345]]

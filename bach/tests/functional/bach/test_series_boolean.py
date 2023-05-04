@@ -30,34 +30,41 @@ def test_to_pandas(engine):
     
 def test_operations(engine):
     bt = get_df_with_test_data(engine)[['city']]
-    expected = []
     bt['t'] = True
     bt['f'] = False
-
-    expected.extend([True, False])
 
     bt['and1'] = bt.t & bt.f
     bt['and2'] = bt.f & bt.t
     bt['and3'] = bt.t & bt.t
     bt['and4'] = bt.f & bt.f
-    expected.extend([False, False, True, False])
-
     bt['or1'] = bt.t | bt.f
     bt['or2'] = bt.f | bt.t
     bt['or3'] = bt.t | bt.t
     bt['or4'] = bt.f | bt.f
-    expected.extend([True, True, True, False])
-    
     bt['xor1'] = bt.t ^ bt.f
     bt['xor2'] = bt.f ^ bt.t
     bt['xor3'] = bt.t ^ bt.t
     bt['xor4'] = bt.f ^ bt.f
-    expected.extend([True, True, False, False])
-
     bt['inv1'] = ~bt.t
     bt['inv2'] = ~bt.f
-    expected.extend([False, True])
-
+    expected = [
+        True,
+        False,
+        False,
+        False,
+        True,
+        False,
+        True,
+        True,
+        True,
+        False,
+        True,
+        True,
+        False,
+        False,
+        False,
+        True,
+    ]
     # this currently does not work as we cast to bigint, and that can not be casted back to bool
     # bt['int'] = 12
     # bt['int_astype'] = bt.int.astype('bool')

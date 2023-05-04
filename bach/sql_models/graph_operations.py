@@ -74,7 +74,7 @@ def get_graph_nodes_info(start_node: SqlModel) -> List[NodeInfo]:
             referencing_node = nodes[referencing_id]
             _add_node_to_node_list(current_node.out_edges, referencing_node)
             _add_node_to_node_list(referencing_node.in_edges, current_node)
-    return [node for node in nodes.values()][::-1]  # reverse list
+    return list(nodes.values())[::-1]
 
 
 def get_node_info_selected_node(start_node: SqlModel, reference_path: RefPath) -> NodeInfo:
@@ -92,8 +92,7 @@ def get_node_info_selected_node(start_node: SqlModel, reference_path: RefPath) -
     selected_nodes = [ni for ni in nodes_info if ni.model is node]
     if len(selected_nodes) != 1:
         raise ValueError(f'Cannot find graph node identified by {reference_path} starting at {start_node}')
-    selected_node = selected_nodes[0]
-    return selected_node
+    return selected_nodes[0]
 
 
 def get_node(start_node: SqlModel, reference_path: RefPath) -> SqlModel:
@@ -152,7 +151,7 @@ def find_nodes(
         if function(node):
             if current_id not in result_nodes:
                 result_nodes[current_id] = FoundNode(node, path)
-            elif current_id in result_nodes and not first_instance:
+            elif not first_instance:
                 # We found a longer path to a node we already found earlier.
                 # we rely on the fact that python 3.7+ will keep the insertion order. So we'll have to
                 # remove and reinsert the item to get it in the right position in the returned result.
@@ -184,9 +183,7 @@ def find_node(
     Similar to find_nodes, but will only return the first node in the result, or None if none are found.
     """
     result = find_nodes(start_node, function, first_instance)
-    if not result:
-        return None
-    return result[0]
+    return result[0] if result else None
 
 
 def get_all_placeholders(start_node: SqlModel) -> Dict[str, Dict[RefPath, Hashable]]:
@@ -300,7 +297,9 @@ def replace_non_start_node_in_graph(
     :raises ValueError: if reference_path is an empty tuple
     """
     if reference_path == tuple():
-        raise ValueError(f'reference path cannot be empty, use replace_node_in_graph() instead.')
+        raise ValueError(
+            'reference path cannot be empty, use replace_node_in_graph() instead.'
+        )
     selected_node = get_node_info_selected_node(start_node, reference_path)
     dependent_model_ids = _get_all_dependent_node_model_ids(selected_node)
     # See replace_node_in_graph() for more comments on the implementation

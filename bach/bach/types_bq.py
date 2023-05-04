@@ -92,15 +92,13 @@ def _tokens_to_dtype(
             elif get_token(tokens, pos) == ',':
                 continue
             else:
-                # parse a sub type
-                if get_token(tokens, pos + 1) == ' ':
-                    # format: `name TYPE`
-                    name = get_token(tokens, pos)
-                    pos, sub_dtype = _tokens_to_dtype(tokens, pos=pos + 2, scalar_mapping=scalar_mapping)
-                    current[name] = sub_dtype
-                else:
+                if get_token(tokens, pos + 1) != ' ':
                     # format: `TYPE`
                     raise ValueError('We do not support STRUCTS with unnamed fields.')
+                # format: `name TYPE`
+                name = get_token(tokens, pos)
+                pos, sub_dtype = _tokens_to_dtype(tokens, pos=pos + 2, scalar_mapping=scalar_mapping)
+                current[name] = sub_dtype
         assert_token(tokens, pos, '>')
         return pos, current
     if t == 'ARRAY':
